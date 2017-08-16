@@ -9,7 +9,8 @@
         }
     ],
     "require": {
-        "laravel/framework": "~5.0"
+        "laravel/framework": "~5.0",
+        "adamwathan/bootforms": "^0.8.2"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
