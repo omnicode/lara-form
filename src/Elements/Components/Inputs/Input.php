@@ -12,13 +12,7 @@ class Input extends Element
      */
     public function toHtml($name='', $options = [])
     {
-        if(empty($name)) {
-            $name = $this->name;
-        }
 
-        if (empty($options)) {
-            $options = $this->options;
-        }
         $type = 'text';
         if (isset($options['type'])) {
             $type = $options['type'];
