@@ -1,6 +1,7 @@
 <?php
-namespace LaraForm;
+namespace LaraForm\ServiceProvider;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use LaraForm\Elements\Components\CheckBox;
 use LaraForm\Elements\Components\Inputs\Hidden;
@@ -10,6 +11,9 @@ use LaraForm\Elements\Components\Inputs\Submit;
 use LaraForm\Elements\Components\Label;
 use LaraForm\Elements\Components\Select;
 use LaraForm\Elements\Components\Textarea;
+use LaraForm\FormBuilder;
+use LaraForm\FormProtection;
+use LaraForm\Middleware\LaraFormMiddleware;
 
 class LaraFormServiceProvider extends ServiceProvider
 {
@@ -21,6 +25,18 @@ class LaraFormServiceProvider extends ServiceProvider
         $this->registerFormProtection();
         $this->registerFormElements();
         $this->registerFormBuilder();
+        $this->registerMiddleware(LaraFormMiddleware::class);
+    }
+
+    /**
+     * Register the Debugbar Middleware
+     *
+     * @param  string $middleware
+     */
+    protected function registerMiddleware($middleware)
+    {
+        $kernel = $this->app[Kernel::class];
+        $kernel->pushMiddleware($middleware);
     }
 
     /**
