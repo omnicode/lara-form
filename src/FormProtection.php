@@ -35,7 +35,7 @@ class FormProtection
      * @var
      */
     protected $pathForUnlock;
-    
+
     /**
      * FormProtection constructor.
      */
@@ -63,6 +63,51 @@ class FormProtection
     {
         $this->unlockFields = $this->processUnlockFields($unlockFields);
     }
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    public function validate($data)
+    {
+        $tokenName = Config::get('lara_form.label.form_protection', 'laraform_token');
+        $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
+
+        if (!$token) {
+            return false;
+        }
+
+        if (!session()->has($this->sessionPath($token))) {
+            return false;
+        }
+
+        $checkedFields = $this->getCheckedFieldsBy($token);
+        $data = $this->removeUnlockFields($data, $token);
+        session()->forget($this->sessionPrePath); // TODO correct dellete all session or only $token
+
+        if (array_keys($data) != array_keys($checkedFields)) {
+            return false;
+        }
+        foreach ($checkedFields as $key => $value) {
+            if (!empty($value)) {
+                if (is_array($value)) {
+//                    if (!is_array($data[$key])) {
+//                        $data[$key] = [$data[$key]];
+//                    }
+                    //for select input
+                    // TODO
+                } else {
+                    if($checkedFields[$key] != $data[$key]) {
+                        //for hidden input
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
 
     /**
      * @param $unlockFields
@@ -119,50 +164,6 @@ class FormProtection
         $this->fields = [];
         $this->unlockFields = [];
         session([$this->sessionPath() => $data]);
-    }
-
-    /**
-     * @param $data
-     * @return bool
-     */
-    public function validate($data)
-    {
-        $tokenName = Config::get('lara_form.label.form_protection', 'laraform_token');
-        $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
-
-        if (!$token) {
-            return false;
-        }
-
-        if (!session()->has($this->sessionPath($token))) {
-            return false;
-        }
-
-        $checkedFields = $this->getCheckedFieldsBy($token);
-        $data = $this->removeUnlockFields($data, $token);
-        session()->forget($this->sessionPrePath); // TODO correct dellete all session or only $token
-
-        if (array_keys($data) != array_keys($checkedFields)) {
-            return false;
-        }
-        foreach ($checkedFields as $key => $value) {
-            if (!empty($value)) {
-                if (is_array($value)) {
-//                    if (!is_array($data[$key])) {
-//                        $data[$key] = [$data[$key]];
-//                    }
-                    //for select input
-                    // TODO
-                } else {
-                    if($checkedFields[$key] != $data[$key]) {
-                        //for hidden input
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 
     /**

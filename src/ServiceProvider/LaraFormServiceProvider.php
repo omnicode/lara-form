@@ -2,6 +2,7 @@
 namespace LaraForm\ServiceProvider;
 
 use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use LaraForm\Elements\Components\CheckBox;
 use LaraForm\Elements\Components\Inputs\Hidden;
@@ -35,8 +36,8 @@ class LaraFormServiceProvider extends ServiceProvider
      */
     protected function registerMiddleware($middleware)
     {
-        $kernel = $this->app[Kernel::class];
-        $kernel->pushMiddleware($middleware);
+        $router = $this->app['router'];
+        $router->pushMiddlewareToGroup('web', $middleware);
     }
 
     /**
@@ -45,8 +46,8 @@ class LaraFormServiceProvider extends ServiceProvider
     protected function registerFormProtection()
     {
         $this->app->singleton('laraform.protection', function ($app) {
-           return new FormProtection(
-           );
+            return new FormProtection(
+            );
         });
     }
 
