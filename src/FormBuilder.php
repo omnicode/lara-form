@@ -189,9 +189,9 @@ class FormBuilder
     private function getGeneralUnlockFieldsBy(&$options)
     {
         $unlockFields = [];
-        if (!empty($options['unlockFields'])) {
-            $unlockFields = $this->formProtection->processUnlockFields($options['unlockFields']);
-            unset($options['unlockFields']);
+        if (!empty($options['_unlockFields'])) {
+            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use 
+            unset($options['_unlockFields']);
         }
         return $unlockFields;
     }
@@ -237,13 +237,9 @@ class FormBuilder
     {
         $hidden = '';
         if (isset($options['empty']) && $options['empty'] === false) {
-            $filedName = substr($name, 0, -2);
-            $hidden = $this->hidden->toHtml($filedName);
-        } else {
-            $filedName = $name;
+            $hidden = $this->hidden->toHtml(substr($name, 0, -2));
         }
-
-        $this->formProtection->addField($filedName, $options);
+        $this->formProtection->addField($name); // TODO add options
 //        TODO for select optional check values
 //        $optionValues = $this->select->getOptionValues($options, false);
 //        $this->formProtection->addField($name, $options,  array_keys($optionValues));
@@ -271,12 +267,12 @@ class FormBuilder
         $this->formProtection->addField($name, $options);
         $checkbox = $this->checkBox->toHtml($name, $options);
 
-        $hidden = $this->hidden->toHtml($name, 0);
-
         if (isset($options['hidden']) && $options['hidden'] === false) {
             $hidden = '';
+            unset($options['hidden']);
+        } else {
+            $hidden = ends_with($name, '[]') ? '' : $this->hidden->toHtml($name, 0);
         }
-        unset($options['hidden']);
 
         foreach ($options as $k => $v) {
             if ($k == 'class') {

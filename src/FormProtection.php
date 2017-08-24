@@ -88,17 +88,17 @@ class FormProtection
         if (array_keys($data) != array_keys($checkedFields)) {
             return false;
         }
-        foreach ($checkedFields as $key => $value) {
+
+        foreach ($checkedFields as $field => $value) {
             if (!empty($value)) {
                 if (is_array($value)) {
-//                    if (!is_array($data[$key])) {
-//                        $data[$key] = [$data[$key]];
-//                    }
-                    //for select input
-                    // TODO
+                    // for array input
+                    if (array_keys(array_dot($value)) != array_keys(array_dot($data[$field]))) {
+                        return false;
+                    }
                 } else {
-                    if($checkedFields[$key] != $data[$key]) {
-                        //for hidden input
+                    //for hidden input
+                    if ($checkedFields[$field] != $data[$field]) {
                         return false;
                     }
                 }
@@ -106,16 +106,6 @@ class FormProtection
         }
 
         return true;
-    }
-
-
-    /**
-     * @param $unlockFields
-     * @throws \Exception
-     */
-    public function addUnlockFields($unlockFields)
-    {
-        $this->unlockFields = array_merge($this->unlockFields, $this->processUnlockFields($unlockFields));
     }
 
     /**
@@ -142,14 +132,39 @@ class FormProtection
      */
     public function addField($field, &$options = [], $value = '')
     {
-        if (!empty($options['unlock'])) {
-            $this->unlockFields[] = $field;
+        if (!empty($options['_unlock'])) {
+            $this->unlockFields[] = $field; // TODO allows unlock array input
         } else {
-            if (!in_array($field, $this->unlockFields)) {
-                $this->fields[$field] = $value;
+            if (!starts_with($field, $this->unlockFields)) {
+                if (str_contains($field, '[') && str_contains($field, ']')) {
+                    $this->addArrayInputField($field);
+                } else {
+                    $this->fields[$field] = $value;
+                }
             }
         }
+    }
 
+    /**
+     * @param $field
+     */
+    public function addArrayInputField($field)
+    {
+        $arr = explode('[', $field);
+
+        foreach ($arr as $key => $item) {
+            $arr[$key] = rtrim($item, ']');
+        }
+
+        $field =  implode('.' , $arr);
+
+        if (ends_with($field, '.')) {
+            array_set($this->fields, substr($field, 0, -1), []);
+        } elseif (str_contains('..', $field)) {
+            dd('as');
+        } else {
+            array_set($this->fields, $field, '');
+        }
     }
 
     /**
@@ -196,12 +211,11 @@ class FormProtection
         $path = $token . '.' . $this->pathForUnlock;
         $unlockFields = session($this->sessionPath($path));
 
-        foreach ($unlockFields as $unlockField) {
-            if (in_array($unlockField, array_keys($data))) {
-                unset($data[$unlockField]);
+        foreach ($data as $key => $value) {
+            if (starts_with($key, $unlockFields)) { //TODO only str_equals
+                unset($data[$key]);
             }
         }
-
         return $data;
     }
 }
