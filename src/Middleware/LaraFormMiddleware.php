@@ -3,6 +3,7 @@ namespace LaraForm\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use LaraForm\FormProtection;
 
 class LaraFormMiddleware
@@ -25,6 +26,7 @@ class LaraFormMiddleware
         }
 
         unset($request[Config::get('lara_form.session.pre_path', 'laraforms')]);
+        dd($request);
         return $next($request);
     }
 }
