@@ -131,7 +131,7 @@ class FormBuilder
         $this->formProtection->setUnlockFields($unlockFields);
 
         if (!empty($model)) {
-             BootForm::bind($model);
+            BootForm::bind($model);
         }
 
         $method = $this->getMethodBy($model, $options);
@@ -272,6 +272,10 @@ class FormBuilder
             unset($options['hidden']);
         } else {
             $hidden = ends_with($name, '[]') ? '' : $this->hidden->toHtml($name, 0);
+        }
+
+        if(empty($options['checked'])) {
+            unset($options['checked']);
         }
 
         foreach ($options as $k => $v) {
