@@ -132,7 +132,7 @@ class FormProtection
      */
     public function addField($field, &$options = [], $value = '')
     {
-        if (!empty($options['_unlock'])) {
+        if (!empty($options['_unlock']) || !empty($options['disabled'])) {
             $this->unlockFields[] = $field; // TODO allows unlock array input
         } else {
             if (!starts_with($field, $this->unlockFields)) {
