@@ -24,6 +24,7 @@ class LaraFormMiddleware
             }
         }
 
+        unset($request[Config::get('lara_form.session.pre_path', 'laraforms')]);
         return $next($request);
     }
 }
