@@ -248,7 +248,7 @@ class FormBuilder
         if (isset($options['empty']) && $options['empty'] === false) {
             $hidden = $this->hidden->toHtml(substr($name, 0, -2));
         }
-        $this->formProtection->addField($name); // TODO add options
+        $this->formProtection->addField($name, $options); // TODO add options
 //        TODO for select optional check values
 //        $optionValues = $this->select->getOptionValues($options, false);
 //        $this->formProtection->addField($name, $options,  array_keys($optionValues));
