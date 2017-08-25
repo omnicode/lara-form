@@ -35,7 +35,6 @@ class Submit extends Element
 
             $options['class'] .= ' btn btn-' . $options['btn'];
         }
-
         // @TODO - combine with Assistant::input
         if (!empty($options['position']) && $options['position'] == 'right') {
             $options['class'] .= ' icon-right';
@@ -47,6 +46,7 @@ class Submit extends Element
         if (!empty($options['class'])) {
             $submit->addClass($options['class']);
         }
+
         unset($options['class']);
 
         foreach ($options as $k => $val) {

@@ -1,12 +1,11 @@
 <?php
 namespace LaraForm\ServiceProvider;
 
-use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use LaraForm\Elements\Components\CheckBox;
 use LaraForm\Elements\Components\Inputs\Hidden;
 use LaraForm\Elements\Components\Inputs\Input;
+use LaraForm\Elements\Components\Inputs\RadioButton;
 use LaraForm\Elements\Components\Inputs\Password;
 use LaraForm\Elements\Components\Inputs\Submit;
 use LaraForm\Elements\Components\Label;
@@ -68,6 +67,9 @@ class LaraFormServiceProvider extends ServiceProvider
         $this->app->singleton('laraform.element.inputs.input', function ($app) {
             return new Input();
         });
+        $this->app->singleton('laraform.element.radio.button', function ($app) {
+            return new RadioButton();
+        });
         $this->app->singleton('laraform.element.checkbox', function ($app) {
             return new CheckBox();
         });
@@ -94,6 +96,7 @@ class LaraFormServiceProvider extends ServiceProvider
                 $app['laraform.element.inputs.submit'],
                 $app['laraform.element.inputs.hidden'],
                 $app['laraform.element.inputs.input'],
+                $app['laraform.element.radio.button'],
                 $app['laraform.element.checkbox'],
                 $app['laraform.element.textarea'],
                 $app['laraform.element.select'],

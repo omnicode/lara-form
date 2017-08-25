@@ -2,6 +2,7 @@
 namespace LaraForm;
 
 use AdamWathan\BootForms\Facades\BootForm;
+use LaraForm\Elements\Components\Inputs\RadioButton;
 use Illuminate\Support\Facades\Config;
 use LaraForm\Elements\Components\CheckBox;
 use LaraForm\Elements\Components\Inputs\Hidden;
@@ -18,6 +19,11 @@ class FormBuilder
      * @var Password
      */
     protected $password;
+
+    /**
+     * @var RadioButton
+     */
+    protected $radioButton;
 
     /**
      * @var CheckBox
@@ -76,6 +82,7 @@ class FormBuilder
      * @param Submit $submit
      * @param Hidden $hidden
      * @param Input $input
+     * @param RadioButton $radioButton
      * @param CheckBox $checkBox
      * @param Textarea $textarea
      * @param Select $select
@@ -87,6 +94,7 @@ class FormBuilder
         Submit $submit,
         Hidden $hidden,
         Input $input,
+        RadioButton $radioButton,
         CheckBox $checkBox,
         Textarea $textarea,
         Select $select,
@@ -94,6 +102,7 @@ class FormBuilder
     )
     {
         $this->formProtection = $formProtection;
+        $this->radioButton = $radioButton;
         $this->password = $password;
         $this->checkBox = $checkBox;
         $this->textarea = $textarea;
@@ -255,6 +264,17 @@ class FormBuilder
     public function submit($name = '', $options = [])
     {
         return $this->submit->toHtml($name, $options);
+    }
+
+    /**
+     * @param $name
+     * @param array $options
+     * @return mixed
+     */
+    public function radioButton($name, array $options = [])
+    {
+        $this->formProtection->addField($name, $options);
+        return $this->radioButton->toHtml($name, $options);
     }
 
     /**
