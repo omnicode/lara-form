@@ -222,7 +222,8 @@ class FormBuilder
     public function input($name, array $options = [])
     {
         $this->formProtection->addField($name, $options);
-        return $this->input->toHtml($name, $options);
+        $hidden =  (!empty($options['type']) && $options['type'] == 'file') ? $this->hidden->toHtml($name) : '';
+        return $hidden . $this->input->toHtml($name, $options);
     }
 
     /**
