@@ -16,12 +16,12 @@ class LaraFormMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->method() != 'GET' || !$this->isGlobalExceptionUrl($request->getUri())) {
+        if ($request->method() != 'GET' && !$this->isGlobalExceptionUrl($request->getUri())) {
 
             $formProtection = new FormProtection();
             $validate = $formProtection->validate($request->all());
             if($validate === false) {
-                return redirect()->back();
+                abort(401, 'Your Action Is Forbidden');
             }
 
             unset($request[Config::get('lara_form.label.form_protection', 'laraform_token')]);
