@@ -36,7 +36,7 @@ class LaraFormMiddleware
      */
     private function isGlobalExceptionUrl($url) {
         $isExcept = false;
-        $excepts = Config::get('lara_form.except');
+        $excepts = Config::get('lara_form.except', []);
 
         foreach ($excepts as $except) {
             if (str_contains($except, '*')) {
