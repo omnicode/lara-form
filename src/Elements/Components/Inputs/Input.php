@@ -26,6 +26,11 @@ class Input extends Element
             $input->hideLabel();
         }
 
+        if(!empty($options['class'])) {
+            $input->class('form-control '. $options['class']);
+            unset($options['class']);
+        }
+
         foreach ($options as $k => $val) {
             $input->attribute($k, $val);
         }
