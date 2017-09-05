@@ -130,24 +130,25 @@ class FormBuilder
     public function create($model = null, $options = [])
     {
         $form = BootForm::open();
-        $token = md5(str_random(80));
-
-        $this->formProtection->setToken($token);
-
-        $unlockFields = $this->getGeneralUnlockFieldsBy($options);
-        $unlockFields[] = '_token';
-
-        $this->formProtection->setUnlockFields($unlockFields);
 
         if (!empty($model)) {
             BootForm::bind($model);
         }
 
+        
+        $token = md5(str_random(80));
+        $this->formProtection->setToken($token);
+
+        $unlockFields = $this->getGeneralUnlockFieldsBy($options);
+        $unlockFields[] = '_token';
+
         $method = $this->getMethodBy($model, $options);
         if ($method) {
             $form->{$method}();
-            $this->formProtection->addField('_method', $options, strtoupper($method));
+            $unlockFields[] = '_method';
         }
+
+        $this->formProtection->setUnlockFields($unlockFields);
 
         if (isset($options['action'])) {
             $form->action($options['action']);
