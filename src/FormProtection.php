@@ -212,6 +212,9 @@ class FormProtection
         $unlockFields = session($this->sessionPath($path));
 
         foreach ($data as $key => $value) {
+            if (ends_with($key, '[]')) {
+                $key = substr($key, 0, -2);
+            }
             if (starts_with($key, $unlockFields)) { //TODO only str_equals
                 unset($data[$key]);
             }
