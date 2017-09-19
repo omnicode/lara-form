@@ -164,7 +164,11 @@ class FormBuilder
             $form->attribute($k, $val);
         }
 
-        $hidden = $this->hidden(Config::get('lara_form.label.form_protection', 'laraform_token'), $token);
+        if($method != 'get') {
+            $hidden = $this->hidden(Config::get('lara_form.label.form_protection', 'laraform_token'), $token);
+        } else {
+            $hidden = '';
+        }
         return $form . $hidden;
     }
 
