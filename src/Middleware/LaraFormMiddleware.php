@@ -19,7 +19,7 @@ class LaraFormMiddleware
         if ($request->method() != 'GET' && !$this->isGlobalExceptionUrl($request->getUri())) {
 
             $formProtection = new FormProtection();
-            $validate = $formProtection->validate($request->all());
+            $validate = $formProtection->validate(array_diff($request->all(), $request->query()));
             if($validate === false) {
                 abort(401, 'Your Action Is Forbidden');
             }
