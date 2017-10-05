@@ -66,9 +66,10 @@ class FormProtection
 
     /**
      * @param $data
+     * @param bool $isAjax
      * @return bool
      */
-    public function validate($data)
+    public function validate($data, $isAjax = false)
     {
         $tokenName = Config::get('lara_form.label.form_protection', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
@@ -83,7 +84,10 @@ class FormProtection
 
         $checkedFields = $this->getCheckedFieldsBy($token);
         $data = $this->removeUnlockFields($data, $token);
-        session()->forget($this->sessionPrePath); // TODO correct dellete all session or only $token
+
+        if (!$isAjax) {
+            session()->forget($this->sessionPath($token));
+        }
 
         if (array_keys($data) != array_keys($checkedFields)) {
             return false;

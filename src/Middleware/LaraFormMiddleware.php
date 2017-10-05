@@ -20,10 +20,14 @@ class LaraFormMiddleware
 
             $formProtection = new FormProtection();
             $data = $request->all();
+
             foreach ($request->query() as $index => $key) {
                 unset($data[$index]);
             }
-            $validate = $formProtection->validate($data);
+
+            $isAjax = $request->ajax();
+            $validate = $formProtection->validate($data, $isAjax);
+
             if($validate === false) {
                 abort(401, 'Your Action Is Forbidden');
             }
