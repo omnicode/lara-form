@@ -86,7 +86,8 @@ class FormProtection
         $data = $this->removeUnlockFields($data, $token);
 
         if (!$isAjax) {
-            session()->forget($this->sessionPath($token));
+
+            session()->forget($this->sessionPath($token)); // TODO correct dellete all session or only $token
         }
 
         if (array_keys($data) != array_keys($checkedFields)) {
@@ -137,7 +138,7 @@ class FormProtection
     public function addField($field, &$options = [], $value = '')
     {
         if (!empty($options['_unlock']) || !empty($options['disabled'])) {
-            unset($this->fields[$field]);
+             unset($this->fields[$field]);
             $this->unlockFields[] = $field; // TODO allows unlock array input
         } else {
             if (!starts_with($field, $this->unlockFields)) {
