@@ -43,14 +43,14 @@ At `config/app.php`, add the Service Provider and the Facade:
 
 ```php
     'providers' => [
-      // ...
-		  'LaraForm\ServiceProvider\LaraFormServiceProvider'
+        // ...
+	'LaraForm\ServiceProvider\LaraFormServiceProvider'
     ]
 
 	//...
 
     'aliases' => [
-        'Form' => 'LaraForm\Facades\LaraForm'
+        'LaraForm' => 'LaraForm\Facades\LaraForm'
     ]
 ```
 
@@ -66,7 +66,7 @@ At `config/app.php`, add the Service Provider and the Facade:
     //...
 
     'aliases' => [
-        'Form' => LaraForm\Facades\LaraForm::class,
+        'LaraForm' => LaraForm\Facades\LaraForm::class,
     ]
 ```
 
@@ -84,6 +84,21 @@ To create a simple form
 {!! LaraForm::end() !!}
 ```
 
+## <a id="security"></a>Security
+
+LaraForm has form tampering protection, this ensures that
+
+- Unknown fields cannot be added to the form
+- Existing fields cannot be removed from the form
+- Values of hidden inputs cannot be changed
+
+Please note, however, that it will not prevent adding new values to select dropdown or radio buttons - this information already should be validated by Laravel Validations
+
+It also prevents submitting the same form twice
+
 ## <a id="helpers"></a>Helpers
 
 ### <a id="form-open"></a>open
+
+
+
