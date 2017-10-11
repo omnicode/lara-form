@@ -92,13 +92,14 @@ LaraForm has form tampering protection, this ensures that
 - Existing fields cannot be removed from the form
 - Values of hidden inputs cannot be changed
 
-Please note, however, that it will not prevent adding new values to select dropdown or radio buttons - this information already should be validated by Laravel Validations
+Please note, however, that it will not prevent adding new values to select dropdown or radio buttons - this information should be validated by Laravel Validations
 
-It also prevents submitting the same form twice
+It also prevents submitting the same form twice (server side implementation)
+
 
 ## <a id="helpers"></a>Helpers
 
-### <a id="form-open"></a>open
+### <a id="form-create"></a>Create Form
 
-
+@TODO
 
