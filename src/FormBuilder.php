@@ -76,6 +76,11 @@ class FormBuilder
     protected $hiddenFields;
 
     /**
+     * @var
+     */
+    protected $introPopUp;
+    
+    /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
      * @param Password $password
@@ -123,12 +128,25 @@ class FormBuilder
     }
 
     /**
+     * @param $options
+     */
+    protected function checkIntroPopUpData(&$options)
+    {
+        if (!empty($options['_intro_pop_up'])) {
+            $this->introPopUp = $options['_intro_pop_up'];
+            unset($options['_intro_pop_up']);
+        }
+    }
+    
+    /**
      * @param null $model
      * @param array $options
      * @return string
      */
     public function create($model = null, $options = [])
     {
+        $this->checkIntroPopUpData($options);
+
         $form = BootForm::open();
 
         if (!empty($model)) {
@@ -226,9 +244,22 @@ class FormBuilder
      */
     public function input($name, array $options = [])
     {
+        $this->correctOptionIntroPopUp($name, $options);
         $this->formProtection->addField($name, $options);
         $hidden =  (!empty($options['type']) && $options['type'] == 'file') ? $this->hidden->toHtml($name) : '';
         return $hidden . $this->input->toHtml($name, $options);
+    }
+
+    /**
+     * @param $name
+     * @param $options
+     */
+    public function correctOptionIntroPopUp($name, &$options)
+    {
+        if (!empty($this->introPopUp[$name])) {
+            $options['data-step'] = $this->introPopUp[$name]->step;
+            $options['data-intro'] = $this->introPopUp[$name]->text;
+        }
     }
 
     /**
@@ -240,6 +271,7 @@ class FormBuilder
     {
         $this->formProtection->addField($name, $options);
         $options['type'] = 'password';
+        $this->correctOptionIntroPopUp($name, $options);
         return $this->input->toHtml($name, $options);
     }
 
@@ -259,6 +291,7 @@ class FormBuilder
 //        $optionValues = $this->select->getOptionValues($options, false);
 //        $this->formProtection->addField($name, $options,  array_keys($optionValues));
 
+        $this->correctOptionIntroPopUp($name, $options);
         return $hidden.$this->select->toHtml($name, $options);
     }
 
@@ -269,6 +302,7 @@ class FormBuilder
      */
     public function submit($name = '', $options = [])
     {
+        $this->correctOptionIntroPopUp(str_slug($name), $options);
         return $this->submit->toHtml($name, $options);
     }
 
@@ -280,6 +314,7 @@ class FormBuilder
     public function radioButton($name, array $options = [])
     {
         $this->formProtection->addField($name, $options);
+        $this->correctOptionIntroPopUp($name, $options);
         return $this->radioButton->toHtml($name, $options);
     }
 
@@ -291,6 +326,7 @@ class FormBuilder
     public function checkbox($name, array $options = [])
     {
         $this->formProtection->addField($name, $options);
+        $this->correctOptionIntroPopUp($name, $options);
         $checkbox = $this->checkBox->toHtml($name, $options);
 
         if (isset($options['hidden']) && $options['hidden'] === false) {
@@ -334,6 +370,7 @@ class FormBuilder
     public function textarea($name, $options = [])
     {
         $this->formProtection->addField($name, $options);
+        $this->correctOptionIntroPopUp($name, $options);
         return $this->textarea->toHtml($name, $options);
     }
 }
