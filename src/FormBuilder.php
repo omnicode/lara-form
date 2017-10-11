@@ -79,7 +79,7 @@ class FormBuilder
      * @var
      */
     protected $introPopUps;
-
+    
     /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
@@ -132,12 +132,12 @@ class FormBuilder
      */
     protected function checkintroPopUpsData(&$options)
     {
-        if (!empty($options['_intro_pop_ups'])) {
+        if (isset($options['_intro_pop_ups'])) {
             $this->introPopUps = $options['_intro_pop_ups'];
             unset($options['_intro_pop_ups']);
         }
     }
-
+    
     /**
      * @param null $model
      * @param array $options
@@ -146,14 +146,13 @@ class FormBuilder
     public function create($model = null, $options = [])
     {
         $this->checkintroPopUpsData($options);
-
         $form = BootForm::open();
 
         if (!empty($model)) {
             BootForm::bind($model);
         }
 
-
+        
         $token = md5(str_random(80));
         $this->formProtection->setToken($token);
 
@@ -222,7 +221,7 @@ class FormBuilder
     {
         $unlockFields = [];
         if (!empty($options['_unlockFields'])) {
-            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use
+            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use 
             unset($options['_unlockFields']);
         }
         return $unlockFields;
@@ -256,6 +255,7 @@ class FormBuilder
      */
     public function correctOptionintroPopUps($name, &$options)
     {
+        $name = 'field_' . str_slug($this->input->getLabel($name, $options, false), '_');
         if (!empty($this->introPopUps[$name])) {
             $options['data-step'] = $this->introPopUps[$name]->step;
             $options['data-intro'] = $this->introPopUps[$name]->introduction;
