@@ -1,8 +1,9 @@
 ## Lara Form - Laravel Form Package with Form Tampering protection
 
+LaraForm is a Laravel Form wrapper with convenient methods, that includes **Form Tampering protection** and prevents double form submission.
+
 ## Contents
 
-1. <a href="#introduction">Introduction</a>
 2. <a href="#installation">Installation</a>
 3. <a href="#quick-start">Quick start</a>
 3. <a href="#security">Security</a>
@@ -19,9 +20,6 @@
     * <a href="#form-buttons">buttons</a>
 5. <a href="#license">License</a>
 
-## <a id="introduction"></a>Introduction
-
-LaraForm is a Laravel Form wrapper with convenient methods, that includes **Form Tampering protection** and prevents double form submission.
 
 ## <a id="installation"></a>Installation
 
