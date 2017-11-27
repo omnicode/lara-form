@@ -1,9 +1,9 @@
 <?php
+
 namespace LaraForm\Elements\Components;
 
 
-class Label
+class PasswordWidget extends BaseInputWidget
 {
-
 
 }

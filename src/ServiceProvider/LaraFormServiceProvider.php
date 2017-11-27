@@ -3,15 +3,6 @@
 namespace LaraForm\ServiceProvider;
 
 use Illuminate\Support\ServiceProvider;
-use LaraForm\Elements\Components\CheckBox;
-use LaraForm\Elements\Components\Inputs\Hidden;
-use LaraForm\Elements\Components\Inputs\Input;
-use LaraForm\Elements\Components\Inputs\RadioButton;
-use LaraForm\Elements\Components\Inputs\Password;
-use LaraForm\Elements\Components\Inputs\Submit;
-use LaraForm\Elements\Components\Label;
-use LaraForm\Elements\Components\Select;
-use LaraForm\Elements\Components\Textarea;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
 use LaraForm\MakeForm;
