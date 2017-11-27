@@ -1,4 +1,5 @@
 <?php
+
 namespace LaraForm\ServiceProvider;
 
 use Illuminate\Support\ServiceProvider;
@@ -13,6 +14,7 @@ use LaraForm\Elements\Components\Select;
 use LaraForm\Elements\Components\Textarea;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
+use LaraForm\MakeForm;
 use LaraForm\Middleware\LaraFormMiddleware;
 
 class LaraFormServiceProvider extends ServiceProvider
@@ -30,7 +32,6 @@ class LaraFormServiceProvider extends ServiceProvider
 
     /**
      * Register the Debugbar Middleware
-     *
      * @param  string $middleware
      */
     protected function registerMiddleware($middleware)
@@ -45,8 +46,7 @@ class LaraFormServiceProvider extends ServiceProvider
     protected function registerFormProtection()
     {
         $this->app->singleton('laraform.protection', function ($app) {
-            return new FormProtection(
-            );
+            return new FormProtection();
         });
     }
 
@@ -55,32 +55,8 @@ class LaraFormServiceProvider extends ServiceProvider
      */
     protected function registerFormElements()
     {
-        $this->app->singleton('laraform.element.inputs.password', function ($app) {
-            return new Password();
-        });
-        $this->app->singleton('laraform.element.inputs.submit', function ($app) {
-            return new Submit();
-        });
-        $this->app->singleton('laraform.element.inputs.hidden', function ($app) {
-            return new Hidden();
-        });
-        $this->app->singleton('laraform.element.inputs.input', function ($app) {
-            return new Input();
-        });
-        $this->app->singleton('laraform.element.radio.button', function ($app) {
-            return new RadioButton();
-        });
-        $this->app->singleton('laraform.element.checkbox', function ($app) {
-            return new CheckBox();
-        });
-        $this->app->singleton('laraform.element.textarea', function ($app) {
-            return new Textarea();
-        });
-        $this->app->singleton('laraform.element.select', function ($app) {
-            return new Select();
-        });
-        $this->app->singleton('laraform.element.label', function ($app) {
-            return new Label();
+        $this->app->singleton('laraform.make-form', function ($app) {
+            return new MakeForm();
         });
     }
 
@@ -89,25 +65,17 @@ class LaraFormServiceProvider extends ServiceProvider
      */
     protected function registerFormBuilder()
     {
+
         $this->app->singleton('laraform', function ($app) {
             return new FormBuilder(
                 $app['laraform.protection'],
-                $app['laraform.element.inputs.password'],
-                $app['laraform.element.inputs.submit'],
-                $app['laraform.element.inputs.hidden'],
-                $app['laraform.element.inputs.input'],
-                $app['laraform.element.radio.button'],
-                $app['laraform.element.checkbox'],
-                $app['laraform.element.textarea'],
-                $app['laraform.element.select'],
-                $app['laraform.element.label']
+                $app['laraform.make-form']
             );
         });
     }
 
     /**
      * Get the services provided by the provider.
-     *
      * @return array
      */
     public function provides()

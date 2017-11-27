@@ -13,6 +13,8 @@ class LaraFormMiddleware
      * @param Request $request
      * @param Closure $next
      * @return \Illuminate\Http\RedirectResponse|mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function handle(Request $request, Closure $next)
     {

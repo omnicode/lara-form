@@ -1,4 +1,5 @@
 <?php
+
 namespace LaraForm;
 
 use AdamWathan\BootForms\Facades\BootForm;
@@ -15,55 +16,18 @@ use LaraForm\Elements\Components\Textarea;
 
 class FormBuilder
 {
-    /**
-     * @var Password
-     */
-    protected $password;
 
-    /**
-     * @var RadioButton
-     */
-    protected $radioButton;
-
-    /**
-     * @var CheckBox
-     */
-    protected $checkBox;
-
-    /**
-     * @var Textarea
-     */
-    protected $textarea;
-
-    /**
-     * @var Submit
-     */
-    protected $submit;
-
-    /**
-     * @var Hidden
-     */
-    protected $hidden;
-
-    /**
-     * @var Select
-     */
-    protected $select;
-
-    /**
-     * @var Label
-     */
-    protected $label;
-
-    /**
-     * @var Input
-     */
-    protected $input;
-
-    /**
-     * @var string
-     */
-    protected $laraFormToken;
+    protected $methods = [
+        'input' => Input::class,
+        'password' => Password::class,
+        'textarea' => Textarea::class,
+        'select' => Select::class,
+        'submit' => Submit::class,
+        'hidden' => Hidden::class,
+        'checkbox' => CheckBox::class,
+        'label' => Label::class,
+        'radioButton' => RadioButton::class
+    ];
 
     /**
      * @var FormProtection
@@ -71,58 +35,60 @@ class FormBuilder
     protected $formProtection;
 
     /**
-     * @var array
+     * @var MakeForm
      */
-    protected $hiddenFields;
+    protected $make;
 
-    /**
-     * @var
-     */
-    protected $introPopUps;
-    
     /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
-     * @param Password $password
-     * @param Submit $submit
-     * @param Hidden $hidden
-     * @param Input $input
-     * @param RadioButton $radioButton
-     * @param CheckBox $checkBox
-     * @param Textarea $textarea
-     * @param Select $select
-     * @param Label $label
+     * @param MakeForm $makeForm
      */
     public function __construct(
         FormProtection $formProtection,
-        Password $password,
-        Submit $submit,
-        Hidden $hidden,
-        Input $input,
-        RadioButton $radioButton,
-        CheckBox $checkBox,
-        Textarea $textarea,
-        Select $select,
-        Label $label
-    )
-    {
+        MakeForm $makeForm
+
+    ) {
         $this->formProtection = $formProtection;
-        $this->radioButton = $radioButton;
-        $this->password = $password;
-        $this->checkBox = $checkBox;
-        $this->textarea = $textarea;
-        $this->submit = $submit;
-        $this->hidden = $hidden;
-        $this->select = $select;
-        $this->label = $label;
-        $this->input = $input;
+        $this->make = $makeForm;
+    }
+
+    /**
+     * @param $methodName
+     * @param $attr
+     * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function __call($methodName, $attr)
+    {
+        /*  try {
+              call_user_func([$this->make,$methodName],$attr);
+          } catch (\Exception $e) {
+                echo '405 [' . $methodName . '] method not allowed';
+          }*/
+
+        return $this->{$methodName}(...$attr);
+
+    }
+
+    /**
+     * @param $proprtyName
+     * @return \Illuminate\Foundation\Application|mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
+    public function __get($proprtyName)
+    {
+        $modelName = $this->methods[$proprtyName];
+        return app($modelName);
     }
 
     /**
      * @param $data
      * @return bool
      */
-    public function validate($data)
+    protected function validate($data)
     {
         return $this->formProtection->validate($data);
     }
@@ -131,16 +97,13 @@ class FormBuilder
      * @param null $model
      * @param array $options
      * @return string
+     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function create($model = null, $options = [])
     {
-        $form = BootForm::open();
+        $form = $this->make->open($model, $options);
 
-        if (!empty($model)) {
-            BootForm::bind($model);
-        }
-
-        
         $token = md5(str_random(80));
         $this->formProtection->setToken($token);
 
@@ -155,26 +118,12 @@ class FormBuilder
 
         $this->formProtection->setUnlockFields($unlockFields);
 
-        if (isset($options['action'])) {
-            $form->action($options['action']);
-            unset($options['action']);
-        }
-
-        if (isset($options['file']) && $options['file']) {
-            $options['enctype'] = 'multipart/form-data';
-            unset($options['file']);
-        }
-
-        foreach ($options as $k => $val) {
-            $form->attribute($k, $val);
-        }
-
-        if($method != 'get') {
+        if ($method != 'get') {
             $hidden = $this->hidden(Config::get('lara_form.label.form_protection', 'laraform_token'), $token);
         } else {
             $hidden = '';
         }
-        return $form . $hidden;
+        return dd($form . $hidden);
     }
 
     /**
@@ -183,7 +132,7 @@ class FormBuilder
      * @param bool $unSet
      * @return null|string
      */
-    private function getMethodBy($model, &$options, $unSet = true)
+    protected function getMethodBy($model, &$options, $unSet = true)
     {
         $method = null;
         if (isset($options['method'])) {
@@ -209,7 +158,7 @@ class FormBuilder
     {
         $unlockFields = [];
         if (!empty($options['_unlockFields'])) {
-            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use 
+            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use
             unset($options['_unlockFields']);
         }
         return $unlockFields;
@@ -229,10 +178,10 @@ class FormBuilder
      * @param array $options
      * @return mixed
      */
-    public function input($name, array $options = [])
+    protected function input($name, array $options = [])
     {
         $this->formProtection->addField($name, $options);
-        $hidden =  (!empty($options['type']) && $options['type'] == 'file') ? $this->hidden->toHtml($name) : '';
+        $hidden = (!empty($options['type']) && $options['type'] == 'file') ? $this->hidden->toHtml($name) : '';
         return $hidden . $this->input->toHtml($name, $options);
     }
 
@@ -242,7 +191,7 @@ class FormBuilder
      * @param array $options
      * @return mixed
      */
-    public function password($name, array $options = [])
+    protected function password($name, array $options = [])
     {
         $this->formProtection->addField($name, $options);
         $options['type'] = 'password';
@@ -254,7 +203,7 @@ class FormBuilder
      * @param array $options
      * @return mixed
      */
-    public function select($name, $options = [])
+    protected function select($name, $options = [])
     {
         $hidden = '';
         if (isset($options['empty']) && $options['empty'] === false) {
@@ -265,7 +214,7 @@ class FormBuilder
 //        $optionValues = $this->select->getOptionValues($options, false);
 //        $this->formProtection->addField($name, $options,  array_keys($optionValues));
 
-        return $hidden.$this->select->toHtml($name, $options);
+        return $hidden . $this->select->toHtml($name, $options);
     }
 
     /**
@@ -273,7 +222,7 @@ class FormBuilder
      * @param array $options
      * @return mixed
      */
-    public function submit($name = '', $options = [])
+    protected function submit($name = '', $options = [])
     {
         return $this->submit->toHtml($name, $options);
     }
@@ -294,10 +243,11 @@ class FormBuilder
      * @param array $options
      * @return string
      */
-    public function checkbox($name, array $options = [])
+    protected function checkbox($name, array $options = [])
     {
+
         $this->formProtection->addField($name, $options);
-        $checkbox = $this->checkBox->toHtml($name, $options);
+        $checkbox = $this->checkbox->toHtml($name, $options);
 
         if (isset($options['hidden']) && $options['hidden'] === false) {
             $hidden = '';
@@ -306,7 +256,7 @@ class FormBuilder
             $hidden = ends_with($name, '[]') ? '' : $this->hidden->toHtml($name, 0);
         }
 
-        if(empty($options['checked'])) {
+        if (empty($options['checked'])) {
             unset($options['checked']);
         }
 
@@ -318,7 +268,7 @@ class FormBuilder
             }
         }
 
-        return $hidden.$checkbox;
+        return $hidden . $checkbox;
     }
 
     /**
@@ -326,7 +276,7 @@ class FormBuilder
      * @param array $options
      * @return string
      */
-    public function hidden($name, $options = [])
+    protected function hidden($name, $options = [])
     {
         $this->formProtection->addField($name, $options, $this->hidden->getValue($options));
         return $this->hidden->toHtml($name, $options);
@@ -337,7 +287,7 @@ class FormBuilder
      * @param array $options
      * @return string
      */
-    public function textarea($name, $options = [])
+    protected function textarea($name, $options = [])
     {
         $this->formProtection->addField($name, $options);
         return $this->textarea->toHtml($name, $options);

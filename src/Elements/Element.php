@@ -29,4 +29,27 @@ abstract class Element
     }
 
     abstract function toHtml($name, $options = []);
+
+    protected function format($name, array $data = [])
+    {
+        if (!isset($this->_compiled[$name])) {
+            throw new RuntimeException("Cannot find template named '$name'.");
+        }
+        list($template, $placeholders) = $this->_compiled[$name];
+
+        if (isset($data['templateVars'])) {
+            $data += $data['templateVars'];
+            unset($data['templateVars']);
+        }
+        $replace = [];
+        foreach ($placeholders as $placeholder) {
+            $replacement = isset($data[$placeholder]) ? $data[$placeholder] : null;
+            if (is_array($replacement)) {
+                $replacement = implode('', $replacement);
+            }
+            $replace[] = $replacement;
+        }
+
+        return vsprintf($template, $replace);
+    }
 }
