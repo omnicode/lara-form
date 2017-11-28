@@ -14,10 +14,21 @@ class BaseInputWidget extends Widget
         'number',
         'email',
         'password',
+        'hidden'
     ];
 
+    public function render($option)
+    {
 
-    protected function toInputFild($name, $attr, $cTemplate = false)
+    }
+
+    /**
+     * @param $name
+     * @param $attr
+     * @param bool $cTemplate
+     * @return string
+     */
+    public function toHtml($name, $attr, $cTemplate = false)
     {
         if (!$cTemplate) {
             $template = $this->_defaultConfig['templates']['input'];
@@ -28,30 +39,45 @@ class BaseInputWidget extends Widget
                     unset($attr['type']);
                 }
             }
-        }else{
+        } else {
             $template = $cTemplate;
         }
 
-        if (!empty($attr['lable'])) {
-            $lableName = $attr['lable'];
+        $htmlAttribute = [];
+        $lable = '';
+        if (isset($attr['id']) && $attr['id'] == false) {
+            unset($attr['id']);
         } else {
-            $lableName = $this->getLableName($name);
+            $htmlAttribute['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($name);
         }
 
-        $htmlAttribute['name'] = $name;
-        $htmlAttribute['id'] = $lableName ? $lableName : $name;
-        $htmlAttribute = array_merge($htmlAttribute,$attr);
-        foreach ($attr as $index => $item) {
-            if (!empty($item)) {
-                $htmlAttribute += [$index => $item];
+
+        $htmlAttribute = array_merge($htmlAttribute, $attr);
+        $scoreAttribute['name'] = $name;
+
+        if (isset($htmlAttribute['type'])) {
+            $scoreAttribute['type'] = $htmlAttribute['type'];
+            unset($htmlAttribute['type']);
+        }
+
+        if (isset($htmlAttribute['value']) && $cTemplate) {
+            $scoreAttribute['value'] = $htmlAttribute['value'];
+            unset($htmlAttribute['value']);
+        }
+
+        if (!isset($scoreAttribute['type'])) {
+            $scoreAttribute['type'] = 'text';
+        }
+        if ($scoreAttribute['type'] !== 'hidden') {
+            if (!isset($attr['lable']) || $attr['lable'] !== false) {
+                $for = isset($htmlAttribute['id'])  ? $htmlAttribute['id'] : $name;
+                $lableName = $this->getLableName($name);
+                $lable = $this->setLable([$lableName,['for' => $for]]);
             }
         }
-
-        if (!$cTemplate && !isset($htmlAttribute['type'])) {
-            $htmlAttribute['type'] = 'text';
-        }
-
         $scoreAttribute['attrs'] = $this->formatAttributes($htmlAttribute);
-        return dump($this->formatTemplate($template, $scoreAttribute));
+        $this->html = $lable.$this->formatTemplate($template, $scoreAttribute);
+        return $this->html;
     }
+
 }

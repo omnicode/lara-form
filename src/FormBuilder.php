@@ -40,7 +40,7 @@ class FormBuilder
      */
     public function __call($methodName, $attr)
     {
-        call_user_func([$this->make, $methodName],$attr);
+        return call_user_func([$this->make, $methodName], $attr);
     }
 
 
@@ -78,7 +78,7 @@ class FormBuilder
         $this->formProtection->setUnlockFields($unlockFields);
 
         if ($method != 'get') {
-            $hidden = $this->hidden(Config::get('lara_form.label.form_protection', 'laraform_token'), $token);
+            $hidden = $this->hidden(Config::get('lara_form.label.form_protection', 'laraform_token'),['value' => $token]);
         } else {
             $hidden = '';
         }
@@ -129,7 +129,7 @@ class FormBuilder
     public function end()
     {
         $this->formProtection->confirm();
-        return dd($this->make->close());
+        return $this->make->close();
     }
 
 }

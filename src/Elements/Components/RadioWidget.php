@@ -4,18 +4,25 @@ namespace LaraForm\Elements\Components;
 
 class RadioWidget extends BaseInputWidget
 {
-
-    public function __construct($option)
+    /**
+     * @param $option
+     * @return string
+     */
+    public function render($option)
     {
         $template = $this->_defaultConfig['templates']['radio'];
         $name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
-        $attr['value'] = 1;
+        $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
+
+        if (empty($attr['id'])) {
+            $attr['id'] = $name . '-' . $attr['value'];
+        }
+
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
-       // $hidden = $this->toInputFild($name, ['type' => 'hidden', 'value' => 0, 'name' => $name, 'id' => $name . '-hid']);
-        return $this->toInputFild($name, $attr, $template);
-    }
 
+        return $this->toHtml($name, $attr, $template);
+    }
 }

@@ -3,6 +3,7 @@
 namespace LaraForm\ServiceProvider;
 
 use Illuminate\Support\ServiceProvider;
+use LaraForm\Elements\Widget;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
 use LaraForm\MakeForm;
@@ -47,7 +48,7 @@ class LaraFormServiceProvider extends ServiceProvider
     protected function registerFormElements()
     {
         $this->app->singleton('laraform.make-form', function ($app) {
-            return new MakeForm();
+            return new MakeForm(new Widget());
         });
     }
 

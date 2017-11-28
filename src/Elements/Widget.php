@@ -2,19 +2,20 @@
 
 namespace LaraForm\Elements;
 
-use Cake\Utility\Inflector;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 
-abstract class Widget
+class Widget implements WidgetInterface
 {
-    protected $_requestMethods = ['get', 'post', 'put', 'patch', 'delete'];
-    protected $_defaultConfig = [
+    public $html;
+    public $routes = [];
+    public $_requestMethods = ['get', 'post', 'put', 'patch', 'delete'];
+    public $_defaultConfig = [
         'templates' => [
             // Used for button elements in button().
             'button' => '<button{{attrs}}>{{text}}</button>',
             // Used for checkboxes in checkbox() and multiCheckbox().
-            'checkbox' => '<input type="checkbox" {{attrs}}/>',
+            'checkbox' => '<input type="checkbox" name="{{name}}" value="{{value}}" {{attrs}}/>',
             // Input group wrapper for checkboxes created via control().
             'checkboxFormGroup' => '{{label}}',
             // Wrapper container for checkboxes.
@@ -40,9 +41,9 @@ abstract class Widget
             // Wrapper content used to hide other content.
             'hiddenBlock' => '<div style="display:none;">{{content}}</div>',
             // Generic input element.
-            'input' => '<input {{attrs}}/>',
+            'input' => '<input type="{{type}}" name="{{name}}" {{attrs}}/>',
             // Submit input element.
-            'inputSubmit' => '<input type="{{type}}" {{attrs}}/>',
+            'submit' => '<input type="submit" {{attrs}}/>',
             // Container element used by control().
             'inputContainer' => '<div class="input {{type}}{{required}}">{{content}}</div>',
             // Container element used by control() when a field has an error.
@@ -66,7 +67,7 @@ abstract class Widget
             // Multi-select element,
             'selectMultiple' => '<select name="{{name}}[]" multiple="multiple" {{attrs}}>{{content}}</select>',
             // Radio input element,
-            'radio' => '<input type="radio" {{attrs}}/>',
+            'radio' => '<input type="radio" name="{{name}}" value="{{value}}" {{attrs}}/>',
             // Wrapping container for radio input/label,
             'radioWrapper' => '{{label}}',
             // Textarea input element,
@@ -75,6 +76,7 @@ abstract class Widget
             'submitContainer' => '<div class="submit">{{content}}</div>',
         ]
     ];
+
 
     /**
      * @param $template
@@ -95,6 +97,11 @@ abstract class Widget
         }
         $fild = str_ireplace($from, $to, $template);
         return $fild;
+
+    }
+
+    public function render($option)
+    {
 
     }
 
@@ -120,7 +127,7 @@ abstract class Widget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function action(&$options = [])
+    public function action(&$options = [])
     {
         if (!empty($options['route'])) {
             $route = $options['route'];
@@ -173,15 +180,15 @@ abstract class Widget
      * @param $name
      * @return mixed
      */
-    protected function getLableName($name)
+    public function getId($name)
     {
-        return str_ireplace(']', '', array_last(explode('[', $name)));
+        return str_ireplace(' ','',ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name)));
     }
 
     /**
      * @return array
      */
-    protected function getRoutes()
+    public function getRoutes()
     {
         if (empty($this->routes)) {
             collect(Route::getRoutes())->map(function ($route) {
@@ -195,7 +202,7 @@ abstract class Widget
     /**
      * @return mixed
      */
-    protected function getCurrentRoute()
+    public function getCurrentRoute()
     {
         return Route::getCurrentRoute();
     }
@@ -204,7 +211,7 @@ abstract class Widget
      * @param $name
      * @return mixed
      */
-    protected function getClassName($name)
+    public function getClassName($name)
     {
         return array_last(explode('\\', $name));
     }
@@ -214,11 +221,38 @@ abstract class Widget
      * @param $arrgs
      * @return mixed
      */
-    protected function createObject($method,$arrgs)
+    public function createObject($method, $arrgs)
     {
         $modelName = ucfirst($method);
         $className = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
-        return new $className(...$arrgs);
+        $obj = new $className();
+        return $obj->render(...$arrgs);
+    }
 
+    public function setLable($option)
+    {
+        $template = $this->_defaultConfig['templates']['label'];
+        $name = array_shift($option);
+        $attr = !empty($option[0]) ? $option[0] : [];
+
+        if (!isset($attr['for'])) {
+            $attr['for'] = $name;
+        }
+
+        $rep = [
+            'attrs' => $this->formatAttributes($attr),
+            'text' => $name
+        ];
+
+        return $this->html = $this->formatTemplate($template, $rep);
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getLableName($name)
+    {
+        return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
     }
 }

@@ -2,23 +2,25 @@
 
 namespace LaraForm\Elements\Components;
 
-class NumberWidget extends BaseInputWidget
+class FileWidget extends BaseInputWidget
 {
     /**
      * @param $option
-     * @return string
+     * @return mixed
      */
     public function render($option)
     {
+        $template = $this->_defaultConfig['templates']['file'];
         $name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
 
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
+        if (isset($attr['value'])) {
+            unset($attr['value']);
+        }
 
-        $attr['type'] = 'number';
-
-        return $this->toHtml($name, $attr);
+        return $this->html = $this->toHtml($name, $attr, $template);
     }
 }
