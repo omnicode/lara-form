@@ -6,10 +6,20 @@ use LaraForm\Elements\Widget;
 
 class SelectWidget extends Widget
 {
+    /**
+     * @var bool
+     */
     protected $selected = false;
+
+    /**
+     * @var array
+     */
     protected $disabled = [];
+
+    /**
+     * @var
+     */
     protected $optionsArray;
-    protected $optionsHtml;
 
     /**
      * @param $params
@@ -21,15 +31,17 @@ class SelectWidget extends Widget
         $selectTemplate = $this->_defaultConfig['templates']['select'];
         $name = array_shift($params);
         $attr = !empty($params[0]) ? $params[0] : [];
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->_defaultConfig['css']['inputClass'];
         $this->inspectionAttributes($attr);
-        $this->renderOptions();
+        $optionsHtml = $this->renderOptions();
         $selectAttrs = [
-            'content' => $this->optionsHtml,
+            'content' => $optionsHtml,
             'name' => $name,
             'attrs' => $this->formatAttributes($attr)
         ];
-        $selectHtml = $this->formatTemplate($selectTemplate, $selectAttrs);
-        return $this->html = $selectHtml;
+        $this->renderLabel($name, $params);
+        $this->html = $this->formatTemplate($selectTemplate, $selectAttrs);
+        return $this->label.$this->html;
     }
 
     /**
@@ -48,10 +60,12 @@ class SelectWidget extends Widget
         if (empty($options)) {
             return false;
         }
+        $optionsHtml = '';
         foreach ($options as $index => $option) {
             $optAttrs = [];
             if (is_array($option)) {
-                $this->renderOptgroup($index, $option);
+                $optionsHtml .=$this->renderOptgroup($index, $option);
+                continue;
             }
             $optAttrs[] = $this->isDisabled($index);
             $optAttrs[] = $this->isSelected($index);
@@ -60,36 +74,27 @@ class SelectWidget extends Widget
                 'value' => $index,
                 'attrs' => $this->formatAttributes($optAttrs)
             ];
-            $this->optionsHtml .= $this->formatTemplate($optionTemplate, $rep);
+            $optionsHtml .= $this->formatTemplate($optionTemplate, $rep);
         }
-        return $this->optionsHtml;
+        return $optionsHtml;
     }
 
     /**
      * @param $groupName
      * @param $options
      * @internal param $option
+     * @return string
      */
     protected function renderOptgroup($groupName, $options)
     {
         $optgroupTemplate = $this->_defaultConfig['templates']['optgroup'];
-        foreach ($options as $index => $option) {
-            $optAttrs[] = $this->isDisabled($index);
-            $optAttrs[] = $this->isSelected($index);
-            $repGroup = [
-                'text' => $option,
-                'value' => $index,
-                'attrs' => $this->formatAttributes($optAttrs)
-            ];
-            $this->optionsHtml .= $this->formatTemplate($optgroupTemplate, $repGroup);
-        }
+        $childOptionsHtml = $this->renderOptions($options);
 
         $rep = [
-            'lable' => $groupName,
-            'content' => $this->optionsHtml,
-            'attrs' => $this->formatAttributes($option)
+            'label' => $groupName,
+            'content' => $childOptionsHtml,
         ];
-        $this->optionsHtml .= $this->formatTemplate($optionTemplate, $rep);
+       return $this->formatTemplate($optgroupTemplate, $rep);
     }
 
     /**

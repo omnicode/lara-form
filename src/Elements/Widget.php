@@ -118,15 +118,17 @@ class Widget implements WidgetInterface
      */
     public function formatAttributes($attributes)
     {
+        $attributes = array_filter($attributes, function ($value) {
+            if (!empty($value) && $value !== '' && $value !== false) {
+                return $value;
+            }
+        });
         $attr = '';
         foreach ($attributes as $index => $attribute) {
-            if (empty($attributes)) {
-                continue;
-            }
-            if (is_numeric($index)) {
-                $attr .= $attribute.' ';
-            }else{
-                $attr .= $index . "'" . $attribute . "' ";
+            if (is_string((string)$index)) {
+                $attr .= $index . "='" . $attribute . "' ";
+            } else {
+                $attr .= $attribute . ' ';
             }
 
         }

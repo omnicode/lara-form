@@ -14,7 +14,7 @@ class RadioWidget extends BaseInputWidget
         $name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
         $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
-
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : false;
         if (empty($attr['id'])) {
             $attr['id'] = $name . '-' . $attr['value'];
         }
