@@ -7,7 +7,7 @@ class InputWidget extends BaseInputWidget
     /**
      * @var array
      */
-    protected $otherInput = ['checkbox', 'radio', 'submit'];
+    protected $otherInput = ['checkbox', 'radio', 'submit','file'];
 
     /**
      * @param $option

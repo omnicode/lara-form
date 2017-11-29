@@ -13,6 +13,7 @@ class FileWidget extends BaseInputWidget
         $template = $this->_defaultConfig['templates']['file'];
         $name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : false;
 
         if (isset($attr['type'])) {
             unset($attr['type']);

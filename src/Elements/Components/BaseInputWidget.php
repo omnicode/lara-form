@@ -44,7 +44,6 @@ class BaseInputWidget extends Widget
         }
 
         $htmlAttribute = [];
-        $lable = '';
         if (isset($attr['id']) && $attr['id'] == false) {
             unset($attr['id']);
         } else {
@@ -60,6 +59,12 @@ class BaseInputWidget extends Widget
             unset($htmlAttribute['type']);
         }
 
+        if (!isset($htmlAttribute['class'])) {
+            $htmlAttribute['class'] = $this->_defaultConfig['css']['inputClass'];
+        } elseif (isset($htmlAttribute['class']) && $htmlAttribute['class'] == false) {
+            unset($htmlAttribute['class']);
+        }
+
         if (isset($htmlAttribute['value']) && $cTemplate) {
             $scoreAttribute['value'] = $htmlAttribute['value'];
             unset($htmlAttribute['value']);
@@ -68,16 +73,17 @@ class BaseInputWidget extends Widget
         if (!isset($scoreAttribute['type'])) {
             $scoreAttribute['type'] = 'text';
         }
+
         if ($scoreAttribute['type'] !== 'hidden') {
-            if (!isset($attr['lable']) || $attr['lable'] !== false) {
-                $for = isset($htmlAttribute['id'])  ? $htmlAttribute['id'] : $name;
-                $lableName = $this->getLableName($name);
-                $lable = $this->setLable([$lableName,['for' => $for]]);
+            $this->renderLabel($name, $htmlAttribute);
+            if (isset($htmlAttribute['label'])) {
+                unset($htmlAttribute['label']);
             }
         }
+
         $scoreAttribute['attrs'] = $this->formatAttributes($htmlAttribute);
-        $this->html = $lable.$this->formatTemplate($template, $scoreAttribute);
-        return $this->html;
+        $this->html = $this->formatTemplate($template, $scoreAttribute);
+        return $this->label.$this->html;
     }
 
 }

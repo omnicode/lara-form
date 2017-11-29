@@ -18,6 +18,10 @@ class CheckboxWidget extends BaseInputWidget
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
+        if (isset($attr['multiple'])) {
+            $name .='[]';
+            unset($attr['multiple']);
+        }
 
         if (isset($attr['hidden']) && $attr['hidden'] == false) {
             $hidden = '';

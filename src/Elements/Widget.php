@@ -8,9 +8,16 @@ use Illuminate\Support\Facades\Config;
 class Widget implements WidgetInterface
 {
     public $html;
+    public $label = '';
     public $routes = [];
+    public $template;
     public $_requestMethods = ['get', 'post', 'put', 'patch', 'delete'];
     public $_defaultConfig = [
+        'css' => [
+            'inputClass' => 'form-control',
+            'inputErrorClass' => 'is-invalid',
+            'submitClass' => 'btn btn-success',
+        ],
         'templates' => [
             // Used for button elements in button().
             'button' => '<button{{attrs}}>{{text}}</button>',
@@ -45,7 +52,7 @@ class Widget implements WidgetInterface
             // Submit input element.
             'submit' => '<input type="submit" {{attrs}}/>',
             // Container element used by control().
-            'inputContainer' => '<div class="input {{type}}{{required}}">{{content}}</div>',
+            'inputContainer' => '<div class="input {{type}}{{required}}" {{containerAttrs}}>{{content}}</div>',
             // Container element used by control() when a field has an error.
             'inputContainerError' => '<div class="input {{type}}{{required}} error">{{content}}{{error}}</div>',
             // Label element when inputs are not nested inside the label.
@@ -116,7 +123,12 @@ class Widget implements WidgetInterface
             if (empty($attributes)) {
                 continue;
             }
-            $attr .= $index . "='" . $attribute . "' ";
+            if (is_numeric($index)) {
+                $attr .= $attribute.' ';
+            }else{
+                $attr .= $index . "'" . $attribute . "' ";
+            }
+
         }
         return $attr;
     }
@@ -182,7 +194,7 @@ class Widget implements WidgetInterface
      */
     public function getId($name)
     {
-        return str_ireplace(' ','',ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name)));
+        return str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name)));
     }
 
     /**
@@ -229,7 +241,10 @@ class Widget implements WidgetInterface
         return $obj->render(...$arrgs);
     }
 
-    public function setLable($option)
+    /*
+     *
+     */
+    public function setLabel($option)
     {
         $template = $this->_defaultConfig['templates']['label'];
         $name = array_shift($option);
@@ -244,14 +259,39 @@ class Widget implements WidgetInterface
             'text' => $name
         ];
 
-        return $this->html = $this->formatTemplate($template, $rep);
+        return $this->formatTemplate($template, $rep);
+    }
+
+    /**
+     * @param $inputName
+     * @param $option
+     * @return string
+     */
+    public function renderLabel($inputName, $option)
+    {
+        $label = '';
+        $for = '';
+        if (isset($option['label'])) {
+            if (is_string((string)$option['label'])) {
+                $for = $option['label'];
+            }
+            if ($option['label'] == false) {
+                return $label;
+            }
+        } else {
+            $for = isset($option['id']) ? $option['id'] : $inputName;
+        }
+
+        $labelName = $this->getLabelName($inputName);
+        $this->label = $this->setLabel([$labelName, ['for' => $for]]);
+        return $this->label;
     }
 
     /**
      * @param $name
      * @return string
      */
-    public function getLableName($name)
+    public function getLabelName($name)
     {
         return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
     }
