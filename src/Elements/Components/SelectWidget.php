@@ -8,6 +8,11 @@ use function Symfony\Component\Debug\Tests\testHeader;
 class SelectWidget extends Widget
 {
     /**
+     * @var
+     */
+    protected $selectTemplate;
+
+    /**
      * @var bool
      */
     protected $selected = false;
@@ -29,9 +34,11 @@ class SelectWidget extends Widget
      */
     public function render($params)
     {
-        $selectTemplate = $this->config['templates']['select'];
         $this->name = array_shift($params);
         $attr = !empty($params[0]) ? $params[0] : [];
+        if (strpos($this->name,'[]')) {
+            $attr['multiple'] = true;
+        }
         $this->inspectionAttributes($attr);
         $optionsHtml = $this->renderOptions();
         $selectAttrs = [
@@ -40,8 +47,8 @@ class SelectWidget extends Widget
             'attrs' => $this->formatAttributes($attr)
         ];
         $this->renderLabel($this->name, $params);
-        $this->html = $this->formatTemplate($selectTemplate, $selectAttrs);
-        return $this->label.$this->html;
+        $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
+        return $this->label . $this->html;
     }
 
     /**
@@ -64,7 +71,7 @@ class SelectWidget extends Widget
         foreach ($options as $index => $option) {
             $optAttrs = [];
             if (is_array($option)) {
-                $optionsHtml .=$this->renderOptgroup($index, $option);
+                $optionsHtml .= $this->renderOptgroup($index, $option);
                 continue;
             }
             $optAttrs += $this->isDisabled($index);
@@ -95,7 +102,7 @@ class SelectWidget extends Widget
             'content' => $childOptionsHtml,
             'attrs' => false
         ];
-       return $this->formatTemplate($optgroupTemplate, $rep);
+        return $this->formatTemplate($optgroupTemplate, $rep);
     }
 
     /**
@@ -105,18 +112,23 @@ class SelectWidget extends Widget
     public function inspectionAttributes(&$attr)
     {
         $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['selectClass'];
-
+        if (isset($attr['multiple'])) {
+            $this->selectTemplate = $this->config['templates']['selectMultiple'];
+            unset($attr['multiple']);
+        }else{
+            $this->selectTemplate = $this->config['templates']['select'];
+        }
         if (!empty($attr['options'])) {
             $this->optionsArray = is_array($attr['options']) ? $attr['options'] : [$attr['options']];
             unset($attr['options']);
         }
         if (isset($attr['empty']) && $attr['empty'] !== false) {
-             array_unshift($this->optionsArray,$attr['empty']);
-             unset($attr['empty']);
-        }else{
+            array_unshift($this->optionsArray, $attr['empty']);
+            unset($attr['empty']);
+        } else {
             $emptyValue = config('lara_form.label.select_empty');
             if ($emptyValue) {
-                array_unshift($this->optionsArray,$emptyValue);
+                array_unshift($this->optionsArray, $emptyValue);
             }
         }
         if (isset($attr['label'])) {

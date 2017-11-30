@@ -6,6 +6,14 @@ use LaraForm\Elements\Widget;
 
 class BaseInputWidget extends Widget
 {
+    /**
+     * @var array
+     */
+    protected $htmlAttributes = [];
+
+    /**
+     * @var array
+     */
     protected $types = [
         'text',
         'checkbox',
@@ -17,16 +25,27 @@ class BaseInputWidget extends Widget
         'hidden'
     ];
 
+    /**
+     * @param $option
+     */
     public function render($option)
     {
 
     }
 
     /**
-     * @param $this->name
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
+
+    }
+    /**
+     * @param $name
      * @param $attr
      * @param bool $cTemplate
      * @return string
+     * @internal param $this ->name
      */
     public function toHtml($name, $attr, $cTemplate = false)
     {
@@ -36,46 +55,10 @@ class BaseInputWidget extends Widget
             $template = $cTemplate;
         }
 
-        $htmlAttribute = [];
-        if (isset($attr['id']) && $attr['id'] == false) {
-            unset($attr['id']);
-        } else {
-            $htmlAttribute['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
-        }
-
-
-        $htmlAttribute = array_merge($htmlAttribute, $attr);
-        $scoreAttribute['name'] = $this->name;
-
-        if (isset($htmlAttribute['type'])) {
-            $scoreAttribute['type'] = $htmlAttribute['type'];
-            unset($htmlAttribute['type']);
-        }
-
-        if (!isset($htmlAttribute['class'])) {
-            $htmlAttribute['class'] = $this->config['css']['inputClass'];
-        } elseif (isset($htmlAttribute['class']) && $htmlAttribute['class'] == false) {
-            unset($htmlAttribute['class']);
-        }
-
-        if (isset($htmlAttribute['value']) && $cTemplate) {
-            $scoreAttribute['value'] = $htmlAttribute['value'];
-            unset($htmlAttribute['value']);
-        }
-
-        if (!isset($scoreAttribute['type'])) {
-            $scoreAttribute['type'] = 'text';
-        }
-
-        if ($scoreAttribute['type'] !== 'hidden') {
-            $this->renderLabel($this->name, $htmlAttribute);
-            if (isset($htmlAttribute['label'])) {
-                unset($htmlAttribute['label']);
-            }
-        }
-
-        $scoreAttribute['attrs'] = $this->formatAttributes($htmlAttribute);
-        $this->html = $this->formatTemplate($template, $scoreAttribute);
+        $this->generalInspectionAttributes($attr, $cTemplate);
+        $this->htmlAttributes['name'] = $this->name;
+        $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
+        $this->html = $this->formatTemplate($template, $this->htmlAttributes);
         return $this->label . $this->html;
     }
 
@@ -90,7 +73,6 @@ class BaseInputWidget extends Widget
         if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
             if (isset($templates[$attr['type']])) {
                 $template = $templates[$attr['type']];
-                unset($attr['type']);
             }
         }
         return $template;
@@ -98,39 +80,39 @@ class BaseInputWidget extends Widget
 
     /**
      * @param $attr
+     * @param $cTemplate
      * @internal param $attrs
      * @internal param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function generalInspectionAttributes(&$attr, $cTemplate)
     {
-        if (!empty($attr['options'])) {
-            $this->optionsArray = is_array($attr['options']) ? $attr['options'] : [$attr['options']];
-            unset($attr['options']);
-        }
-        if (isset($attr['empty']) && $attr['empty'] !== false) {
-            array_unshift($this->optionsArray, $attr['empty']);
-            unset($attr['empty']);
+        if (isset($attr['id']) && $attr['id'] == false) {
+            unset($attr['id']);
         } else {
-            $emptyValue = config('lara_form.label.select_empty');
-            if ($emptyValue) {
-                array_unshift($this->optionsArray, $emptyValue);
-            }
+            $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
         }
-        if (isset($attr['label'])) {
-            unset($attr['label']);
-        }
-
-        if (isset($attr['selected'])) {
-            $this->selected = $attr['selected'];
-            unset($attr['selected']);
+        if (isset($attr['type'])) {
+            $this->htmlAttributes['type'] = $attr['type'];
+            unset($attr['type']);
+        } else {
+            $this->htmlAttributes['type'] = 'text';
         }
 
-        if (isset($attr['disabled'])) {
-            $this->disabled = $attr['disabled'];
-            if (!is_array($this->disabled)) {
-                $this->disabled = [$this->disabled];
+        if (!isset($attr['class'])) {
+            $attr['class'] = $this->config['css']['inputClass'];
+        } elseif (isset($attr['class']) && $attr['class'] == false) {
+            unset($attr['class']);
+        }
+
+        if (isset($attr['value']) && $cTemplate) {
+            $this->htmlAttributes['value'] = $attr['value'];
+            unset($attr['value']);
+        }
+        if ($this->htmlAttributes['type'] !== 'hidden') {
+            $this->renderLabel($this->name, $attr);
+            if (isset($attr['label'])) {
+                unset($attr['label']);
             }
-            unset($attr['disabled']);
         }
     }
 }

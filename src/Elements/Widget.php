@@ -7,11 +7,34 @@ use Illuminate\Support\Facades\Config;
 
 class Widget implements WidgetInterface
 {
+    /**
+     * @var string
+     */
     public $html = '';
+
+    /**
+     * @var string
+     */
     public $label = '';
+
+    /**
+     * @var
+     */
     public $name;
+
+    /**
+     * @var array
+     */
     public $routes = [];
+
+    /**
+     * @var array
+     */
     public $_requestMethods = ['get', 'post', 'put', 'patch', 'delete'];
+
+    /**
+     * @var mixed
+     */
     public $config;
 
     /**
@@ -20,6 +43,22 @@ class Widget implements WidgetInterface
     public function __construct()
     {
         $this->config = config('lara_form');
+    }
+
+    /**
+     * @param $option
+     */
+    public function render($option)
+    {
+
+    }
+
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
+
     }
 
     /**
@@ -41,11 +80,6 @@ class Widget implements WidgetInterface
         }
         $fild = str_ireplace($from, $to, $template);
         return $fild;
-
-    }
-
-    public function render($option)
-    {
 
     }
 
@@ -240,9 +274,4 @@ class Widget implements WidgetInterface
         return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
     }
 
-
-    public function inspectionAttributes(&$attr)
-    {
-
-    }
 }

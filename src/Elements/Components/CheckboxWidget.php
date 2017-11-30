@@ -18,6 +18,9 @@ class CheckboxWidget extends BaseInputWidget
         $template = $this->config['templates']['checkbox'];
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
+        if (strpos($this->name,'[]')) {
+            $attr['multiple'] = true;
+        }
         $this->inspectionAttributes($attr);
         return $this->html = $this->hidden . $this->toHtml($this->name, $attr, $template);
     }
