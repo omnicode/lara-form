@@ -15,14 +15,9 @@ class BaseInputWidget extends Widget
      * @var array
      */
     protected $types = [
-        'text',
         'checkbox',
         'radio',
-        'submit',
-        'number',
-        'email',
-        'password',
-        'hidden'
+        'submit'
     ];
 
     /**
@@ -40,6 +35,7 @@ class BaseInputWidget extends Widget
     {
 
     }
+
     /**
      * @param $name
      * @param $attr
@@ -59,7 +55,7 @@ class BaseInputWidget extends Widget
         $this->htmlAttributes['name'] = $this->name;
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
         $this->html = $this->formatTemplate($template, $this->htmlAttributes);
-        return $this->label . $this->html;
+        return $this->completeTemplate();
     }
 
     /**
@@ -91,6 +87,7 @@ class BaseInputWidget extends Widget
         } else {
             $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
         }
+
         if (isset($attr['type'])) {
             $this->htmlAttributes['type'] = $attr['type'];
             unset($attr['type']);

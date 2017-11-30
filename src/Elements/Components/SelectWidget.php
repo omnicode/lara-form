@@ -15,7 +15,7 @@ class SelectWidget extends Widget
     /**
      * @var bool
      */
-    protected $selected = false;
+    protected $selected = [];
 
     /**
      * @var array
@@ -26,6 +26,7 @@ class SelectWidget extends Widget
      * @var
      */
     protected $optionsArray;
+
 
     /**
      * @param $params
@@ -89,14 +90,14 @@ class SelectWidget extends Widget
     /**
      * @param $groupName
      * @param $options
-     * @internal param $option
      * @return string
+     * @internal param array $attr
+     * @internal param $option
      */
     protected function renderOptgroup($groupName, $options)
     {
         $optgroupTemplate = $this->config['templates']['optgroup'];
         $childOptionsHtml = $this->renderOptions($options);
-
         $rep = [
             'label' => $groupName,
             'content' => $childOptionsHtml,
@@ -106,8 +107,7 @@ class SelectWidget extends Widget
     }
 
     /**
-     * @param $attrs
-     * @internal param $attr
+     * @param $attr
      */
     public function inspectionAttributes(&$attr)
     {
@@ -137,6 +137,9 @@ class SelectWidget extends Widget
 
         if (isset($attr['selected'])) {
             $this->selected = $attr['selected'];
+            if (!is_array($this->selected)) {
+                $this->selected = [$this->selected];
+            }
             unset($attr['selected']);
         }
 
@@ -170,7 +173,7 @@ class SelectWidget extends Widget
     protected function isSelected($str)
     {
         $arr = [];
-        if ($this->selected == $str) {
+        if (in_array($str, $this->selected)) {
             $arr['selected'] = 'selected';
         }
         return $arr;

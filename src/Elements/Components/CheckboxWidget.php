@@ -5,11 +5,6 @@ namespace LaraForm\Elements\Components;
 class CheckboxWidget extends BaseInputWidget
 {
     /**
-     * @var string
-     */
-    protected $hidden = '';
-
-    /**
      * @param $option
      * @return string
      */
@@ -22,7 +17,8 @@ class CheckboxWidget extends BaseInputWidget
             $attr['multiple'] = true;
         }
         $this->inspectionAttributes($attr);
-        return $this->html = $this->hidden . $this->toHtml($this->name, $attr, $template);
+        $this->containerTemplate = $this->config['templates']['nestingLabel'];
+        return $this->toHtml($this->name, $attr, $template);
     }
 
 
@@ -38,14 +34,16 @@ class CheckboxWidget extends BaseInputWidget
             unset($attr['type']);
         }
         if (isset($attr['multiple'])) {
-            $this->name .='[]';
+            if (!strpos($this->name,'[]')) {
+                $this->name .='[]';
+            }
             unset($attr['multiple']);
         }
 
         if (isset($attr['hidden']) && $attr['hidden'] == false) {
             unset($attr['hidden']);
         } else {
-            $this->hidden = $this->toHtml($this->name, ['type' => 'hidden', 'value' => 0, 'name' => $this->name, 'id' => false]);
+            $this->hidden = $this->toHtml($this->name, ['type' => 'hidden', 'value' => '0', 'name' => $this->name, 'id' => false]);
         }
     }
 }

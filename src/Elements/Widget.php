@@ -38,6 +38,20 @@ class Widget implements WidgetInterface
     public $config;
 
     /**
+     * @var
+     */
+    public $attributes;
+
+    /**
+     * @var bool
+     */
+    public $containerTemplate = false;
+
+    /**
+     * @var string
+     */
+    public $hidden = '';
+    /**
      * Widget constructor.
      */
     public function __construct()
@@ -78,9 +92,7 @@ class Widget implements WidgetInterface
             $from[] = '{{' . $index . '}}';
             $to[] = $attribute;
         }
-        $fild = str_ireplace($from, $to, $template);
-        return $fild;
-
+        return str_ireplace($from, $to, $template);
     }
 
     /**
@@ -94,18 +106,38 @@ class Widget implements WidgetInterface
                 return $value;
             }
         });
+
         $attr = '';
         foreach ($attributes as $index => $attribute) {
             if (is_string((string)$index)) {
-                $attr .= $index . "='" . $attribute . "' ";
+                $attr .= $index . '="' . $attribute . '"';
             } else {
                 $attr .= $attribute . ' ';
             }
 
         }
+
         return $attr;
     }
 
+    /**
+     * @return string
+     */
+    public function completeTemplate()
+    {
+        $containerAttributes = [
+            'required' => '',
+            'type' => '',
+            'text' => $this->label,
+            'label' => $this->label,
+            'attrs' => '',
+            'hidden' => $this->hidden,
+            'containerAttrs' => '',
+            'content' => $this->html
+        ];
+        $container = $this->containerTemplate ? $this->containerTemplate : $this->config['templates']['inputContainer'];
+        return $this->formatTemplate($container,$containerAttributes);
+    }
     /**
      * @param array $options
      * @return array|mixed|string

@@ -11,10 +11,10 @@ class PasswordWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $name = $option[0];
-        $attr = !empty($option[1]) ? $option[1] : [];
+        $this->name = array_shift($option);
+        $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
-        return $this->toHtml($name, $attr);
+        return $this->toHtml($this->name, $attr);
     }
 
 

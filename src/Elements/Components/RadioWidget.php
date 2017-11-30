@@ -22,7 +22,8 @@ class RadioWidget extends BaseInputWidget
 
 
     /**
-     * @param $attrs
+     * @param $attr
+     * @internal param $attrs
      * @internal param $attr
      */
     public function inspectionAttributes(&$attr)
