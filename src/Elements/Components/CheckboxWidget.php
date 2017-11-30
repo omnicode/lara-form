@@ -5,32 +5,44 @@ namespace LaraForm\Elements\Components;
 class CheckboxWidget extends BaseInputWidget
 {
     /**
+     * @var string
+     */
+    protected $hidden = '';
+
+    /**
      * @param $option
      * @return string
      */
     public function render($option)
     {
-        $template = $this->_defaultConfig['templates']['checkbox'];
-        $name = array_shift($option);
+        $template = $this->config['templates']['checkbox'];
+        $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
+        $this->inspectionAttributes($attr);
+        return $this->html = $this->hidden . $this->toHtml($this->name, $attr, $template);
+    }
+
+
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : false;
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['checkboxClass'];
 
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
         if (isset($attr['multiple'])) {
-            $name .='[]';
+            $this->name .='[]';
             unset($attr['multiple']);
         }
 
         if (isset($attr['hidden']) && $attr['hidden'] == false) {
-            $hidden = '';
             unset($attr['hidden']);
         } else {
-            $hidden = $this->toHtml($name, ['type' => 'hidden', 'value' => 0, 'name' => $name, 'id' => false]);
+            $this->hidden = $this->toHtml($this->name, ['type' => 'hidden', 'value' => 0, 'name' => $this->name, 'id' => false]);
         }
-
-        return $this->html = $hidden . $this->toHtml($name, $attr, $template);
     }
 }

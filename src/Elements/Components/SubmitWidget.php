@@ -10,14 +10,22 @@ class SubmitWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $template = $this->_defaultConfig['templates']['submit'];
-        $name = array_shift($option);
+        $template = $this->config['templates']['submit'];
+        $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->_defaultConfig['css']['submitClass'];
+        $this->inspectionAttributes($attr);
+        return $this->html = $this->toHtml($this->name, $attr, $template);
+    }
+
+
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['submitClass'];
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
-
-        return $this->html = $this->toHtml($name, $attr, $template);
     }
 }

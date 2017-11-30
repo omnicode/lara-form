@@ -12,14 +12,22 @@ class TextareaWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $template = $this->_defaultConfig['templates']['textarea'];
-        $name = array_shift($option);
+        $template = $this->config['templates']['textarea'];
+        $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
+        $this->inspectionAttributes($attr);
+        return $this->html = $this->toHtml($this->name, $attr, $template);
+    }
+
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : '';
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['textareaClass'];
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
-
-        return $this->html = $this->toHtml($name, $attr, $template);
     }
 }

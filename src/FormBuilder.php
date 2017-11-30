@@ -78,7 +78,7 @@ class FormBuilder
         $this->formProtection->setUnlockFields($unlockFields);
 
         if ($method != 'get') {
-            $hidden = $this->hidden(Config::get('lara_form.label.form_protection', 'laraform_token'), ['value' => $token]);
+            $hidden = $this->hidden(config('lara_form.label.form_protection', 'laraform_token'), ['value' => $token]);
         } else {
             $hidden = '';
         }

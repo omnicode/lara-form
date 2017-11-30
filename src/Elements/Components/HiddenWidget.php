@@ -11,16 +11,20 @@ class HiddenWidget extends BaseInputWidget
      */
     public function render($option)
     {
-
-        $name = array_shift($option);
+        $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
+        $this->inspectionAttributes($attr);
+        return $this->toHtml($this->name, $attr);
+    }
 
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
-
         $attr['type'] = 'hidden';
-
-        return $this->toHtml($name, $attr);
     }
 }

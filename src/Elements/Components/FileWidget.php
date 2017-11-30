@@ -10,18 +10,24 @@ class FileWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $template = $this->_defaultConfig['templates']['file'];
-        $name = array_shift($option);
+        $template = $this->config['templates']['file'];
+        $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : false;
+        $this->inspectionAttributes($attr);
+        return $this->html = $this->toHtml($this->name, $attr, $template);
+    }
 
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['fileClass'];
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
         if (isset($attr['value'])) {
             unset($attr['value']);
         }
-
-        return $this->html = $this->toHtml($name, $attr, $template);
     }
 }

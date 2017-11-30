@@ -14,4 +14,12 @@ class LabelWidget extends Widget
     {
         return $this->setLabel($option);
     }
+
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
+
+    }
 }

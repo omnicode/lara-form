@@ -48,7 +48,7 @@ class MakeForm
         $action = $this->widget->action($options);
         $htmlAttributes['action'] = $action;
         $htmlAttributes['method'] = ($method == 'get') ? 'GET' : 'POST';
-        $htmlAttributes['accept-charset'] = Config::get('lara_form.charset', 'utf-8');
+        $htmlAttributes['accept-charset'] = config('lara_form.charset', 'utf-8');
 
         if (!empty($options['file'])) {
             $htmlAttributes['enctype'] = 'multipart/form-data';
@@ -56,7 +56,7 @@ class MakeForm
         }
 
         $htmlAttributes += $options;
-        $template = $this->widget->_defaultConfig['templates']['formStart'];
+        $template = $this->widget->config['templates']['formStart'];
         $rep = [
             'attrs' => $this->widget->formatAttributes($htmlAttributes)
         ];
@@ -78,7 +78,7 @@ class MakeForm
      */
     public function close()
     {
-        $template = $this->widget->_defaultConfig['templates']['formEnd'];
+        $template = $this->widget->config['templates']['formEnd'];
         return $this->widget->formatTemplate($template, false);
     }
 

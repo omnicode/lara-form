@@ -12,10 +12,12 @@ class InputWidget extends BaseInputWidget
     /**
      * @param $option
      * @return mixed|string
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
      */
     public function render($option)
     {
-        $name = $option[0];
+        $this->name = $option[0];
         $attr = !empty($option[1]) ? $option[1] : [];
         if (isset($attr['type'])) {
             if (in_array($attr['type'], $this->otherInput)) {
@@ -23,6 +25,14 @@ class InputWidget extends BaseInputWidget
             }
         }
 
-        return $this->toHtml($name, $attr);
+        return $this->toHtml($this->name, $attr);
+    }
+
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
+
     }
 }

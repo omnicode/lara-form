@@ -3,6 +3,7 @@
 namespace LaraForm\Elements\Components;
 
 use LaraForm\Elements\Widget;
+use function Symfony\Component\Debug\Tests\testHeader;
 
 class SelectWidget extends Widget
 {
@@ -28,18 +29,17 @@ class SelectWidget extends Widget
      */
     public function render($params)
     {
-        $selectTemplate = $this->_defaultConfig['templates']['select'];
-        $name = array_shift($params);
+        $selectTemplate = $this->config['templates']['select'];
+        $this->name = array_shift($params);
         $attr = !empty($params[0]) ? $params[0] : [];
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->_defaultConfig['css']['inputClass'];
         $this->inspectionAttributes($attr);
         $optionsHtml = $this->renderOptions();
         $selectAttrs = [
             'content' => $optionsHtml,
-            'name' => $name,
+            'name' => $this->name,
             'attrs' => $this->formatAttributes($attr)
         ];
-        $this->renderLabel($name, $params);
+        $this->renderLabel($this->name, $params);
         $this->html = $this->formatTemplate($selectTemplate, $selectAttrs);
         return $this->label.$this->html;
     }
@@ -51,7 +51,7 @@ class SelectWidget extends Widget
      */
     protected function renderOptions($gropup = false)
     {
-        $optionTemplate = $this->_defaultConfig['templates']['option'];
+        $optionTemplate = $this->config['templates']['option'];
         if ($gropup) {
             $options = $gropup;
         } else {
@@ -67,8 +67,8 @@ class SelectWidget extends Widget
                 $optionsHtml .=$this->renderOptgroup($index, $option);
                 continue;
             }
-            $optAttrs[] = $this->isDisabled($index);
-            $optAttrs[] = $this->isSelected($index);
+            $optAttrs += $this->isDisabled($index);
+            $optAttrs += $this->isSelected($index);
             $rep = [
                 'text' => $option,
                 'value' => $index,
@@ -87,26 +87,37 @@ class SelectWidget extends Widget
      */
     protected function renderOptgroup($groupName, $options)
     {
-        $optgroupTemplate = $this->_defaultConfig['templates']['optgroup'];
+        $optgroupTemplate = $this->config['templates']['optgroup'];
         $childOptionsHtml = $this->renderOptions($options);
 
         $rep = [
             'label' => $groupName,
             'content' => $childOptionsHtml,
+            'attrs' => false
         ];
        return $this->formatTemplate($optgroupTemplate, $rep);
     }
 
     /**
-     * @param $attr
+     * @param $attrs
+     * @internal param $attr
      */
-    protected function inspectionAttributes(&$attr)
+    public function inspectionAttributes(&$attr)
     {
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['selectClass'];
+
         if (!empty($attr['options'])) {
             $this->optionsArray = is_array($attr['options']) ? $attr['options'] : [$attr['options']];
             unset($attr['options']);
-        } else {
-            $this->optionsArray = ['--Select--'];
+        }
+        if (isset($attr['empty']) && $attr['empty'] !== false) {
+             array_unshift($this->optionsArray,$attr['empty']);
+             unset($attr['empty']);
+        }else{
+            $emptyValue = config('lara_form.label.select_empty');
+            if ($emptyValue) {
+                array_unshift($this->optionsArray,$emptyValue);
+            }
         }
         if (isset($attr['label'])) {
             unset($attr['label']);
@@ -129,25 +140,27 @@ class SelectWidget extends Widget
 
     /**
      * @param $str
-     * @return string
+     * @return array
      */
     protected function isDisabled($str)
     {
+        $arr = [];
         if (in_array($str, $this->disabled)) {
-            return 'disabled';
+            $arr['disabled'] = 'disabled';
         }
-        return '';
+        return $arr;
     }
 
     /**
      * @param $str
-     * @return string
+     * @return array
      */
     protected function isSelected($str)
     {
+        $arr = [];
         if ($this->selected == $str) {
-            return 'selected';
+            $arr['selected'] = 'selected';
         }
-        return '';
+        return $arr;
     }
 }

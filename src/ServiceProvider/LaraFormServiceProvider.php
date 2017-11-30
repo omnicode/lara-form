@@ -17,6 +17,7 @@ class LaraFormServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerFormProtection();
+        $this->registerFormWidget();
         $this->registerFormElements();
         $this->registerFormBuilder();
         $this->registerMiddleware(LaraFormMiddleware::class);
@@ -32,6 +33,7 @@ class LaraFormServiceProvider extends ServiceProvider
         $router->pushMiddlewareToGroup('web', $middleware);
     }
 
+
     /**
      *
      */
@@ -45,10 +47,20 @@ class LaraFormServiceProvider extends ServiceProvider
     /**
      *
      */
+    protected function registerFormWidget()
+    {
+        $this->app->singleton('widget', function ($app) {
+            return new Widget();
+        });
+    }
+
+    /**
+     *
+     */
     protected function registerFormElements()
     {
         $this->app->singleton('laraform.make-form', function ($app) {
-            return new MakeForm(new Widget());
+            return new MakeForm($app['widget']);
         });
     }
 
