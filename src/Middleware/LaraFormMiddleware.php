@@ -1,4 +1,5 @@
 <?php
+
 namespace LaraForm\Middleware;
 
 use Closure;
@@ -28,9 +29,9 @@ class LaraFormMiddleware
 
             $isAjax = $request->ajax();
             $validate = $formProtection->validate($data, $isAjax);
-            if($validate === false) {
-                abort(401, 'Your Action Is Forbidden');
-            }
+            /*if($validate === false) {
+                   abort(401, 'Your Action Is Forbidden');
+               }*/
 
             unset($request[Config::get('lara_form.label.form_protection', 'laraform_token')]);
         }
@@ -42,7 +43,8 @@ class LaraFormMiddleware
      * @param $url
      * @return bool
      */
-    private function isGlobalExceptionUrl($url) {
+    private function isGlobalExceptionUrl($url)
+    {
         $isExcept = false;
         $excepts = Config::get('lara_form.except', []);
 
@@ -55,7 +57,7 @@ class LaraFormMiddleware
                     }
                 }
             } else {
-                if(url($except) == $url) {
+                if (url($except) == $url) {
                     $isExcept = true;
                     break;
                 }

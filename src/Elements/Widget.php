@@ -4,9 +4,15 @@ namespace LaraForm\Elements;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
+use LaraForm\Stores\ErrorsStore;
 
 class Widget implements WidgetInterface
 {
+    /**
+     * @var array
+     */
+    protected $htmlAttributes = [];
+
     /**
      * @var string
      */
@@ -51,12 +57,19 @@ class Widget implements WidgetInterface
      * @var string
      */
     public $hidden = '';
+
+    /**
+     * @var array
+     */
+    public $errors = [];
+
     /**
      * Widget constructor.
      */
     public function __construct()
     {
         $this->config = config('lara_form');
+        $this->errors = new ErrorsStore();
     }
 
     /**
@@ -85,7 +98,6 @@ class Widget implements WidgetInterface
         if (empty($attributes)) {
             return $template;
         }
-
         $from = [];
         $to = [];
         foreach ($attributes as $index => $attribute) {
@@ -101,12 +113,11 @@ class Widget implements WidgetInterface
      */
     public function formatAttributes($attributes)
     {
-        $attributes = array_filter($attributes, function ($value) {
-            if (!empty($value) && $value !== '' && $value !== false) {
+       /* $attributes = array_filter($attributes, function ($value) {
+            if ($value !== '' && $value !== false) {
                 return $value;
             }
-        });
-
+        });*/
         $attr = '';
         foreach ($attributes as $index => $attribute) {
             if (is_string((string)$index)) {
@@ -135,9 +146,16 @@ class Widget implements WidgetInterface
             'containerAttrs' => '',
             'content' => $this->html
         ];
-        $container = $this->containerTemplate ? $this->containerTemplate : $this->config['templates']['inputContainer'];
-        return $this->formatTemplate($container,$containerAttributes);
+        if ($this->containerTemplate) {
+            $container = $this->containerTemplate;
+        } elseif ($this->htmlAttributes['type'] !== 'hidden') {
+            $container = $this->config['templates']['inputContainer'];
+        } else {
+            return $this->html;
+        }
+        return $this->formatTemplate($container, $containerAttributes);
     }
+
     /**
      * @param array $options
      * @return array|mixed|string
@@ -146,6 +164,7 @@ class Widget implements WidgetInterface
      */
     public function action(&$options = [])
     {
+
         if (!empty($options['route'])) {
             $route = $options['route'];
             unset($options['route']);
@@ -164,15 +183,14 @@ class Widget implements WidgetInterface
         if (isset($options['action'])) {
             $action = $options['action'];
             if (!is_array($action)) {
+                //if action is url
+                if (filter_var($action, FILTER_VALIDATE_URL)) {
+                    return $action;
+                }
                 $action = [$action];
             }
         } else {
             return request()->url();
-        }
-
-        //if action is url
-        if (filter_var($action, FILTER_VALIDATE_URL)) {
-            return $action;
         }
 
         $allRoutes = $this->getRoutes();
@@ -245,7 +263,7 @@ class Widget implements WidgetInterface
         //TODO optimization create objects system
         $modelName = ucfirst($method);
         $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
-        app()->singleton($modelName . 'Widget',function ()use($classNamspace){
+        app()->singleton($modelName . 'Widget', function () use ($classNamspace) {
             return new $classNamspace();
         });
         return app($modelName . 'Widget')->render(...$arrgs);
@@ -279,19 +297,7 @@ class Widget implements WidgetInterface
      */
     public function renderLabel($inputName, $option)
     {
-        $label = '';
-        $for = '';
-        if (isset($option['label'])) {
-            if (is_string((string)$option['label'])) {
-                $for = $option['label'];
-            }
-            if ($option['label'] == false) {
-                return $label;
-            }
-        } else {
-            $for = isset($option['id']) ? $option['id'] : $inputName;
-        }
-
+        $for = isset($option['id']) ? $option['id'] : $inputName;
         $labelName = $this->getLabelName($inputName);
         $this->label = $this->setLabel([$labelName, ['for' => $for]]);
         return $this->label;
@@ -306,4 +312,15 @@ class Widget implements WidgetInterface
         return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
     }
 
+    /**
+     * @param $attr
+     */
+    public function generateId(&$attr)
+    {
+        if (isset($attr['id']) && $attr['id'] == false) {
+            unset($attr['id']);
+        } else {
+            $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
+        }
+    }
 }

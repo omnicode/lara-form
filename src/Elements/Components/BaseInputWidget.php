@@ -9,11 +9,6 @@ class BaseInputWidget extends Widget
     /**
      * @var array
      */
-    protected $htmlAttributes = [];
-
-    /**
-     * @var array
-     */
     protected $types = [
         'checkbox',
         'radio',
@@ -52,7 +47,7 @@ class BaseInputWidget extends Widget
         }
 
         $this->generalInspectionAttributes($attr, $cTemplate);
-        $this->htmlAttributes['name'] = $this->name;
+        $this->htmlAttributes['name'] = $name;
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
         $this->html = $this->formatTemplate($template, $this->htmlAttributes);
         return $this->completeTemplate();
@@ -82,11 +77,7 @@ class BaseInputWidget extends Widget
      */
     public function generalInspectionAttributes(&$attr, $cTemplate)
     {
-        if (isset($attr['id']) && $attr['id'] == false) {
-            unset($attr['id']);
-        } else {
-            $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
-        }
+        $this->generateId($attr);
 
         if (isset($attr['type'])) {
             $this->htmlAttributes['type'] = $attr['type'];
@@ -94,22 +85,24 @@ class BaseInputWidget extends Widget
         } else {
             $this->htmlAttributes['type'] = 'text';
         }
-
-        if (!isset($attr['class'])) {
-            $attr['class'] = $this->config['css']['inputClass'];
-        } elseif (isset($attr['class']) && $attr['class'] == false) {
-            unset($attr['class']);
-        }
-
         if (isset($attr['value']) && $cTemplate) {
             $this->htmlAttributes['value'] = $attr['value'];
             unset($attr['value']);
         }
-        if ($this->htmlAttributes['type'] !== 'hidden') {
-            $this->renderLabel($this->name, $attr);
-            if (isset($attr['label'])) {
+        if ($this->htmlAttributes['type'] !== 'hidden' && $this->htmlAttributes['type'] !== 'submit') {
+            if (isset($attr['label']) && $attr['label'] !== false) {
+                $this->renderLabel($attr['label'], $attr);
                 unset($attr['label']);
+            } else {
+                $this->renderLabel($this->name, $attr);
             }
         }
+
+        if (!isset($attr['class']) && $this->htmlAttributes['type'] !== 'hidden') {
+            $attr['class'] = $this->config['css']['inputClass'];
+        } elseif (isset($attr['class']) && $attr['class'] == false) {
+            unset($attr['class']);
+        }
     }
+
 }

@@ -20,7 +20,12 @@ class SelectWidget extends Widget
     /**
      * @var array
      */
-    protected $disabled = [];
+    protected $optionDisabled = [];
+
+    /**
+     * @var array
+     */
+    protected $groupDisabled = [];
 
     /**
      * @var
@@ -37,9 +42,6 @@ class SelectWidget extends Widget
     {
         $this->name = array_shift($params);
         $attr = !empty($params[0]) ? $params[0] : [];
-        if (strpos($this->name,'[]')) {
-            $attr['multiple'] = true;
-        }
         $this->inspectionAttributes($attr);
         $optionsHtml = $this->renderOptions();
         $selectAttrs = [
@@ -47,7 +49,6 @@ class SelectWidget extends Widget
             'name' => $this->name,
             'attrs' => $this->formatAttributes($attr)
         ];
-        $this->renderLabel($this->name, $params);
         $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
         return $this->label . $this->html;
     }
@@ -98,10 +99,14 @@ class SelectWidget extends Widget
     {
         $optgroupTemplate = $this->config['templates']['optgroup'];
         $childOptionsHtml = $this->renderOptions($options);
+        $groupAttrs = [];
+        if (!empty($this->groupDisabled)) {
+            $groupAttrs = $this->isDisabled($groupName,$this->groupDisabled);
+        }
         $rep = [
             'label' => $groupName,
             'content' => $childOptionsHtml,
-            'attrs' => false
+            'attrs' => $this->formatAttributes($groupAttrs)
         ];
         return $this->formatTemplate($optgroupTemplate, $rep);
     }
@@ -111,11 +116,16 @@ class SelectWidget extends Widget
      */
     public function inspectionAttributes(&$attr)
     {
+        $this->generateId($attr);
         $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['selectClass'];
+        if (strpos($this->name, '[]')) {
+            $attr['multiple'] = true;
+            $this->name = str_ireplace('[]','',$this->name);
+        }
         if (isset($attr['multiple'])) {
             $this->selectTemplate = $this->config['templates']['selectMultiple'];
             unset($attr['multiple']);
-        }else{
+        } else {
             $this->selectTemplate = $this->config['templates']['select'];
         }
         if (!empty($attr['options'])) {
@@ -126,15 +136,11 @@ class SelectWidget extends Widget
             array_unshift($this->optionsArray, $attr['empty']);
             unset($attr['empty']);
         } else {
-            $emptyValue = config('lara_form.label.select_empty');
+            $emptyValue = $this->config['label']['select_empty'];
             if ($emptyValue) {
                 array_unshift($this->optionsArray, $emptyValue);
             }
         }
-        if (isset($attr['label'])) {
-            unset($attr['label']);
-        }
-
         if (isset($attr['selected'])) {
             $this->selected = $attr['selected'];
             if (!is_array($this->selected)) {
@@ -143,24 +149,43 @@ class SelectWidget extends Widget
             unset($attr['selected']);
         }
 
-        if (isset($attr['disabled'])) {
-            $this->disabled = $attr['disabled'];
-            if (!is_array($this->disabled)) {
-                $this->disabled = [$this->disabled];
-            }
-            unset($attr['disabled']);
+        if (isset($attr['disabled']) && $attr['disabled'] != false) {
+            $attr['disabled'] = 'disabled';
         }
-
+        if (isset($attr['optionDisabled']) && $attr['optionDisabled'] !== false) {
+            $this->optionDisabled = $attr['optionDisabled'];
+            if (!is_array($this->optionDisabled)) {
+                $this->optionDisabled = [$this->optionDisabled];
+            }
+            unset($attr['optionDisabled']);
+        }
+        if (isset($attr['groupDisabled']) && $attr['groupDisabled'] !== false) {
+            $this->groupDisabled = $attr['groupDisabled'];
+            if (!is_array($this->groupDisabled)) {
+                $this->groupDisabled = [$this->groupDisabled];
+            }
+            unset($attr['groupDisabled']);
+        }
+        if (isset($attr['label']) && $attr['label'] !== false) {
+            $this->renderLabel($attr['label'], $attr);
+            unset($attr['label']);
+        } else {
+            $this->renderLabel($this->name, $attr);
+        }
     }
 
     /**
      * @param $str
+     * @param array|bool $disabled
      * @return array
      */
-    protected function isDisabled($str)
+    protected function isDisabled($str, array $disabled = [])
     {
+        if (empty($disabled)) {
+            $disabled = $this->optionDisabled;
+        }
         $arr = [];
-        if (in_array($str, $this->disabled)) {
+        if (in_array($str, $disabled,true)) {
             $arr['disabled'] = 'disabled';
         }
         return $arr;
@@ -173,7 +198,7 @@ class SelectWidget extends Widget
     protected function isSelected($str)
     {
         $arr = [];
-        if (in_array($str, $this->selected)) {
+        if (in_array($str, $this->selected,true)) {
             $arr['selected'] = 'selected';
         }
         return $arr;

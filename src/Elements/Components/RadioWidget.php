@@ -33,5 +33,8 @@ class RadioWidget extends BaseInputWidget
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
+        if (isset($attr['checked'])) {
+            $attr['checked'] = 'checked';
+        }
     }
 }
