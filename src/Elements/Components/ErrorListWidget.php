@@ -11,7 +11,7 @@ namespace LaraForm\Elements\Components;
 
 use LaraForm\Elements\Widget;
 
-class ErrorsWidget extends Widget
+class ErrorListWidget extends Widget
 {
     public function render($option)
     {
@@ -21,10 +21,12 @@ class ErrorsWidget extends Widget
 
         $ul = $this->config['templates']['errorList'];
         $li = $this->config['templates']['errorItem'];
-dd($this->errors->getErrors()->all());
-        foreach ($this->errors->getErrors() as $name => $error) {
-            dump($name.'   '.$error);
+        $errors = $this->errors->getErrors()->all();
+        $list = '';
+        foreach ($errors as $name => $error) {
+            $list .= $this->formatTemplate($li,['text' => $error]);
         }
+        return $this->formatTemplate($ul,['content' => $list]);
     }
 
     public function inspectionAttributes(&$attr)

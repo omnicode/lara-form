@@ -89,7 +89,8 @@ class BaseInputWidget extends Widget
             $this->htmlAttributes['value'] = $attr['value'];
             unset($attr['value']);
         }
-        if ($this->htmlAttributes['type'] !== 'hidden' && $this->htmlAttributes['type'] !== 'submit') {
+        $notLabel = ['hidden','submit','reset','button'];
+        if (!in_array($this->htmlAttributes['type'],$notLabel)) {
             if (isset($attr['label']) && $attr['label'] !== false) {
                 $this->renderLabel($attr['label'], $attr);
                 unset($attr['label']);

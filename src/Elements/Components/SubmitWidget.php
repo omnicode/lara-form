@@ -5,6 +5,11 @@ namespace LaraForm\Elements\Components;
 class SubmitWidget extends BaseInputWidget
 {
     /**
+     * @var array
+     */
+    protected $_submitTypes = ['submit', 'button', 'reset'];
+
+    /**
      * @param $option
      * @return string
      */
@@ -24,8 +29,12 @@ class SubmitWidget extends BaseInputWidget
     public function inspectionAttributes(&$attr)
     {
         $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['submitClass'];
-        if (isset($attr['type'])) {
-            unset($attr['type']);
+        if (isset($attr['btn'])) {
+            $attr['class'] .= ' btn btn-' . $attr['btn'];
+            unset($attr['btn']);
+        }
+        if (!isset($attr['type']) || (isset($attr['type']) && !in_array($attr['type'], $this->_submitTypes))) {
+            $attr['type'] = 'submit';
         }
     }
 }
