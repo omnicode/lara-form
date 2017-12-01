@@ -4,7 +4,8 @@ namespace LaraForm\Elements;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
-use LaraForm\Stores\ErrorsStore;
+use LaraForm\Stores\ErrorStore;
+use LaraForm\Stores\OldInputStore;
 
 class Widget implements WidgetInterface
 {
@@ -64,12 +65,18 @@ class Widget implements WidgetInterface
     public $errors = [];
 
     /**
+     * @var array
+     */
+    public $oldInputs = [];
+
+    /**
      * Widget constructor.
      */
     public function __construct()
     {
         $this->config = config('lara_form');
-        $this->errors = new ErrorsStore();
+        $this->errors = new ErrorStore();
+        $this->oldInputs = new OldInputStore();
     }
 
     /**
@@ -113,11 +120,11 @@ class Widget implements WidgetInterface
      */
     public function formatAttributes($attributes)
     {
-       /* $attributes = array_filter($attributes, function ($value) {
-            if ($value !== '' && $value !== false) {
-                return $value;
-            }
-        });*/
+        /* $attributes = array_filter($attributes, function ($value) {
+             if ($value !== '' && $value !== false) {
+                 return $value;
+             }
+         });*/
         $attr = '';
         foreach ($attributes as $index => $attribute) {
             if (is_string((string)$index)) {
@@ -144,8 +151,9 @@ class Widget implements WidgetInterface
             'attrs' => '',
             'hidden' => $this->hidden,
             'containerAttrs' => '',
-            'content' => $this->html
+            'content' => $this->html,
         ];
+        $containerAttributes += $this->setError($this->name);
         if ($this->containerTemplate) {
             $container = $this->containerTemplate;
         } elseif ($this->htmlAttributes['type'] !== 'hidden') {
@@ -156,6 +164,41 @@ class Widget implements WidgetInterface
         return $this->formatTemplate($container, $containerAttributes);
     }
 
+    /**
+     * @param $name
+     * @return array
+     */
+    public function setError($name)
+    {
+        $errorParams = [
+            'help' => '',
+            'error' => ''
+        ];
+
+        if (!empty($this->errors->hasError($name))) {
+            $helpBlockTemplate = $this->config['templates']['helpBlock'];
+            $errorAttr['text'] = $this->errors->getError($name);
+            $errorParams['help'] = $this->formatTemplate($helpBlockTemplate,$errorAttr);
+            $errorParams['error'] = $this->config['css']['errorClass'];
+        }
+        return $errorParams;
+    }
+
+    /**
+     * @param $name
+     * @return array
+     */
+    public function setOldInput($name)
+    {
+        $oldInputParams = [];
+        if (!empty($this->oldInputs->hasOldInput())) {
+            $value = $this->oldInputs->getOldInput($name);
+            if (!empty($value)) {
+                $oldInputParams['value'] = $value;
+            }
+        }
+        return $oldInputParams;
+    }
     /**
      * @param array $options
      * @return array|mixed|string

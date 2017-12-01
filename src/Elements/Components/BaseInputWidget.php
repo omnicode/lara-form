@@ -89,6 +89,10 @@ class BaseInputWidget extends Widget
             $this->htmlAttributes['value'] = $attr['value'];
             unset($attr['value']);
         }
+        $norOldInput = ['hidden','submit','reset','button','radio','checkbox','label'];
+        if (!in_array($this->htmlAttributes['type'],$norOldInput) && !$cTemplate) {
+            $attr += $this->setOldInput($this->name);
+        }
         $notLabel = ['hidden','submit','reset','button'];
         if (!in_array($this->htmlAttributes['type'],$notLabel)) {
             if (isset($attr['label']) && $attr['label'] !== false) {
@@ -98,7 +102,6 @@ class BaseInputWidget extends Widget
                 $this->renderLabel($this->name, $attr);
             }
         }
-
         if (!isset($attr['class']) && $this->htmlAttributes['type'] !== 'hidden') {
             $attr['class'] = $this->config['css']['inputClass'];
         } elseif (isset($attr['class']) && $attr['class'] == false) {

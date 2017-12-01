@@ -2,7 +2,7 @@
 
 namespace LaraForm\Stores;
 
-class ErrorsStore
+class ErrorStore
 {
     private $session;
 
@@ -45,6 +45,6 @@ class ErrorsStore
 
     protected function transformKey($key)
     {
-        return str_replace(['.', '[]', '[', ']'], ['_', '', '.', ''], $key);
+        return str_ireplace(['.', '[]', '[', ']'], ['_', '', '.', ''], $key);
     }
 }
