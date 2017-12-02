@@ -89,9 +89,9 @@ class BaseInputWidget extends Widget
             $this->htmlAttributes['value'] = $attr['value'];
             unset($attr['value']);
         }
-        $norOldInput = ['hidden','submit','reset','button','radio','checkbox','label'];
-        if (!in_array($this->htmlAttributes['type'],$norOldInput) && !$cTemplate) {
-            $attr += $this->setOldInput($this->name);
+        $notD = ['hidden','submit','reset','button','radio','checkbox','label'];
+        if (!in_array($this->htmlAttributes['type'],$notD) && !$cTemplate) {
+            $attr += $this->getValue($this->name);
         }
         $notLabel = ['hidden','submit','reset','button'];
         if (!in_array($this->htmlAttributes['type'],$notLabel)) {

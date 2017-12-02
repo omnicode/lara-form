@@ -27,7 +27,7 @@ class FormWidget extends Widget
 
     protected function start($options)
     {
-        if (isset($options['method']) && in_array(strtolower($options['method']), $this->_requestMethods)) {
+        if (isset($options['method']) && in_array(strtolower($options['method']), ['get', 'post', 'put', 'patch', 'delete'])) {
             $method = $options['method'];
             unset($options['method']);
         } elseif (!empty($model)) {

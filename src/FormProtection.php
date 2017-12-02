@@ -41,9 +41,9 @@ class FormProtection
      */
     public function __construct()
     {
-        $this->sessionPrePath = Config::get('lara_form.session.pre_path', 'laraforms');
-        $this->pathForUnlock= Config::get('lara_form.session.path_for.unlock', 'is_unlock');
-        $this->pathForCheck = Config::get('lara_form.session.path_for.check', 'is_check');
+        $this->sessionPrePath = config('lara_form.session.pre_path', 'laraforms');
+        $this->pathForUnlock= config('lara_form.session.path_for.unlock', 'is_unlock');
+        $this->pathForCheck = config('lara_form.session.path_for.check', 'is_check');
         $this->fields = [];
     }
 

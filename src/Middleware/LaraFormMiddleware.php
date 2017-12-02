@@ -29,9 +29,9 @@ class LaraFormMiddleware
 
             $isAjax = $request->ajax();
             $validate = $formProtection->validate($data, $isAjax);
-          /*  if ($validate === false) {
-                abort(403, 'Your Action Is Forbidden');
-            }*/
+            if ($validate === false) {
+              //  abort(403, 'Your Action Is Forbidden');
+            }
 
             unset($request[Config::get('lara_form.label.form_protection', 'laraform_token')]);
         }

@@ -4,6 +4,7 @@ namespace LaraForm\Elements;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
+use LaraForm\Stores\BoundStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 
@@ -65,6 +66,11 @@ class Widget implements WidgetInterface
     public $oldInputs = [];
 
     /**
+     * @var
+     */
+    public $bound = null;
+
+    /**
      * Widget constructor.
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
@@ -75,6 +81,26 @@ class Widget implements WidgetInterface
         $this->config = config('lara_form');
         $this->errors = $errorStore;
         $this->oldInputs = $oldInputStore;
+    }
+
+    public function setModel($data)
+    {
+        $this->bound = new BoundStore($data);
+
+    }
+
+    public function getValue($name)
+    {
+        $value = '';
+        $data = [];
+        if (!empty($this->bound)) {
+            $value = $this->bound->get($name, null);
+        }
+        if ($this->oldInputs->hasOldInput()) {
+            $value = $this->oldInputs->getOldInput($name);
+        }
+        $data['value'] = $value;
+        return $data;
     }
 
     /**

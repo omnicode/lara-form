@@ -3,6 +3,7 @@
 namespace LaraForm;
 
 use Illuminate\Support\Facades\Config;
+use LaraForm\Stores\BoundStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 
@@ -30,6 +31,11 @@ class FormBuilder
     protected $maked = [];
 
     /**
+     * @var $model
+     */
+    protected $model;
+
+    /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
      * @param ErrorStore $errorStore
@@ -39,7 +45,7 @@ class FormBuilder
         FormProtection $formProtection,
         ErrorStore $errorStore,
         OldInputStore $oldInputStore
-    ){
+    ) {
         $this->formProtection = $formProtection;
         $this->errorStore = $errorStore;
         $this->oldInputStore = $oldInputStore;
@@ -63,9 +69,8 @@ class FormBuilder
      */
     public function create($model = null, $options = [])
     {
-
-        $formHtml = $this->open($model, $options);
-
+        $this->model = $model;
+        $formHtml = $this->makeSingleton('form', ['start', $options]);
         $token = md5(str_random(80));
         $this->formProtection->setToken($token);
 
@@ -131,28 +136,6 @@ class FormBuilder
     public function end()
     {
         $this->formProtection->confirm();
-        return $this->close();
-    }
-    /**
-     * @param $model
-     * @param $options
-     * @return string
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \LogicException
-     */
-    public function open($model, $options)
-    {
-        return $this->makeSingleton('form', ['start', $options]);
-
-    }
-
-    /**
-     * @return string
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \LogicException
-     */
-    public function close()
-    {
         return $this->makeSingleton('form', ['end']);
     }
 
@@ -165,11 +148,19 @@ class FormBuilder
      */
     public function __call($method, $arrgs = [])
     {
-        $attr = !empty($arrgs[0][1]) ? $arrgs[0][1] : [];
+        $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
         if (isset($attr['type'])) {
             if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file'])) {
                 $method = $attr['type'];
             }
+        }
+        if (isset($arrgs[0])) {
+            $value = '';
+            if ($method == 'hidden') {
+                $value = isset($attr['value']) ? $attr['value'] : 0;
+            }
+
+            $this->formProtection->addField($arrgs[0], $attr, $value);
         }
 
         return $this->makeSingleton($method, $arrgs);
@@ -187,7 +178,10 @@ class FormBuilder
         $modelName = ucfirst($method);
         $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
         if (!isset($this->maked[$modelName])) {
-            $this->maked[$modelName] = app($classNamspace,[$this->errorStore,$this->oldInputStore,$arrgs]);
+            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $arrgs]);
+        }
+        if (!empty($this->model)) {
+            $this->maked[$modelName]->setModel($this->model);
         }
         return $this->maked[$modelName]->render($arrgs);
     }

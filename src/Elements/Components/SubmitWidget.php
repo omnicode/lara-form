@@ -29,9 +29,16 @@ class SubmitWidget extends BaseInputWidget
     public function inspectionAttributes(&$attr)
     {
         $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['submitClass'];
-        if (isset($attr['btn'])) {
+        if (!empty($options['btn'])) {
+            if ($attr['btn'] === true) {
+                $attr['btn'] = $this->config['label']['submit_btn'];
+            }
             $attr['class'] .= ' btn btn-' . $attr['btn'];
             unset($attr['btn']);
+        }
+        // @TODO - combine with Assistant::input
+        if (!empty($attr['position']) && $attr['position'] == 'right') {
+            $attr['class'] .= ' icon-right';
         }
         if (!isset($attr['type']) || (isset($attr['type']) && !in_array($attr['type'], $this->_submitTypes))) {
             $attr['type'] = 'submit';
