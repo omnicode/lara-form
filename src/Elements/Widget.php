@@ -74,6 +74,7 @@ class Widget implements WidgetInterface
      */
     public function __construct()
     {
+        dump('widget');
         $this->config = config('lara_form');
         $this->errors = new ErrorStore();
         $this->oldInputs = new OldInputStore();
@@ -294,23 +295,6 @@ class Widget implements WidgetInterface
         return array_last(explode('\\', $name));
     }
 
-    /**
-     * @param $method
-     * @param $arrgs
-     * @return mixed
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \LogicException
-     */
-    public function createObject($method, $arrgs)
-    {
-        //TODO optimization create objects system
-        $modelName = ucfirst($method);
-        $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
-        app()->singleton($modelName . 'Widget', function () use ($classNamspace) {
-            return new $classNamspace();
-        });
-        return app($modelName . 'Widget')->render(...$arrgs);
-    }
 
     /*
      *

@@ -19,11 +19,6 @@ class InputWidget extends BaseInputWidget
     {
         $this->name = $option[0];
         $attr = !empty($option[1]) ? $option[1] : [];
-        if (isset($attr['type'])) {
-            if (in_array($attr['type'], $this->otherInput)) {
-                return $this->html = $this->createObject($attr['type'], [$option]);
-            }
-        }
 
         return $this->toHtml($this->name, $attr);
     }

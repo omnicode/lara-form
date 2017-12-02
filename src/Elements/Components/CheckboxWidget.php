@@ -40,7 +40,7 @@ class CheckboxWidget extends BaseInputWidget
     {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
         $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['checkboxClass'];
-        
+
         if (isset($attr['type'])) {
             unset($attr['type']);
         }

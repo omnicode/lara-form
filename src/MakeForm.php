@@ -14,6 +14,11 @@ class MakeForm
     public $widget;
 
     /**
+     * @var array
+     */
+    protected $maked = [];
+
+    /**
      * MakeForm constructor.
      * @param Widget $widget
      */
@@ -86,9 +91,35 @@ class MakeForm
      * @param $method
      * @param $arrgs
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
      */
     public function __call($method, $arrgs)
     {
-       return $this->widget->createObject($method, $arrgs);
+        $attr = !empty($arrgs[0][1]) ? $arrgs[0][1] : [];
+        if (isset($attr['type'])) {
+            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file'])) {
+                $method = $attr['type'];
+            }
+        }
+
+        return $this->makeSingleton($method, $arrgs);
+    }
+
+    /**
+     * @param $method
+     * @param $arrgs
+     * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
+    public function makeSingleton($method, $arrgs)
+    {
+        $modelName = ucfirst($method);
+        $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
+        if (!isset($this->maked[$modelName])) {
+            $this->maked[$modelName] = app($classNamspace);
+        }
+        return $this->maked[$modelName]->render(...$arrgs);
     }
 }

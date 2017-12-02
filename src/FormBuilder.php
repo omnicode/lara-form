@@ -41,6 +41,13 @@ class FormBuilder
     public function __call($methodName, $attr)
     {
         return call_user_func([$this->make, $methodName], $attr);
+
+        /*if ($this->formCreate) {
+            $this->view .= call_user_func([$this->make, $methodName], $attr);
+        }else{
+            dump('other ['.$methodName.']');
+            return call_user_func([$this->make, $methodName], $attr);
+        }*/
     }
 
 
@@ -62,6 +69,7 @@ class FormBuilder
      */
     public function create($model = null, $options = [])
     {
+
         $formHtml = $this->make->open($model, $options);
 
         $token = md5(str_random(80));
