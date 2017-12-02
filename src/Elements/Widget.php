@@ -35,11 +35,6 @@ class Widget implements WidgetInterface
     public $routes = [];
 
     /**
-     * @var array
-     */
-    public $_requestMethods = ['get', 'post', 'put', 'patch', 'delete'];
-
-    /**
      * @var mixed
      */
     public $config;
@@ -71,13 +66,15 @@ class Widget implements WidgetInterface
 
     /**
      * Widget constructor.
+     * @param ErrorStore $errorStore
+     * @param OldInputStore $oldInputStore
+     * @param array $params
      */
-    public function __construct()
+    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $params = [])
     {
-        dump('widget');
         $this->config = config('lara_form');
-        $this->errors = new ErrorStore();
-        $this->oldInputs = new OldInputStore();
+        $this->errors = $errorStore;
+        $this->oldInputs = $oldInputStore;
     }
 
     /**
@@ -179,7 +176,7 @@ class Widget implements WidgetInterface
         if (!empty($this->errors->hasError($name))) {
             $helpBlockTemplate = $this->config['templates']['helpBlock'];
             $errorAttr['text'] = $this->errors->getError($name);
-            $errorParams['help'] = $this->formatTemplate($helpBlockTemplate,$errorAttr);
+            $errorParams['help'] = $this->formatTemplate($helpBlockTemplate, $errorAttr);
             $errorParams['error'] = $this->config['css']['errorClass'];
         }
         return $errorParams;
@@ -200,6 +197,7 @@ class Widget implements WidgetInterface
         }
         return $oldInputParams;
     }
+
     /**
      * @param array $options
      * @return array|mixed|string

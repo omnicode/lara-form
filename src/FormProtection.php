@@ -71,7 +71,7 @@ class FormProtection
      */
     public function validate($data, $isAjax = false)
     {
-        $tokenName = Config::get('lara_form.label.form_protection', 'laraform_token');
+        $tokenName = config('lara_form.label.form_protection', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
 
         if (!$token) {

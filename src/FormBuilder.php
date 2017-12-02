@@ -3,6 +3,8 @@
 namespace LaraForm;
 
 use Illuminate\Support\Facades\Config;
+use LaraForm\Stores\ErrorStore;
+use LaraForm\Stores\OldInputStore;
 
 class FormBuilder
 {
@@ -13,43 +15,35 @@ class FormBuilder
     protected $formProtection;
 
     /**
-     * @var MakeForm
+     * @var ErrorStore
      */
-    protected $make;
+    protected $errorStore;
+
+    /**
+     * @var OldInputStore
+     */
+    protected $oldInputStore;
+
+    /**
+     * @var array
+     */
+    protected $maked = [];
 
     /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
-     * @param MakeForm $makeForm
+     * @param ErrorStore $errorStore
+     * @param OldInputStore $oldInputStore
      */
     public function __construct(
         FormProtection $formProtection,
-        MakeForm $makeForm
-
-    ) {
+        ErrorStore $errorStore,
+        OldInputStore $oldInputStore
+    ){
         $this->formProtection = $formProtection;
-        $this->make = $makeForm;
+        $this->errorStore = $errorStore;
+        $this->oldInputStore = $oldInputStore;
     }
-
-    /**
-     * @param $methodName
-     * @param $attr
-     * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function __call($methodName, $attr)
-    {
-        return call_user_func([$this->make, $methodName], $attr);
-
-        /*if ($this->formCreate) {
-            $this->view .= call_user_func([$this->make, $methodName], $attr);
-        }else{
-            dump('other ['.$methodName.']');
-            return call_user_func([$this->make, $methodName], $attr);
-        }*/
-    }
-
 
     /**
      * @param $data
@@ -70,7 +64,7 @@ class FormBuilder
     public function create($model = null, $options = [])
     {
 
-        $formHtml = $this->make->open($model, $options);
+        $formHtml = $this->open($model, $options);
 
         $token = md5(str_random(80));
         $this->formProtection->setToken($token);
@@ -84,11 +78,9 @@ class FormBuilder
         }
 
         $this->formProtection->setUnlockFields($unlockFields);
-
+        $hidden = '';
         if ($method != 'get') {
             $hidden = $this->hidden(config('lara_form.label.form_protection', 'laraform_token'), ['value' => $token]);
-        } else {
-            $hidden = '';
         }
         return $formHtml . $hidden;
     }
@@ -133,11 +125,70 @@ class FormBuilder
 
     /**
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
      */
     public function end()
     {
         $this->formProtection->confirm();
-        return $this->make->close();
+        return $this->close();
+    }
+    /**
+     * @param $model
+     * @param $options
+     * @return string
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
+    public function open($model, $options)
+    {
+        return $this->makeSingleton('form', ['start', $options]);
+
     }
 
+    /**
+     * @return string
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
+    public function close()
+    {
+        return $this->makeSingleton('form', ['end']);
+    }
+
+    /**
+     * @param $method
+     * @param $arrgs
+     * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
+    public function __call($method, $arrgs = [])
+    {
+        $attr = !empty($arrgs[0][1]) ? $arrgs[0][1] : [];
+        if (isset($attr['type'])) {
+            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file'])) {
+                $method = $attr['type'];
+            }
+        }
+
+        return $this->makeSingleton($method, $arrgs);
+    }
+
+    /**
+     * @param $method
+     * @param $arrgs
+     * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
+    public function makeSingleton($method, $arrgs)
+    {
+        $modelName = ucfirst($method);
+        $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
+        if (!isset($this->maked[$modelName])) {
+            $this->maked[$modelName] = app($classNamspace,[$this->errorStore,$this->oldInputStore,$arrgs]);
+        }
+        return $this->maked[$modelName]->render($arrgs);
+    }
 }

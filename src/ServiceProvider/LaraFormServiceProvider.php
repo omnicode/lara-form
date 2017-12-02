@@ -3,11 +3,11 @@
 namespace LaraForm\ServiceProvider;
 
 use Illuminate\Support\ServiceProvider;
-use LaraForm\Elements\Widget;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
-use LaraForm\MakeForm;
 use LaraForm\Middleware\LaraFormMiddleware;
+use LaraForm\Stores\ErrorStore;
+use LaraForm\Stores\OldInputStore;
 
 class LaraFormServiceProvider extends ServiceProvider
 {
@@ -17,7 +17,6 @@ class LaraFormServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerFormProtection();
-        $this->registerFormWidget();
         $this->registerFormElements();
         $this->registerFormBuilder();
         $this->registerMiddleware(LaraFormMiddleware::class);
@@ -44,23 +43,17 @@ class LaraFormServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     *
-     */
-    protected function registerFormWidget()
-    {
-        $this->app->singleton('widget', function ($app) {
-            return new Widget();
-        });
-    }
 
     /**
      *
      */
     protected function registerFormElements()
     {
-        $this->app->singleton('laraform.make-form', function ($app) {
-            return new MakeForm($app['widget']);
+        $this->app->singleton('laraform.error', function ($app) {
+            return new ErrorStore();
+        });
+        $this->app->singleton('laraform.oldInput', function ($app) {
+            return new OldInputStore();
         });
     }
 
@@ -73,7 +66,8 @@ class LaraFormServiceProvider extends ServiceProvider
         $this->app->singleton('laraform', function ($app) {
             return new FormBuilder(
                 $app['laraform.protection'],
-                $app['laraform.make-form']
+                $app['laraform.error'],
+                $app['laraform.oldInput']
             );
         });
     }
