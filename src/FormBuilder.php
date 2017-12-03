@@ -36,6 +36,11 @@ class FormBuilder
     protected $model;
 
     /**
+     * @var
+     */
+    protected $templates = [];
+
+    /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
      * @param ErrorStore $errorStore
@@ -70,47 +75,15 @@ class FormBuilder
     public function create($model = null, $options = [])
     {
         $this->model = $model;
-        $formHtml = $this->makeSingleton('form', ['start', $options]);
         $token = md5(str_random(80));
         $this->formProtection->setToken($token);
-
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
+        $options['form_token'] = $token;
         $unlockFields[] = '_token';
-
-        $method = $this->getMethodBy($model, $options);
-        if ($method) {
-            $unlockFields[] = '_method';
-        }
-
+        $unlockFields[] = '_method';
         $this->formProtection->setUnlockFields($unlockFields);
-        $hidden = '';
-        if ($method != 'get') {
-            $hidden = $this->hidden(config('lara_form.label.form_protection', 'laraform_token'), ['value' => $token]);
-        }
-        return $formHtml . $hidden;
-    }
 
-    /**
-     * @param $model
-     * @param $options
-     * @param bool $unSet
-     * @return null|string
-     */
-    protected function getMethodBy($model, &$options, $unSet = true)
-    {
-        $method = null;
-        if (isset($options['method'])) {
-            if (in_array($options['method'], ['get', 'post', 'put', 'patch', 'delete'])) {
-                $method = $options['method'];
-            }
-            if ($unSet) {
-                unset($options['method']);
-            }
-        } elseif (!empty($model)) {
-            $method = 'put';
-        }
-
-        return $method;
+        return $this->makeSingleton('form', ['start', $options]);
     }
 
     /**
@@ -136,6 +109,9 @@ class FormBuilder
     public function end()
     {
         $this->formProtection->confirm();
+        if (isset($this->templates['formStart'])) {
+            unset($this->templates['formStart']);
+        }
         return $this->makeSingleton('form', ['end']);
     }
 
@@ -162,7 +138,7 @@ class FormBuilder
 
             $this->formProtection->addField($arrgs[0], $attr, $value);
         }
-
+        $this->setTemplate($attr);
         return $this->makeSingleton($method, $arrgs);
     }
 
@@ -173,16 +149,32 @@ class FormBuilder
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
      */
-    public function makeSingleton($method, $arrgs)
+    private function makeSingleton($method, $arrgs)
     {
         $modelName = ucfirst($method);
         $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
         if (!isset($this->maked[$modelName])) {
-            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $arrgs]);
+            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $this->templates, $arrgs]);
         }
         if (!empty($this->model)) {
             $this->maked[$modelName]->setModel($this->model);
         }
         return $this->maked[$modelName]->render($arrgs);
     }
+
+    /**
+     * @param $templateName
+     * @param bool $templateValue
+     */
+    public function setTemplate($templateName, $templateValue = false)
+    {
+        if (is_array($templateName)) {
+            foreach ($templateName as $key => $value) {
+                $this->templates[$key] = $value;
+            }
+        } elseif ($templateValue) {
+            $this->templates[$templateName] = $templateValue;
+        }
+    }
+
 }

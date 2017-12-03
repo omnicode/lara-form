@@ -41,6 +41,11 @@ class Widget implements WidgetInterface
     public $config;
 
     /**
+     * @var array
+     */
+    public $addedTemplates = [];
+
+    /**
      * @var
      */
     public $attributes;
@@ -74,21 +79,55 @@ class Widget implements WidgetInterface
      * Widget constructor.
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
+     * @param null $setTemplate
      * @param array $params
      */
-    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $params = [])
+    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $setTemplate = [], $params = [])
     {
+        //TODO inspection base params
         $this->config = config('lara_form');
         $this->errors = $errorStore;
         $this->oldInputs = $oldInputStore;
+        $this->addTemplate($setTemplate);
     }
 
+    /**
+     * @param $data
+     */
     public function setModel($data)
     {
         $this->bound = new BoundStore($data);
 
     }
 
+    protected function addTemplate($templates)
+    {
+        if (!empty($templates)) {
+            foreach ($templates as $key => $value) {
+                if (isset($this->config['templates'][$key])) {
+                    $this->addedTemplates[$key] = $value;
+                }
+            }
+        }
+    }
+
+    protected function getTemplateByName($templateName)
+    {
+        $template = null;
+        if (!empty($this->addedTemplates[$templateName])) {
+            $template = $this->addedTemplates[$templateName];
+            unset($this->addedTemplates[$templateName]);
+        }elseif (!empty($this->config['templates'][$templateName])) {
+            $template = $this->config['templates'][$templateName];
+        }
+
+        return $template;
+    }
+
+    /**
+     * @param $name
+     * @return array
+     */
     public function getValue($name)
     {
         $value = '';
@@ -132,7 +171,7 @@ class Widget implements WidgetInterface
         $from = [];
         $to = [];
         foreach ($attributes as $index => $attribute) {
-            $from[] = '{{' . $index . '}}';
+            $from[] = '[' . $index . ']';
             $to[] = $attribute;
         }
         return str_ireplace($from, $to, $template);
@@ -144,11 +183,11 @@ class Widget implements WidgetInterface
      */
     public function formatAttributes($attributes)
     {
-        /* $attributes = array_filter($attributes, function ($value) {
-             if ($value !== '' && $value !== false) {
-                 return $value;
-             }
-         });*/
+        $attributes = array_filter($attributes, function ($value) {
+            if (!empty($value) && $value !== '' && $value !== false) {
+                return $value;
+            }
+        });
         $attr = '';
         foreach ($attributes as $index => $attribute) {
             if (is_string((string)$index)) {
@@ -210,104 +249,11 @@ class Widget implements WidgetInterface
 
     /**
      * @param $name
-     * @return array
-     */
-    public function setOldInput($name)
-    {
-        $oldInputParams = [];
-        if (!empty($this->oldInputs->hasOldInput())) {
-            $value = $this->oldInputs->getOldInput($name);
-            if (!empty($value)) {
-                $oldInputParams['value'] = $value;
-            }
-        }
-        return $oldInputParams;
-    }
-
-    /**
-     * @param array $options
-     * @return array|mixed|string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function action(&$options = [])
-    {
-
-        if (!empty($options['route'])) {
-            $route = $options['route'];
-            unset($options['route']);
-            if (!is_array($route)) {
-                $route = [$route];
-            }
-            return route(...$route);
-        }
-
-        if (!empty($options['url'])) {
-            $url = $options['url'];
-            unset($options['url']);
-            return $url;
-        }
-
-        if (isset($options['action'])) {
-            $action = $options['action'];
-            if (!is_array($action)) {
-                //if action is url
-                if (filter_var($action, FILTER_VALIDATE_URL)) {
-                    return $action;
-                }
-                $action = [$action];
-            }
-        } else {
-            return request()->url();
-        }
-
-        $allRoutes = $this->getRoutes();
-        $methodName = array_shift($action);
-
-        if (!strpos('@', $methodName)) {
-            $curr = $this->getCurrentRoute();
-            $controller = $this->getClassName(get_class($curr->getController()));
-            $methodName = $controller . '@' . $methodName;
-        }
-
-        $routeName = array_search($methodName, $allRoutes);
-
-        if (empty($routeName)) {
-            abort(405, '[' . $methodName . '] method not allowed!');
-        }
-
-        return route($routeName, $action);
-    }
-
-    /**
-     * @param $name
      * @return mixed
      */
     public function getId($name)
     {
         return str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name)));
-    }
-
-    /**
-     * @return array
-     */
-    public function getRoutes()
-    {
-        if (empty($this->routes)) {
-            collect(Route::getRoutes())->map(function ($route) {
-                $this->routes[$route->getName()] = $this->getClassName($route->getActionName());
-            });
-        }
-
-        return $this->routes;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCurrentRoute()
-    {
-        return Route::getCurrentRoute();
     }
 
     /**
@@ -373,5 +319,26 @@ class Widget implements WidgetInterface
         } else {
             $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
         }
+        if ($this->config['label']['idPrefix'] && !isset($attr['idPrefix'])) {
+            $attr['id'] = $this->config['idPrefix'] . $attr['id'];
+        } elseif (isset($attr['idPrefix']) && $attr['id'] !== false) {
+            $attr['id'] = $attr['idPrefix'] . $attr['id'];
+            unset($attr['idPrefix']);
+        }
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @return string
+     */
+    public function setHidden($name, $value)
+    {
+        $hiddenTemplate = $this->config['templates']['hiddenInput'];
+        $attr = [
+            'name' => $name,
+            'value' => $value,
+        ];
+        return $this->formatTemplate($hiddenTemplate, $attr);
     }
 }

@@ -28,7 +28,7 @@ class CheckboxWidget extends BaseInputWidget
         ];
 
         $this->html = $this->formatTemplate($labelTemplate, $labelAttr);
-        $this->html = $this->completeTemplate();
+       // $this->html = $this->completeTemplate();
         return $this->html;
     }
 
@@ -56,7 +56,12 @@ class CheckboxWidget extends BaseInputWidget
         if (isset($attr['hidden']) && $attr['hidden'] == false) {
             unset($attr['hidden']);
         } else {
-            $this->hidden = $this->toHtml($this->name, ['type' => 'hidden', 'value' => '0', 'id' => false]);
+            if (ends_with($this->name,'[]')) {
+                $hiddenName = str_ireplace('[]','',$this->name);
+            }else{
+                $hiddenName = $this->name;
+            }
+            $this->hidden = $this->setHidden($hiddenName,0);
         }
     }
 }

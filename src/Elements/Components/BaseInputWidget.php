@@ -59,12 +59,11 @@ class BaseInputWidget extends Widget
      */
     protected function getTemplate(&$attr)
     {
-        $templates = $this->config['templates'];
-        $template = $templates['input'];
         if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
-            if (isset($templates[$attr['type']])) {
-                $template = $templates[$attr['type']];
-            }
+            $template = $this->getTemplateByName($attr['type']);
+        }
+        if (empty($template)) {
+            return $this->config['templates']['input'];
         }
         return $template;
     }
@@ -89,12 +88,12 @@ class BaseInputWidget extends Widget
             $this->htmlAttributes['value'] = $attr['value'];
             unset($attr['value']);
         }
-        $notD = ['hidden','submit','reset','button','radio','checkbox','label'];
-        if (!in_array($this->htmlAttributes['type'],$notD) && !$cTemplate) {
+        $notD = ['hidden', 'submit', 'reset', 'button', 'radio', 'checkbox', 'label'];
+        if (!in_array($this->htmlAttributes['type'], $notD) && !$cTemplate) {
             $attr += $this->getValue($this->name);
         }
-        $notLabel = ['hidden','submit','reset','button'];
-        if (!in_array($this->htmlAttributes['type'],$notLabel)) {
+        $notLabel = ['hidden', 'submit', 'reset', 'button'];
+        if (!in_array($this->htmlAttributes['type'], $notLabel)) {
             if (isset($attr['label']) && $attr['label'] !== false) {
                 $this->renderLabel($attr['label'], $attr);
                 unset($attr['label']);
