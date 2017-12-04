@@ -36,7 +36,8 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param bool $cTemplate
      * @return string
-     * @internal param $this ->name
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function toHtml($name, $attr, $cTemplate = false)
     {
@@ -49,7 +50,6 @@ class BaseInputWidget extends Widget
         } else {
             $template = $cTemplate;
         }
-
         $this->generalInspectionAttributes($attr, $cTemplate);
         $this->htmlAttributes['name'] = $name;
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
@@ -60,8 +60,8 @@ class BaseInputWidget extends Widget
     /**
      * @param $attr
      * @param $cTemplate
-     * @internal param $attrs
-     * @internal param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function generalInspectionAttributes(&$attr, $cTemplate)
     {

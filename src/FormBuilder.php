@@ -36,9 +36,14 @@ class FormBuilder
     protected $model;
 
     /**
-     * @var
+     * @var array
      */
     protected $templates = [];
+
+    /**
+     * @var array
+     */
+    protected $globalTemplates = [];
 
     /**
      * FormBuilder constructor.
@@ -109,9 +114,7 @@ class FormBuilder
     public function end()
     {
         $this->formProtection->confirm();
-        if (isset($this->templates['formStart'])) {
-            unset($this->templates['formStart']);
-        }
+        $this->maked = [];
         return $this->makeSingleton('form', ['end']);
     }
 
@@ -126,7 +129,7 @@ class FormBuilder
     {
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
         if (isset($attr['type'])) {
-            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file','textarea'])) {
+            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file', 'textarea'])) {
                 $method = $attr['type'];
             }
         }
@@ -138,7 +141,7 @@ class FormBuilder
 
             $this->formProtection->addField($arrgs[0], $attr, $value);
         }
-        $this->setTemplate($attr);
+        $this->hasTemplate($arrgs);
         return $this->makeSingleton($method, $arrgs);
     }
 
@@ -153,28 +156,62 @@ class FormBuilder
     {
         $modelName = ucfirst($method);
         $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
+
         if (!isset($this->maked[$modelName])) {
-            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $this->templates, $arrgs]);
+            $templates = [
+                'local' => $this->templates,
+                'global' => $this->globalTemplates,
+            ];
+            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $templates, $arrgs]);
         }
+
         if (!empty($this->model)) {
             $this->maked[$modelName]->setModel($this->model);
         }
+
         return $this->maked[$modelName]->render($arrgs);
+    }
+
+    /**
+     * @param $attr
+     */
+    private function hasTemplate(&$attr)
+    {
+        $templates = false;
+        if (!empty($attr[1]['template'])) {
+            $templates = $attr[1]['template'];
+            unset($attr[1]['template']);
+        }
+        if (!empty($attr[1]['globalTemplate'])) {
+            $templates = array_merge($attr[1]['globalTemplate'], ['_global' => true]);
+            unset($attr[1]['globalTemplate']);
+        }
+        $this->setTemplate($templates);
     }
 
     /**
      * @param $templateName
      * @param bool $templateValue
+     * @param bool $global
      */
-    public function setTemplate($templateName, $templateValue = false)
+    public function setTemplate($templateName, $templateValue = false, $global = false)
     {
         if (is_array($templateName)) {
-            foreach ($templateName as $key => $value) {
-                $this->templates[$key] = $value;
+            if (!empty($templateName['_global'])) {
+                foreach ($templateName as $key => $value) {
+                    $this->generalTemplates[$key] = $value;
+                }
+            } else {
+                foreach ($templateName as $key => $value) {
+                    $this->templates[$key] = $value;
+                }
             }
         } elseif ($templateValue) {
-            $this->templates[$templateName] = $templateValue;
+            if ($global) {
+                $this->globalTemplates[$templateName] = $templateValue;
+            } else {
+                $this->templates[$templateName] = $templateValue;
+            }
         }
     }
-
 }

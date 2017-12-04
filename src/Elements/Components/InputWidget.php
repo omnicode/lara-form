@@ -12,14 +12,13 @@ class InputWidget extends BaseInputWidget
     /**
      * @param $option
      * @return mixed|string
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \LogicException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function render($option)
     {
         $this->name = $option[0];
         $attr = !empty($option[1]) ? $option[1] : [];
-
         return $this->toHtml($this->name, $attr);
     }
 

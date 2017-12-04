@@ -58,7 +58,7 @@ class FormWidget extends Widget
             if ($method !== 'post') {
                 $form .= method_field(strtoupper($method));
             }
-            $form .= $this->setHidden($this->config['label']['form_protection'],$token);
+            $form .= $this->setHidden($this->config['label']['form_protection'], $token);
         }
 
         return $form;
@@ -66,6 +66,8 @@ class FormWidget extends Widget
 
     /**
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function end()
     {
@@ -94,7 +96,6 @@ class FormWidget extends Widget
 
         return $method;
     }
-
 
 
     /**

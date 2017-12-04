@@ -9,6 +9,8 @@ class SubmitWidget extends BaseInputWidget
     /**
      * @param $option
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function render($option)
     {
@@ -16,9 +18,11 @@ class SubmitWidget extends BaseInputWidget
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
         $template = $this->getTemplate('button');
+
+        $name = !empty($this->name) ? $this->name : '';
         $btnAttr = [
             'attrs' => $this->formatAttributes($attr),
-            'text' => $this->icon. !empty($this->name) ? $this->name : '',
+            'text' => $this->icon. $name,
         ];
         return $this->html = $this->formatTemplate($template, $btnAttr);
     }
@@ -26,6 +30,8 @@ class SubmitWidget extends BaseInputWidget
 
     /**
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

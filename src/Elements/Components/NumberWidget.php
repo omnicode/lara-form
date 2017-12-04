@@ -7,6 +7,8 @@ class NumberWidget extends BaseInputWidget
     /**
      * @param $option
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function render($option)
     {
@@ -18,8 +20,7 @@ class NumberWidget extends BaseInputWidget
 
 
     /**
-     * @param $attrs
-     * @internal param $attr
+     * @param $attr
      */
     public function inspectionAttributes(&$attr)
     {

@@ -7,6 +7,8 @@ class RadioWidget extends BaseInputWidget
     /**
      * @param $option
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function render($option)
     {
@@ -25,8 +27,8 @@ class RadioWidget extends BaseInputWidget
 
     /**
      * @param $attr
-     * @internal param $attrs
-     * @internal param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

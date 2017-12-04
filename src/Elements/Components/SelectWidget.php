@@ -36,7 +36,8 @@ class SelectWidget extends Widget
     /**
      * @param $params
      * @return string
-     * @internal param $option
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function render($params)
     {
@@ -55,8 +56,9 @@ class SelectWidget extends Widget
 
     /**
      * @param bool $gropup
-     * @return bool
-     * @internal param $optionTemplate
+     * @return bool|string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function renderOptions($gropup = false)
     {
@@ -92,8 +94,8 @@ class SelectWidget extends Widget
      * @param $groupName
      * @param $options
      * @return string
-     * @internal param array $attr
-     * @internal param $option
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function renderOptgroup($groupName, $options)
     {
@@ -113,6 +115,8 @@ class SelectWidget extends Widget
 
     /**
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

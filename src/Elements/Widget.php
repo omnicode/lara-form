@@ -43,7 +43,12 @@ class Widget implements WidgetInterface
     /**
      * @var array
      */
-    public $addedTemplates = [];
+    public $localTemplates = [];
+
+    /**
+     * @var array
+     */
+    public $globalTemplates = [];
 
     /**
      * @var
@@ -79,7 +84,7 @@ class Widget implements WidgetInterface
      * Widget constructor.
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
-     * @param null $setTemplate
+     * @param array|null $setTemplate
      * @param array $params
      */
     public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $setTemplate = [], $params = [])
@@ -105,13 +110,20 @@ class Widget implements WidgetInterface
      */
     protected function addTemplate($templates)
     {
-        if (!empty($templates)) {
-            foreach ($templates as $key => $value) {
+        if (!empty($templates['local'])) {
+            foreach ($templates['local'] as $key => $value) {
                 if (isset($this->config['templates'][$key])) {
-                    $this->addedTemplates[$key] = $value;
+                    $this->localTemplates[$key] = $value;
                 }
             }
         }
+        if (!empty($templates['global'])) {
+            foreach ($templates['global'] as $key => $value) {
+                if (isset($this->config['templates'][$key])) {
+                    $this->globalTemplates[$key] = $value;
+                }
+            }
+        };
     }
 
     /**
@@ -122,12 +134,11 @@ class Widget implements WidgetInterface
     protected function getTemplate($templateName, $unset = true)
     {
         $template = null;
-        if (!empty($this->addedTemplates[$templateName])) {
-            $template = $this->addedTemplates[$templateName];
-            if ($unset) {
-                unset($this->addedTemplates[$templateName]);
-            }
-        } elseif (!empty($this->config['templates'][$templateName])) {
+        if (!empty($this->localTemplates[$templateName])) {
+            $template = $this->localTemplates[$templateName];
+        } elseif(!empty($this->globalTemplates[$templateName])){
+            $template = $this->globalTemplates[$templateName];
+        }elseif (!empty($this->config['templates'][$templateName])) {
             $template = $this->config['templates'][$templateName];
         }
 
@@ -172,6 +183,8 @@ class Widget implements WidgetInterface
      * @param $template
      * @param $attributes
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function formatTemplate($template, $attributes)
     {
@@ -191,6 +204,8 @@ class Widget implements WidgetInterface
 
     /**
      * @param $template
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     private function transformTemplate(&$template)
     {
@@ -230,6 +245,8 @@ class Widget implements WidgetInterface
 
     /**
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function completeTemplate()
     {
@@ -257,6 +274,8 @@ class Widget implements WidgetInterface
     /**
      * @param $name
      * @return array
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function setError($name)
     {
@@ -318,6 +337,8 @@ class Widget implements WidgetInterface
      * @param $inputName
      * @param $option
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function renderLabel($inputName, $option)
     {
@@ -347,7 +368,7 @@ class Widget implements WidgetInterface
             $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
         }
         if ($this->config['label']['idPrefix'] && !isset($attr['idPrefix'])) {
-            $attr['id'] = $this->config['idPrefix'] . $attr['id'];
+            $attr['id'] = $this->config['label']['idPrefix'] . $attr['id'];
         } elseif (isset($attr['idPrefix']) && $attr['id'] !== false) {
             $attr['id'] = $attr['idPrefix'] . $attr['id'];
             unset($attr['idPrefix']);
@@ -358,6 +379,8 @@ class Widget implements WidgetInterface
      * @param $name
      * @param $value
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function setHidden($name, $value)
     {
