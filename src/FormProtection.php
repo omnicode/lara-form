@@ -1,4 +1,5 @@
 <?php
+
 namespace LaraForm;
 
 use Illuminate\Support\Facades\Config;
@@ -34,7 +35,14 @@ class FormProtection
     /**
      * @var
      */
+    protected $pathForTime;
+
+    /**
+     * @var
+     */
     protected $pathForUnlock;
+
+    protected $created_time;
 
     /**
      * FormProtection constructor.
@@ -42,8 +50,9 @@ class FormProtection
     public function __construct()
     {
         $this->sessionPrePath = config('lara_form.session.pre_path', 'laraforms');
-        $this->pathForUnlock= config('lara_form.session.path_for.unlock', 'is_unlock');
+        $this->pathForUnlock = config('lara_form.session.path_for.unlock', 'is_unlock');
         $this->pathForCheck = config('lara_form.session.path_for.check', 'is_check');
+        $this->pathForTime = config('lara_form.session.path_for.time', 'created_time');
         $this->fields = [];
     }
 
@@ -53,6 +62,11 @@ class FormProtection
     public function setToken($token)
     {
         $this->token = $token;
+    }
+
+    public function setTime()
+    {
+        $this->created_time = time();
     }
 
     /**
@@ -78,15 +92,17 @@ class FormProtection
             return false;
         }
 
+
         if (!session()->has($this->sessionPath($token))) {
             return false;
         }
 
         $checkedFields = $this->getCheckedFieldsBy($token);
+        $time = $this->getCreatedTime($token);
         $data = $this->removeUnlockFields($data, $token);
 
-        if (!$isAjax) {
 
+        if (!$isAjax) {
             session()->forget($this->sessionPath($token)); // TODO correct dellete all session or only $token
         }
 
@@ -114,6 +130,54 @@ class FormProtection
     }
 
     /**
+     * @return bool
+     */
+    public function removeByTime()
+    {
+        $maxTime = \config('lara_form.session.max_time', false);
+        if (!$maxTime) {
+            return false;
+        }
+
+        $maxSeccounds = $maxTime * 60;
+        $formHistories = session(config('lara_form.session.pre_path'));
+        $timeName = config('lara_form.session.path_for.time');
+        $currentTime = time();
+        $subTime = $currentTime - $maxSeccounds;
+        $newHistories = array_filter($formHistories, function ($value) use ($timeName, $subTime) {
+            if (isset($value[$timeName])) {
+                if ($value[$timeName] > $subTime) {
+                    return $value;
+                }
+            }
+        });
+        session()->put(config('lara_form.session.pre_path'), $newHistories);
+    }
+
+    /**
+     * @return bool
+     */
+    public function removeByCount()
+    {
+        $maxCount = \config('lara_form.session.max_count', false);
+        if (!$maxCount) {
+            return false;
+        }
+        $formHistories = session(config('lara_form.session.pre_path'));
+        $intervalCount = count($formHistories) - $maxCount;
+        $newHistories = [];
+        $loop = 0;
+        foreach (array_reverse($formHistories) as $key => $formHistory) {
+            if ($loop == $intervalCount) {
+                break;
+            }
+            $loop[$key] = $formHistory;
+            $loop++;
+        }
+        session()->put(config('lara_form.session.pre_path'), $newHistories);
+    }
+
+    /**
      * @param $unlockFields
      * @return array|string
      * @throws \Exception
@@ -138,7 +202,7 @@ class FormProtection
     public function addField($field, &$options = [], $value = '')
     {
         if (!empty($options['_unlock']) || !empty($options['disabled'])) {
-             unset($this->fields[$field]);
+            unset($this->fields[$field]);
             $this->unlockFields[] = $field; // TODO allows unlock array input
         } else {
             if (!starts_with($field, $this->unlockFields)) {
@@ -162,7 +226,7 @@ class FormProtection
             $arr[$key] = rtrim($item, ']');
         }
 
-        $field =  implode('.' , $arr);
+        $field = implode('.', $arr);
 
         if (ends_with($field, '.')) {
             array_set($this->fields, substr($field, 0, -1), []);
@@ -180,7 +244,8 @@ class FormProtection
     {
         $data = [
             $this->pathForCheck => $this->fields,
-            $this->pathForUnlock => $this->unlockFields
+            $this->pathForUnlock => $this->unlockFields,
+            $this->pathForTime => $this->created_time,
         ];
         $this->fields = [];
         $this->unlockFields = [];
@@ -208,6 +273,16 @@ class FormProtection
     }
 
     /**
+     * @param $token
+     * @return mixed
+     */
+    private function getCreatedTime($token)
+    {
+        $path = $token . '.' . $this->pathForTime;
+        return session($this->sessionPath($path));
+    }
+
+    /**
      * @param $data
      * @param $token
      * @return mixed
@@ -225,6 +300,7 @@ class FormProtection
                 unset($data[$key]);
             }
         }
+
         return $data;
     }
 }

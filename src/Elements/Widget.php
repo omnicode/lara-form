@@ -84,12 +84,10 @@ class Widget implements WidgetInterface
      * Widget constructor.
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
-     * @param array|null $setTemplate
-     * @param array $params
+     * @param array $setTemplate
      */
-    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $setTemplate = [], $params = [])
+    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $setTemplate = [])
     {
-        //TODO inspection base params
         $this->config = config('lara_form');
         $this->errors = $errorStore;
         $this->oldInputs = $oldInputStore;
@@ -136,9 +134,9 @@ class Widget implements WidgetInterface
         $template = null;
         if (!empty($this->localTemplates[$templateName])) {
             $template = $this->localTemplates[$templateName];
-        } elseif(!empty($this->globalTemplates[$templateName])){
+        } elseif (!empty($this->globalTemplates[$templateName])) {
             $template = $this->globalTemplates[$templateName];
-        }elseif (!empty($this->config['templates'][$templateName])) {
+        } elseif (!empty($this->config['templates'][$templateName])) {
             $template = $this->config['templates'][$templateName];
         }
 
@@ -211,10 +209,10 @@ class Widget implements WidgetInterface
     {
         $start = $this->config['seperator']['start'];
         $end = $this->config['seperator']['end'];
-        $seperatorsStart = ['[','{','('];
-        $seperatorsEnd = [']','}',')'];
-        if (!starts_with($start,$seperatorsStart) && !ends_with($end,$seperatorsEnd)) {
-            abort(300,'Sintax error, allowed symbols for start '.implode(',',$seperatorsStart).' and for end '.implode(',',$seperatorsEnd));
+        $seperatorsStart = ['[', '{', '('];
+        $seperatorsEnd = [']', '}', ')'];
+        if (!starts_with($start, $seperatorsStart) && !ends_with($end, $seperatorsEnd)) {
+            abort(300, 'Sintax error, allowed symbols for start ' . implode(',', $seperatorsStart) . ' and for end ' . implode(',', $seperatorsEnd));
         }
         $template = str_ireplace([$start, $end], ['{%', '%}'], $template);
     }

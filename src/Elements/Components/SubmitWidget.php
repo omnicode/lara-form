@@ -52,6 +52,8 @@ class SubmitWidget extends BaseInputWidget
         if (!empty($attr['position']) && $attr['position'] == 'right') {
             $attr['class'] .= ' icon-right';
         }
-        $attr['type'] = 'submit';
+        if (!isset($attr['type'])) {
+            $attr['type'] = 'submit';
+        }
     }
 }

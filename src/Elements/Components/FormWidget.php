@@ -6,6 +6,13 @@ use LaraForm\Elements\Widget;
 
 class FormWidget extends Widget
 {
+    /**
+     * @param $option
+     * @return string
+     * @throws \RuntimeException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function render($option)
     {
 
@@ -20,6 +27,9 @@ class FormWidget extends Widget
 
     }
 
+    /**
+     * @param $attr
+     */
     public function inspectionAttributes(&$attr)
     {
         if (!empty($options['file'])) {
@@ -40,7 +50,6 @@ class FormWidget extends Widget
         $method = $this->getMethod($options);
         $action = $this->getAction($options);
         $token = $options['form_token'];
-        unset($options['form_token']);
         $htmlAttributes['action'] = $action;
         $htmlAttributes['method'] = ($method == 'get') ? 'GET' : 'POST';
         $htmlAttributes['accept-charset'] = $this->config['charset'];

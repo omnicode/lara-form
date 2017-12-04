@@ -45,6 +45,7 @@ class FormBuilder
      */
     protected $globalTemplates = [];
 
+    protected $token;
     /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
@@ -82,8 +83,10 @@ class FormBuilder
         $this->model = $model;
         $token = md5(str_random(80));
         $this->formProtection->setToken($token);
+        $this->formProtection->setTime();
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
         $options['form_token'] = $token;
+        $this->token = $token;
         $unlockFields[] = '_token';
         $unlockFields[] = '_method';
         $this->formProtection->setUnlockFields($unlockFields);
@@ -115,6 +118,7 @@ class FormBuilder
     {
         $this->formProtection->confirm();
         $this->maked = [];
+        $this->templates = [];
         return $this->makeSingleton('form', ['end']);
     }
 
@@ -138,8 +142,10 @@ class FormBuilder
             if ($method == 'hidden') {
                 $value = isset($attr['value']) ? $attr['value'] : 0;
             }
+           if ($method !== 'submit') {
 
-            $this->formProtection->addField($arrgs[0], $attr, $value);
+               $this->formProtection->addField($arrgs[0], $attr, $value);
+           }
         }
         $this->hasTemplate($arrgs);
         return $this->makeSingleton($method, $arrgs);
@@ -162,7 +168,7 @@ class FormBuilder
                 'local' => $this->templates,
                 'global' => $this->globalTemplates,
             ];
-            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $templates, $arrgs]);
+            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $templates]);
         }
 
         if (!empty($this->model)) {
@@ -186,7 +192,9 @@ class FormBuilder
             $templates = array_merge($attr[1]['globalTemplate'], ['_global' => true]);
             unset($attr[1]['globalTemplate']);
         }
-        $this->setTemplate($templates);
+        if ($templates) {
+            $this->setTemplate($templates);
+        }
     }
 
     /**
@@ -198,8 +206,9 @@ class FormBuilder
     {
         if (is_array($templateName)) {
             if (!empty($templateName['_global'])) {
+                unset($templateName['_global']);
                 foreach ($templateName as $key => $value) {
-                    $this->generalTemplates[$key] = $value;
+                    $this->globalTemplates[$key] = $value;
                 }
             } else {
                 foreach ($templateName as $key => $value) {

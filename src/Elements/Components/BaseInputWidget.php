@@ -50,6 +50,7 @@ class BaseInputWidget extends Widget
         } else {
             $template = $cTemplate;
         }
+
         $this->generalInspectionAttributes($attr, $cTemplate);
         $this->htmlAttributes['name'] = $name;
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
@@ -73,7 +74,8 @@ class BaseInputWidget extends Widget
         } else {
             $this->htmlAttributes['type'] = 'text';
         }
-        if (isset($attr['value']) && $cTemplate) {
+        $this->htmlAttributes['value'] = '';
+        if (!empty($attr['value']) && $cTemplate) {
             $this->htmlAttributes['value'] = $attr['value'];
             unset($attr['value']);
         }
