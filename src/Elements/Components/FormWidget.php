@@ -45,10 +45,12 @@ class FormWidget extends Widget
         $htmlAttributes['method'] = ($method == 'get') ? 'GET' : 'POST';
         $htmlAttributes['accept-charset'] = $this->config['charset'];
         $htmlAttributes += $options;
-        $template = $this->getTemplateByName('formStart');
+        $template = $this->getTemplate('formStart');
+
         $rep = [
             'attrs' => $this->formatAttributes($htmlAttributes)
         ];
+
         $form = $this->formatTemplate($template, $rep);
 
         if ($method !== 'get') {
@@ -67,7 +69,7 @@ class FormWidget extends Widget
      */
     protected function end()
     {
-        $template = $this->config['templates']['formEnd'];
+        $template = $this->getTemplate('formEnd');
         return $this->formatTemplate($template, false);
     }
 

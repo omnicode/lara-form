@@ -12,7 +12,7 @@ class TextareaWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $template = $this->config['templates']['textarea'];
+        $template = $this->getTemplate('textarea');
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);

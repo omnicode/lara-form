@@ -126,7 +126,7 @@ class FormBuilder
     {
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
         if (isset($attr['type'])) {
-            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file'])) {
+            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file','textarea'])) {
                 $method = $attr['type'];
             }
         }

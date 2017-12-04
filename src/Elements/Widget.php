@@ -100,6 +100,9 @@ class Widget implements WidgetInterface
 
     }
 
+    /**
+     * @param $templates
+     */
     protected function addTemplate($templates)
     {
         if (!empty($templates)) {
@@ -111,13 +114,20 @@ class Widget implements WidgetInterface
         }
     }
 
-    protected function getTemplateByName($templateName)
+    /**
+     * @param $templateName
+     * @param bool $unset
+     * @return mixed|null
+     */
+    protected function getTemplate($templateName, $unset = true)
     {
         $template = null;
         if (!empty($this->addedTemplates[$templateName])) {
             $template = $this->addedTemplates[$templateName];
-            unset($this->addedTemplates[$templateName]);
-        }elseif (!empty($this->config['templates'][$templateName])) {
+            if ($unset) {
+                unset($this->addedTemplates[$templateName]);
+            }
+        } elseif (!empty($this->config['templates'][$templateName])) {
             $template = $this->config['templates'][$templateName];
         }
 
@@ -170,11 +180,28 @@ class Widget implements WidgetInterface
         }
         $from = [];
         $to = [];
+        $this->transformTemplate($template);
         foreach ($attributes as $index => $attribute) {
-            $from[] = '[' . $index . ']';
+            $from[] = '{%' . $index . '%}';
             $to[] = $attribute;
         }
+
         return str_ireplace($from, $to, $template);
+    }
+
+    /**
+     * @param $template
+     */
+    private function transformTemplate(&$template)
+    {
+        $start = $this->config['seperator']['start'];
+        $end = $this->config['seperator']['end'];
+        $seperatorsStart = ['[','{','('];
+        $seperatorsEnd = [']','}',')'];
+        if (!starts_with($start,$seperatorsStart) && !ends_with($end,$seperatorsEnd)) {
+            abort(300,'Sintax error, allowed symbols for start '.implode(',',$seperatorsStart).' and for end '.implode(',',$seperatorsEnd));
+        }
+        $template = str_ireplace([$start, $end], ['{%', '%}'], $template);
     }
 
     /**
@@ -191,7 +218,7 @@ class Widget implements WidgetInterface
         $attr = '';
         foreach ($attributes as $index => $attribute) {
             if (is_string((string)$index)) {
-                $attr .= $index . '="' . $attribute . '"';
+                $attr .= $index . '="' . $attribute . '" ';
             } else {
                 $attr .= $attribute . ' ';
             }

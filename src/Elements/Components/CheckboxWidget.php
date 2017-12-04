@@ -10,15 +10,15 @@ class CheckboxWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $template = $this->config['templates']['checkbox'];
+        $template = $this->getTemplate('checkbox');
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
         if (strpos($this->name, '[]')) {
             $attr['multiple'] = true;
         }
         $this->inspectionAttributes($attr);
-        $this->containerTemplate = $this->config['templates']['checkboxContainer'];
-        $labelTemplate = $this->config['templates']['nestingLabel'];
+        $this->containerTemplate = $this->getTemplate('checkboxContainer');
+        $labelTemplate = $this->getTemplate('nestingLabel');
         $this->toHtml($this->name, $attr, $template);
         $labelAttr = [
             'hidden' => $this->hidden,
@@ -26,9 +26,8 @@ class CheckboxWidget extends BaseInputWidget
             'text' => isset($attr['label']) ? $attr['label'] : $this->getLabelName($this->name),
             'attrs' => ''
         ];
-
         $this->html = $this->formatTemplate($labelTemplate, $labelAttr);
-       // $this->html = $this->completeTemplate();
+        $this->html = $this->completeTemplate();
         return $this->html;
     }
 
@@ -38,7 +37,7 @@ class CheckboxWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-        $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
+        $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['checkbox'];
         $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['checkboxClass'];
 
         if (isset($attr['type'])) {
@@ -61,7 +60,7 @@ class CheckboxWidget extends BaseInputWidget
             }else{
                 $hiddenName = $this->name;
             }
-            $this->hidden = $this->setHidden($hiddenName,0);
+            $this->hidden = $this->setHidden($hiddenName,$this->config['default_value']['hidden']);
         }
     }
 }

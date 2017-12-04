@@ -41,7 +41,11 @@ class BaseInputWidget extends Widget
     public function toHtml($name, $attr, $cTemplate = false)
     {
         if (!$cTemplate) {
-            $template = $this->getTemplate($attr);
+            if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
+                $template = $this->getTemplate($attr['type']);
+            }else{
+                $template = $this->getTemplate('input');
+            }
         } else {
             $template = $cTemplate;
         }
@@ -51,21 +55,6 @@ class BaseInputWidget extends Widget
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
         $this->html = $this->formatTemplate($template, $this->htmlAttributes);
         return $this->completeTemplate();
-    }
-
-    /**
-     * @param $attr
-     * @return mixed
-     */
-    protected function getTemplate(&$attr)
-    {
-        if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
-            $template = $this->getTemplateByName($attr['type']);
-        }
-        if (empty($template)) {
-            return $this->config['templates']['input'];
-        }
-        return $template;
     }
 
     /**

@@ -4,10 +4,7 @@ namespace LaraForm\Elements\Components;
 
 class SubmitWidget extends BaseInputWidget
 {
-    /**
-     * @var array
-     */
-    protected $_submitTypes = ['submit', 'button', 'reset'];
+    protected $icon = '';
 
     /**
      * @param $option
@@ -15,11 +12,15 @@ class SubmitWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $template = $this->config['templates']['submit'];
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
-        return $this->html = $this->toHtml($this->name, $attr, $template);
+        $template = $this->getTemplate('button');
+        $btnAttr = [
+            'attrs' => $this->formatAttributes($attr),
+            'text' => $this->icon. !empty($this->name) ? $this->name : '',
+        ];
+        return $this->html = $this->formatTemplate($template, $btnAttr);
     }
 
 
@@ -28,7 +29,7 @@ class SubmitWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['submitClass'];
+        $attr['class'] = isset($attr['class']) ? $attr['class'] . ' btn' : $this->config['css']['submitClass'];
         if (!empty($options['btn'])) {
             if ($attr['btn'] === true) {
                 $attr['btn'] = $this->config['label']['submit_btn'];
@@ -36,12 +37,15 @@ class SubmitWidget extends BaseInputWidget
             $attr['class'] .= ' btn btn-' . $attr['btn'];
             unset($attr['btn']);
         }
-        // @TODO - combine with Assistant::input
+        $iconTemplate = $this->getTemplate('icon');
+        if (!empty($attr['icon'])) {
+            $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
+            unset($attr['icon']);
+        }
+
         if (!empty($attr['position']) && $attr['position'] == 'right') {
             $attr['class'] .= ' icon-right';
         }
-        if (!isset($attr['type']) || (isset($attr['type']) && !in_array($attr['type'], $this->_submitTypes))) {
-            $attr['type'] = 'submit';
-        }
+        $attr['type'] = 'submit';
     }
 }

@@ -19,7 +19,44 @@ class LaraFormServiceProvider extends ServiceProvider
         $this->registerFormProtection();
         $this->registerFormElements();
         $this->registerFormBuilder();
+        $this->configMerge();
         $this->registerMiddleware(LaraFormMiddleware::class);
+
+    }
+
+    /**
+     * @throws \LogicException
+     */
+    public function boot()
+    {
+        $this->publishes([
+            dirname (__DIR__) .'/Config/lara_form_base.php' => config_path('lara_form.php'),
+        ]);
+    }
+
+
+    /**
+     *
+     */
+    protected function configMerge()
+    {
+        $this->replaceConfig(
+            dirname (__DIR__) . '/Config/lara_form_base.php', 'lara_form'
+        );
+    }
+
+    /**
+     * Merge the given configuration with the existing configuration.
+     * @param  string $path
+     * @param  string $key
+     * @return void
+     */
+    protected function replaceConfig($path, $key)
+    {
+        $config = $this->app['config']->get($key, []);
+        $baseConfig = require_once $path;
+
+        $this->app['config']->set($key, array_replace_recursive($baseConfig,$config));
     }
 
     /**

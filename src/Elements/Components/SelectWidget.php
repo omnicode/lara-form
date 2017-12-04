@@ -60,7 +60,7 @@ class SelectWidget extends Widget
      */
     protected function renderOptions($gropup = false)
     {
-        $optionTemplate = $this->config['templates']['option'];
+        $optionTemplate = $this->getTemplate('option', false);
         if ($gropup) {
             $options = $gropup;
         } else {
@@ -97,7 +97,7 @@ class SelectWidget extends Widget
      */
     protected function renderOptgroup($groupName, $options)
     {
-        $optgroupTemplate = $this->config['templates']['optgroup'];
+        $optgroupTemplate = $this->getTemplate('optgroup',false);
         $childOptionsHtml = $this->renderOptions($options);
         $groupAttrs = [];
         if (!empty($this->groupDisabled)) {
@@ -123,10 +123,10 @@ class SelectWidget extends Widget
             $this->name = str_ireplace('[]','',$this->name);
         }
         if (isset($attr['multiple'])) {
-            $this->selectTemplate = $this->config['templates']['selectMultiple'];
+            $this->selectTemplate = $this->getTemplate('selectMultiple');
             unset($attr['multiple']);
         } else {
-            $this->selectTemplate = $this->config['templates']['select'];
+            $this->selectTemplate = $this->getTemplate('select');
         }
         if (!empty($attr['options'])) {
             $this->optionsArray = is_array($attr['options']) ? $attr['options'] : [$attr['options']];
