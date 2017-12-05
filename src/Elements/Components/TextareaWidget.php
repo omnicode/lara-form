@@ -27,9 +27,10 @@ class TextareaWidget extends BaseInputWidget
     public function inspectionAttributes(&$attr)
     {
         $attr += $this->getValue($this->name);
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['textareaClass'];
+        $this->htmlClass[] = isset($attr['class']) ? $attr['class'] : $this->config['css']['textareaClass'];
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
+        $attr['class'] = $this->formatClass();
     }
 }

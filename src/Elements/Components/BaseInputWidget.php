@@ -12,7 +12,8 @@ class BaseInputWidget extends Widget
     protected $types = [
         'checkbox',
         'radio',
-        'submit'
+        'submit',
+        'textarea'
     ];
 
     /**
@@ -52,6 +53,7 @@ class BaseInputWidget extends Widget
         }
 
         $this->generalInspectionAttributes($attr, $cTemplate);
+        $this->setContatinerParams($attr);
         $this->htmlAttributes['name'] = $name;
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
         $this->html = $this->formatTemplate($template, $this->htmlAttributes);
@@ -70,14 +72,14 @@ class BaseInputWidget extends Widget
 
         if (isset($attr['type'])) {
             $this->htmlAttributes['type'] = $attr['type'];
-            unset($attr['type']);
+            $this->unlokAttributes['type'] = $attr['type'];
         } else {
             $this->htmlAttributes['type'] = 'text';
         }
         $this->htmlAttributes['value'] = '';
         if (!empty($attr['value']) && $cTemplate) {
             $this->htmlAttributes['value'] = $attr['value'];
-            unset($attr['value']);
+            $this->unlokAttributes['value'] = $attr['value'];
         }
         $notD = ['hidden', 'submit', 'reset', 'button', 'radio', 'checkbox', 'label'];
         if (!in_array($this->htmlAttributes['type'], $notD) && !$cTemplate) {
@@ -87,15 +89,15 @@ class BaseInputWidget extends Widget
         if (!in_array($this->htmlAttributes['type'], $notLabel)) {
             if (isset($attr['label']) && $attr['label'] !== false) {
                 $this->renderLabel($attr['label'], $attr);
-                unset($attr['label']);
+                $this->unlokAttributes['label'] = $attr['label'];
             } else {
                 $this->renderLabel($this->name, $attr);
             }
         }
         if (!isset($attr['class']) && $this->htmlAttributes['type'] !== 'hidden') {
-            $attr['class'] = $this->config['css']['inputClass'];
+            $this->htmlClass[] = $this->config['css']['inputClass'];
         } elseif (isset($attr['class']) && $attr['class'] == false) {
-            unset($attr['class']);
+            $this->unlokAttributes['class'] = $attr['class'];
         }
     }
 

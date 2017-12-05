@@ -1,10 +1,10 @@
 <?php
 return [
-    'seperator' => [
-        'start' => '{%',
-        'end' => '%}',
-    ],
     'charset' => 'utf-8',
+    'seperator' => [
+        'start' => '{%', // [..., {..., (...
+        'end' => '%}',   // ...], ...}, ...)
+    ],
     'label' => [
         'form_protection' => 'laraform_token',
         'select_empty' => '--Select--',
@@ -18,6 +18,9 @@ return [
     ],
     'session' => [
         'pre_path' => 'laraforms',
+        'request_interval' => 5, // by hour
+        'max_time' => 2, // by hour
+        'max_count' => false,
         'path_for' => [
             'check' => 'is_check',
             'unlock' => 'is_unlock',
@@ -35,7 +38,8 @@ return [
         'radioClass' => false,
         'fileClass' => false,
         'textareaClass' => 'form-control',
-        'submitClass' => 'btn btn-success',
+        'submitColor' => 'btn-default',
+        'submitClass' => 'btn',
     ],
     'templates' => [
         // Used for button elements in button().
@@ -43,9 +47,9 @@ return [
         // Used for checkboxes in checkbox() and multiCheckbox().
         'checkbox' => '<input type="checkbox" name="{%name%}" value="{%value%}" {%attrs%}/>',
         // Wrapper container for checkboxes.
-        'checkboxContainer' => '<div class="checkbox {%type%}{%required%}" {%containerAttrs%}>{%content%}</div>',
+        'checkboxContainer' => '<div class="checkbox {%type%}{%required%}{%class%}" {%containerAttrs%}>{%content%}</div>',
         // Container for error items.
-        'errorList' => '<div class="alert alert-danger">
+        'errorList' => '<div class="alert alert-danger {%class%}">
                             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                             <ul>{%content%}</ul>
                         </div>',
@@ -70,9 +74,9 @@ return [
         // Submit input element.
         'submit' => '<input type="{%type%}" value="{%name%}" {%attrs%}/>',
         // Container element used by control().
-        'inputContainer' => '<div class="form-group {%type%}{%required%}{%error%}" {%containerAttrs%}>{%label%}{%content%}{%help%}</div>',
+        'inputContainer' => '<div class="form-group {%type%}{%required%}{%class%}{%error%}" {%containerAttrs%}>{%label%}{%content%}{%help%}</div>',
         // Container element used by control() when a field has an error.
-        'helpBlock' => '<span class="help-block">{%text%}</span>',
+        'helpBlock' => '<span class="help-block {%class%}">{%text%}</span>',
         // Label element when inputs are not nested inside the label.
         'label' => '<label {%attrs%}>{%text%}</label>',
         // Label element used for radio and multi-checkbox inputs.
@@ -98,8 +102,8 @@ return [
         // Textarea input element,
         'textarea' => '<textarea name="{%name%}" {%attrs%}>{%value%}</textarea>',
         // Container for submit buttons.
-        'submitContainer' => '<div class="submit">{%content%}</div>',
+        'submitContainer' => '<div class="submit {%class%}">{%content%}</div>',
         //icon
-        'icon' => '<i class="fa fa-{%name%}"></i>'
+        'icon' => '<i class="fa fa-{%name%} {%class%}"></i>'
     ]
 ];

@@ -23,6 +23,7 @@ class LaraFormMiddleware
 
             $formProtection = new FormProtection();
             $data = $request->all();
+
             foreach ($request->query() as $index => $key) {
                 unset($data[$index]);
             }
@@ -30,13 +31,14 @@ class LaraFormMiddleware
             $isAjax = $request->ajax();
             $validate = $formProtection->validate($data, $isAjax);
 
-            unset($request[config('lara_form.label.form_protection', 'laraform_token')]);
             $formProtection->removeByTime();
             $formProtection->removeByCount();
 
-            if ($validate === false) {
-                abort(403, 'Your Action Is Forbidden');
-            }
+            //if ($validate === false) {
+             //   abort(403, 'Your Action Is Forbidden');
+            //}
+
+            unset($request[config('lara_form.label.form_protection', 'laraform_token')]);
         }
 
         return $next($request);

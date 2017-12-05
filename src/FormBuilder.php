@@ -38,14 +38,19 @@ class FormBuilder
     /**
      * @var array
      */
-    protected $templates = [];
+    protected $templates = [
+        'pattern' => [],
+        'div' => [],
+    ];
 
     /**
      * @var array
      */
-    protected $globalTemplates = [];
+    protected $globalTemplates = [
+        'pattern' => [],
+        'div' => [],
+    ];
 
-    protected $token;
     /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
@@ -85,12 +90,8 @@ class FormBuilder
         $this->formProtection->setToken($token);
         $this->formProtection->setTime();
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
-        $options['form_token'] = $token;
-        $this->token = $token;
-        $unlockFields[] = '_token';
-        $unlockFields[] = '_method';
         $this->formProtection->setUnlockFields($unlockFields);
-
+        $options['form_token'] = $token;
         return $this->makeSingleton('form', ['start', $options]);
     }
 
@@ -106,6 +107,8 @@ class FormBuilder
             $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use
             unset($options['_unlockFields']);
         }
+        $unlockFields[] = '_token';
+        $unlockFields[] = '_method';
         return $unlockFields;
     }
 
@@ -117,9 +120,10 @@ class FormBuilder
     public function end()
     {
         $this->formProtection->confirm();
+        $end = $this->makeSingleton('form', ['end']);
         $this->maked = [];
         $this->templates = [];
-        return $this->makeSingleton('form', ['end']);
+        return $end;
     }
 
     /**
@@ -133,19 +137,18 @@ class FormBuilder
     {
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
         if (isset($attr['type'])) {
-            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file', 'textarea'])) {
+            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file', 'textarea', 'hidden'])) {
                 $method = $attr['type'];
             }
         }
         if (isset($arrgs[0])) {
             $value = '';
             if ($method == 'hidden') {
-                $value = isset($attr['value']) ? $attr['value'] : 0;
+                $value = isset($attr['value']) ? $attr['value'] : config('lara_form.default_value.hidden');
             }
-           if ($method !== 'submit') {
-
-               $this->formProtection->addField($arrgs[0], $attr, $value);
-           }
+            if ($method !== 'submit') {
+                $this->formProtection->addField($arrgs[0], $attr, $value);
+            }
         }
         $this->hasTemplate($arrgs);
         return $this->makeSingleton($method, $arrgs);
@@ -165,8 +168,10 @@ class FormBuilder
 
         if (!isset($this->maked[$modelName])) {
             $templates = [
-                'local' => $this->templates,
-                'global' => $this->globalTemplates,
+                'local' => $this->templates['pattern'],
+                'divLocal' => $this->templates['div'],
+                'global' => $this->globalTemplates['pattern'],
+                'divGlobal' => $this->globalTemplates['div'],
             ];
             $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $templates]);
         }
@@ -184,13 +189,17 @@ class FormBuilder
     private function hasTemplate(&$attr)
     {
         $templates = false;
-        if (!empty($attr[1]['template'])) {
-            $templates = $attr[1]['template'];
-            unset($attr[1]['template']);
+        if (!empty($attr[1]['_template'])) {
+            $templates = $attr[1]['_template'];
+            unset($attr[1]['_template']);
         }
-        if (!empty($attr[1]['globalTemplate'])) {
-            $templates = array_merge($attr[1]['globalTemplate'], ['_global' => true]);
-            unset($attr[1]['globalTemplate']);
+        if (!empty($attr[1]['_globalTemplate'])) {
+            $templates = array_merge($attr[1]['_globalTemplate'], ['_global' => true]);
+            unset($attr[1]['_globalTemplate']);
+        }
+        if (isset($attr[1]['_div'])) {
+            $templates['_div'] = $attr[1]['_div'];
+            unset($attr[1]['_div']);
         }
         if ($templates) {
             $this->setTemplate($templates);
@@ -208,19 +217,28 @@ class FormBuilder
             if (!empty($templateName['_global'])) {
                 unset($templateName['_global']);
                 foreach ($templateName as $key => $value) {
-                    $this->globalTemplates[$key] = $value;
+                    $this->globalTemplates['pattern'][$key] = $value;
+                }
+                if (isset($templateName['_div'])) {
+                    $this->globalTemplates['div'] = $templateName['_div'];
+                    unset($templateName['_div']);
                 }
             } else {
                 foreach ($templateName as $key => $value) {
-                    $this->templates[$key] = $value;
+                    $this->templates['pattern'][$key] = $value;
+                }
+                if (isset($templateName['_div'])) {
+                    $this->templates['div'] = $templateName['_div'];
+                    unset($templateName['_div']);
                 }
             }
         } elseif ($templateValue) {
             if ($global) {
-                $this->globalTemplates[$templateName] = $templateValue;
+                $this->globalTemplates['pattern'][$templateName] = $templateValue;
             } else {
-                $this->templates[$templateName] = $templateValue;
+                $this->templates['pattern'][$templateName] = $templateValue;
             }
         }
+
     }
 }

@@ -35,12 +35,22 @@ class SubmitWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-        $attr['class'] = isset($attr['class']) ? $attr['class'] . ' btn' : $this->config['css']['submitClass'];
-        if (!empty($options['btn'])) {
+        $btn = $this->config['css']['submitClass'];
+        $btnColor = $this->config['css']['submitColor'];
+
+        if (isset($attr['class'])) {
+            $this->htmlClass[] = $attr['class'];
+            unset($attr['class']);
+        }else{
+            $this->htmlClass[] = $btn;
+            $this->htmlClass[] = $btnColor;
+        }
+        if (isset($attr['btn'])) {
             if ($attr['btn'] === true) {
-                $attr['btn'] = $this->config['label']['submit_btn'];
+                $attr['btn'] = $btnColor;
             }
-            $attr['class'] .= ' btn btn-' . $attr['btn'];
+            $this->htmlClass[] = $btn;
+            $this->htmlClass[] = $btn.'-'.$attr['btn'];
             unset($attr['btn']);
         }
         $iconTemplate = $this->getTemplate('icon');
@@ -48,12 +58,9 @@ class SubmitWidget extends BaseInputWidget
             $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
             unset($attr['icon']);
         }
-
-        if (!empty($attr['position']) && $attr['position'] == 'right') {
-            $attr['class'] .= ' icon-right';
-        }
         if (!isset($attr['type'])) {
             $attr['type'] = 'submit';
         }
     }
+
 }

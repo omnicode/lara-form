@@ -19,6 +19,7 @@ class CheckboxWidget extends BaseInputWidget
             $attr['multiple'] = true;
         }
         $this->inspectionAttributes($attr);
+        $this->setContatinerParams($attr);
         $this->containerTemplate = $this->getTemplate('checkboxContainer');
         $labelTemplate = $this->getTemplate('nestingLabel');
         $this->toHtml($this->name, $attr, $template);

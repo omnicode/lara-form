@@ -16,6 +16,16 @@ class Widget implements WidgetInterface
     protected $htmlAttributes = [];
 
     /**
+     * @var array
+     */
+    protected $unlokAttributes = [];
+
+    /**
+     * @var array
+     */
+    protected $htmlClass = [];
+
+    /**
      * @var string
      */
     public $html = '';
@@ -61,6 +71,16 @@ class Widget implements WidgetInterface
     public $containerTemplate = false;
 
     /**
+     * @var array
+     */
+    public $containerParams = true;
+
+    /**
+     * @var bool
+     */
+    public $isContainer = true;
+
+    /**
      * @var string
      */
     public $hidden = '';
@@ -84,14 +104,15 @@ class Widget implements WidgetInterface
      * Widget constructor.
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
-     * @param array $setTemplate
+     * @param array $params
      */
-    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $setTemplate = [])
+    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $params = [])
     {
         $this->config = config('lara_form');
         $this->errors = $errorStore;
         $this->oldInputs = $oldInputStore;
-        $this->addTemplate($setTemplate);
+        $this->addTemplate($params);
+        $this->addContainerAttributes($params);
     }
 
     /**
@@ -122,6 +143,20 @@ class Widget implements WidgetInterface
                 }
             }
         };
+    }
+
+    /**
+     * @param $params
+     */
+    protected function addContainerAttributes($params)
+    {
+        if (isset($params['divGlobal'])) {
+
+        }
+        if (isset($params['divLocal'])) {
+
+        }
+       //TODO create system for dinamic controll by container filds
     }
 
     /**
@@ -223,12 +258,21 @@ class Widget implements WidgetInterface
      */
     public function formatAttributes($attributes)
     {
+        $attr = '';
+        if (empty($attributes)) {
+            return $attr;
+        }
+        if (!empty($this->unlokAttributes)) {
+            $attributes = array_diff($attributes, $this->unlokAttributes);
+        }
+        if (!isset($attributes['class'])) {
+            $attributes['class'] = $this->formatClass();
+        }
         $attributes = array_filter($attributes, function ($value) {
             if (!empty($value) && $value !== '' && $value !== false) {
                 return $value;
             }
         });
-        $attr = '';
         foreach ($attributes as $index => $attribute) {
             if (is_string((string)$index)) {
                 $attr .= $index . '="' . $attribute . '" ';
@@ -243,30 +287,86 @@ class Widget implements WidgetInterface
 
     /**
      * @return string
+     */
+    protected function formatClass()
+    {
+        $class = '';
+        if (!empty($this->htmlClass)) {
+            $uniqueClass = array_unique($this->htmlClass);
+            $arrayClass = array_filter($uniqueClass, function ($value) {
+                if (!empty($value) || $value !== false || $value !== '') {
+                    return $value;
+                }
+            });
+            $class = implode(' ', $arrayClass);
+        }
+        $this->htmlClass = [];
+        return $class;
+    }
+
+    /**
+     * @return string
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function completeTemplate()
     {
         $containerAttributes = [
-            'required' => '',
-            'type' => '',
             'text' => $this->label,
             'label' => $this->label,
-            'attrs' => '',
             'hidden' => $this->hidden,
-            'containerAttrs' => '',
             'content' => $this->html,
         ];
         $containerAttributes += $this->setError($this->name);
+        $containerAttributes += $this->getContatinerAttributes();
+        if (!$this->containerParams || !$this->isContainer) {
+            $this->containerParams = true;
+            return $this->html;
+        }
         if ($this->containerTemplate) {
             $container = $this->containerTemplate;
         } elseif ($this->htmlAttributes['type'] !== 'hidden') {
-            $container = $this->config['templates']['inputContainer'];
+            $container = $this->getTemplate('inputContainer');
         } else {
             return $this->html;
         }
         return $this->formatTemplate($container, $containerAttributes);
+    }
+
+    /**
+     * @return array
+     */
+    private function getContatinerAttributes()
+    {
+        $params = [
+            'required' => '',
+            'type' => '',
+            'containerAttrs' => '',
+            'class' => '',
+        ];
+
+        if (!is_array($this->containerParams)) {
+            return $params;
+        }
+        if (!empty($this->containerParams['required'])) {
+            $params['required'] = $this->containerParams['required'];
+            unset($this->containerParams['required']);
+        }
+        if (!empty($this->containerParams['type'])) {
+            $params['type'] = $this->containerParams['type'];
+            unset($this->containerParams['type']);
+        }
+        if (!empty($this->containerParams['class'])) {
+            $class = $this->containerParams['class'];
+            if (!is_array($class)) {
+                $class = [$class];
+            }
+            $this->htmlClass = $class;
+            $params['class'] = $this->formatClass();
+            unset($this->containerParams['class']);
+        }
+        $params['containerAttrs'] = $this->formatAttributes($this->containerParams);
+        return $params;
     }
 
     /**
@@ -361,7 +461,7 @@ class Widget implements WidgetInterface
     public function generateId(&$attr)
     {
         if (isset($attr['id']) && $attr['id'] == false) {
-            unset($attr['id']);
+            $this->unlokAttributes['id'] = $attr['id'];
         } else {
             $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
         }
@@ -369,7 +469,38 @@ class Widget implements WidgetInterface
             $attr['id'] = $this->config['label']['idPrefix'] . $attr['id'];
         } elseif (isset($attr['idPrefix']) && $attr['id'] !== false) {
             $attr['id'] = $attr['idPrefix'] . $attr['id'];
-            unset($attr['idPrefix']);
+            $this->unlokAttributes['idPrefix'] = $attr['idPrefix'];
+        }
+    }
+
+    /**
+     * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function generateLabel(&$attr)
+    {
+        if (isset($attr['label']) && $attr['label'] !== false) {
+            $this->renderLabel($attr['label'], $attr);
+            $this->unlokAttributes[] = $attr['label'];
+        } else {
+            $this->renderLabel($this->name, $attr);
+        }
+    }
+
+    /**
+     * @param $attr
+     */
+    public function setContatinerParams(&$attr)
+    {
+        if (isset($attr['_div'])) {
+            if ($attr['_div'] === false) {
+                $this->containerParams = false;
+            }
+            if (is_array($attr['_div'])) {
+                $this->containerParams = $attr['_div'];
+            }
+            unset($attr['_div']);
         }
     }
 

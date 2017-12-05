@@ -92,14 +92,12 @@ class FormProtection
             return false;
         }
 
-
         if (!session()->has($this->sessionPath($token))) {
             return false;
         }
 
         $checkedFields = $this->getCheckedFieldsBy($token);
-        $time = $this->getCreatedTime($token);
-        $data = $this->removeUnlockFields($data, $token);
+        $data = $this->removeUnlockFields($data, $token, $tokenName);
 
 
         if (!$isAjax) {
@@ -138,20 +136,19 @@ class FormProtection
         if (!$maxTime) {
             return false;
         }
-
-        $maxSeccounds = $maxTime * 60;
-        $formHistories = session(config('lara_form.session.pre_path'));
+        $maxSeccounds = $maxTime * 60 * 60;
+        $formHistory = session(config('lara_form.session.pre_path'));
         $timeName = config('lara_form.session.path_for.time');
         $currentTime = time();
-        $subTime = $currentTime - $maxSeccounds;
-        $newHistories = array_filter($formHistories, function ($value) use ($timeName, $subTime) {
+        $betweenTime = $currentTime - $maxSeccounds;
+        $newHistory = array_filter($formHistory, function ($value) use ($timeName, $betweenTime) {
             if (isset($value[$timeName])) {
-                if ($value[$timeName] > $subTime) {
+                if ($value[$timeName] > $betweenTime) {
                     return $value;
                 }
             }
         });
-        session()->put(config('lara_form.session.pre_path'), $newHistories);
+        session()->put(config('lara_form.session.pre_path'), $newHistory);
     }
 
     /**
@@ -163,18 +160,12 @@ class FormProtection
         if (!$maxCount) {
             return false;
         }
-        $formHistories = session(config('lara_form.session.pre_path'));
-        $intervalCount = count($formHistories) - $maxCount;
-        $newHistories = [];
-        $loop = 0;
-        foreach (array_reverse($formHistories) as $key => $formHistory) {
-            if ($loop == $intervalCount) {
-                break;
-            }
-            $loop[$key] = $formHistory;
-            $loop++;
+        $formHistory = session(config('lara_form.session.pre_path'));
+        $between = count($formHistory) - $maxCount;
+        if ($intervalCount > 0) {
+            $newHistory = array_slice($formHistory, 0, $between);
+            session()->put(config('lara_form.session.pre_path'), $newHistory);
         }
-        session()->put(config('lara_form.session.pre_path'), $newHistories);
     }
 
     /**
@@ -285,10 +276,12 @@ class FormProtection
     /**
      * @param $data
      * @param $token
+     * @param $tokenName
      * @return mixed
      */
-    private function removeUnlockFields($data, $token)
+    private function removeUnlockFields($data, $token, $tokenName)
     {
+
         $path = $token . '.' . $this->pathForUnlock;
         $unlockFields = session($this->sessionPath($path));
 
@@ -301,6 +294,7 @@ class FormProtection
             }
         }
 
+        unset($data[$tokenName]);
         return $data;
     }
 }
