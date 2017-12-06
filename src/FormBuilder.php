@@ -3,11 +3,12 @@
 namespace LaraForm;
 
 use Illuminate\Support\Facades\Config;
+use LaraForm\Core\BaseFormBuilder;
 use LaraForm\Stores\BoundStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 
-class FormBuilder
+class FormBuilder extends BaseFormBuilder
 {
 
     /**
@@ -38,7 +39,7 @@ class FormBuilder
     /**
      * @var array
      */
-    protected $templates = [
+    protected $localTemplates = [
         'pattern' => [],
         'div' => [],
     ];
@@ -47,6 +48,11 @@ class FormBuilder
      * @var array
      */
     protected $globalTemplates = [
+        'pattern' => [],
+        'div' => [],
+    ];
+
+    protected $inlineTemplates = [
         'pattern' => [],
         'div' => [],
     ];
@@ -87,12 +93,16 @@ class FormBuilder
     {
         $this->model = $model;
         $token = md5(str_random(80));
+        $options['form_token'] = $token;
+        $formData = $this->makeSingleton('form', ['start', $options]);
         $this->formProtection->setToken($token);
         $this->formProtection->setTime();
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
         $this->formProtection->setUnlockFields($unlockFields);
-        $options['form_token'] = $token;
-        return $this->makeSingleton('form', ['start', $options]);
+        if ($formData['method'] !== 'get') {
+            $this->formProtection->addField('_url', $options, $formData['action']);
+        }
+        return $formData['html'];
     }
 
     /**
@@ -122,7 +132,10 @@ class FormBuilder
         $this->formProtection->confirm();
         $end = $this->makeSingleton('form', ['end']);
         $this->maked = [];
-        $this->templates = [];
+        $this->localTemplates = [
+            'pattern' => [],
+            'div' => [],
+        ];
         return $end;
     }
 
@@ -136,6 +149,7 @@ class FormBuilder
     public function __call($method, $arrgs = [])
     {
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
+
         if (isset($attr['type'])) {
             if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file', 'textarea', 'hidden'])) {
                 $method = $attr['type'];
@@ -146,10 +160,11 @@ class FormBuilder
             if ($method == 'hidden') {
                 $value = isset($attr['value']) ? $attr['value'] : config('lara_form.default_value.hidden');
             }
-            if ($method !== 'submit') {
+            if (!in_array($method, ['submit', 'button', 'reset'])) {
                 $this->formProtection->addField($arrgs[0], $attr, $value);
             }
         }
+
         $this->hasTemplate($arrgs);
         return $this->makeSingleton($method, $arrgs);
     }
@@ -167,19 +182,28 @@ class FormBuilder
         $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
 
         if (!isset($this->maked[$modelName])) {
-            $templates = [
-                'local' => $this->templates['pattern'],
-                'divLocal' => $this->templates['div'],
-                'global' => $this->globalTemplates['pattern'],
-                'divGlobal' => $this->globalTemplates['div'],
-            ];
-            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore, $templates]);
+            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore]);
         }
 
         if (!empty($this->model)) {
             $this->maked[$modelName]->setModel($this->model);
         }
 
+        $templates = [
+            // for fields in form
+            'local' => $this->localTemplates['pattern'],
+            'divLocal' => $this->localTemplates['div'],
+            // for all page
+            'global' => $this->globalTemplates['pattern'],
+            'divGlobal' => $this->globalTemplates['div'],
+            // for once filed
+            'inline' => $this->inlineTemplates['pattern'],
+            'divInline' => $this->inlineTemplates['div'],
+        ];
+
+        $this->inlineTemplates['pattern'] = [];
+        $this->inlineTemplates['div'] = [];
+        $this->maked[$modelName]->setParams($templates);
         return $this->maked[$modelName]->render($arrgs);
     }
 
@@ -188,21 +212,13 @@ class FormBuilder
      */
     private function hasTemplate(&$attr)
     {
-        $templates = false;
-        if (!empty($attr[1]['_template'])) {
-            $templates = $attr[1]['_template'];
-            unset($attr[1]['_template']);
+        if (!empty($attr[1]['template'])) {
+            $this->inlineTemplates['pattern'] = $attr[1]['template'];
+            unset($attr[1]['template']);
         }
-        if (!empty($attr[1]['_globalTemplate'])) {
-            $templates = array_merge($attr[1]['_globalTemplate'], ['_global' => true]);
-            unset($attr[1]['_globalTemplate']);
-        }
-        if (isset($attr[1]['_div'])) {
-            $templates['_div'] = $attr[1]['_div'];
-            unset($attr[1]['_div']);
-        }
-        if ($templates) {
-            $this->setTemplate($templates);
+        if (isset($attr[1]['div'])) {
+            $this->inlineTemplates['div'] = $attr[1]['div'];
+            unset($attr[1]['div']);
         }
     }
 
@@ -214,31 +230,29 @@ class FormBuilder
     public function setTemplate($templateName, $templateValue = false, $global = false)
     {
         if (is_array($templateName)) {
-            if (!empty($templateName['_global'])) {
-                unset($templateName['_global']);
+            if (isset($templateName['_options']['div'])) {
+                if (!empty($templateName['_options']['global'])) {
+                    $this->globalTemplates['div'] = $templateName['_options']['div'];
+                } else {
+                    $this->localTemplates['div'] = $templateName['_options']['div'];
+                }
+            }
+            if (!empty($templateName['_options']['global'])) {
+                unset($templateName['_options']['global']);
                 foreach ($templateName as $key => $value) {
                     $this->globalTemplates['pattern'][$key] = $value;
                 }
-                if (isset($templateName['_div'])) {
-                    $this->globalTemplates['div'] = $templateName['_div'];
-                    unset($templateName['_div']);
-                }
             } else {
                 foreach ($templateName as $key => $value) {
-                    $this->templates['pattern'][$key] = $value;
-                }
-                if (isset($templateName['_div'])) {
-                    $this->templates['div'] = $templateName['_div'];
-                    unset($templateName['_div']);
+                    $this->localTemplates['pattern'][$key] = $value;
                 }
             }
         } elseif ($templateValue) {
             if ($global) {
                 $this->globalTemplates['pattern'][$templateName] = $templateValue;
             } else {
-                $this->templates['pattern'][$templateName] = $templateValue;
+                $this->localTemplates['pattern'][$templateName] = $templateValue;
             }
         }
-
     }
 }

@@ -58,7 +58,7 @@ class SubmitWidget extends BaseInputWidget
             $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
             unset($attr['icon']);
         }
-        if (!isset($attr['type'])) {
+        if (!empty($attr['type']) && !in_array($attr['type'],['submit','button','reset'])) {
             $attr['type'] = 'submit';
         }
     }

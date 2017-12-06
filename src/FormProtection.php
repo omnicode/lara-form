@@ -3,9 +3,9 @@
 namespace LaraForm;
 
 use Illuminate\Support\Facades\Config;
+use LaraForm\Core\BaseFormProtection;
 
-
-class FormProtection
+class FormProtection extends BaseFormProtection
 {
     /**
      * @var

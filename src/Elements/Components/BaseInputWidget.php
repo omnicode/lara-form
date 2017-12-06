@@ -99,6 +99,7 @@ class BaseInputWidget extends Widget
         } elseif (isset($attr['class']) && $attr['class'] == false) {
             $this->unlokAttributes['class'] = $attr['class'];
         }
+        $this->otherHtmlAttributes = $attr;
     }
 
 }

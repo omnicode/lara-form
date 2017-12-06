@@ -2,7 +2,9 @@
 
 namespace LaraForm\Stores;
 
-class OldInputStore
+use LaraForm\Core\BaseStore;
+
+class OldInputStore extends BaseStore
 {
     /**
      * @var mixed
@@ -34,12 +36,4 @@ class OldInputStore
         return $this->session->getOldInput($this->transformKey($key));
     }
 
-    /**
-     * @param $key
-     * @return mixed
-     */
-    protected function transformKey($key)
-    {
-        return str_ireplace(['.', '[]', '[', ']'], ['_', '', '.', ''], $key);
-    }
 }

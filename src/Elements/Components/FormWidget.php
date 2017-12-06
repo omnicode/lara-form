@@ -40,7 +40,7 @@ class FormWidget extends Widget
 
     /**
      * @param $options
-     * @return string
+     * @return array
      * @throws \RuntimeException
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -71,7 +71,7 @@ class FormWidget extends Widget
             $form .= $this->setHidden($this->config['label']['form_protection'], $token);
         }
 
-        return $form;
+        return ['html' => $form, 'action' => $action , 'method' => $method];
     }
 
     /**
@@ -182,5 +182,14 @@ class FormWidget extends Widget
     public function getCurrentRoute()
     {
         return Route::getCurrentRoute();
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function getClassName($name)
+    {
+        return array_last(explode('\\', $name));
     }
 }

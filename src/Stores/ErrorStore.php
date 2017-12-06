@@ -2,7 +2,9 @@
 
 namespace LaraForm\Stores;
 
-class ErrorStore
+use LaraForm\Core\BaseStore;
+
+class ErrorStore extends BaseStore
 {
     private $session;
 
@@ -60,12 +62,4 @@ class ErrorStore
         return $this->hasErrors() ? $this->session->get('errors') : null;
     }
 
-    /**
-     * @param $key
-     * @return mixed
-     */
-    protected function transformKey($key)
-    {
-        return str_ireplace(['.', '[]', '[', ']'], ['_', '', '.', ''], $key);
-    }
 }

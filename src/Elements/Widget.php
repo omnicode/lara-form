@@ -4,102 +4,13 @@ namespace LaraForm\Elements;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
+use LaraForm\Core\BaseWidget;
 use LaraForm\Stores\BoundStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 
-class Widget implements WidgetInterface
+class Widget extends BaseWidget implements WidgetInterface
 {
-    /**
-     * @var array
-     */
-    protected $htmlAttributes = [];
-
-    /**
-     * @var array
-     */
-    protected $unlokAttributes = [];
-
-    /**
-     * @var array
-     */
-    protected $htmlClass = [];
-
-    /**
-     * @var string
-     */
-    public $html = '';
-
-    /**
-     * @var string
-     */
-    public $label = '';
-
-    /**
-     * @var
-     */
-    public $name;
-
-    /**
-     * @var array
-     */
-    public $routes = [];
-
-    /**
-     * @var mixed
-     */
-    public $config;
-
-    /**
-     * @var array
-     */
-    public $localTemplates = [];
-
-    /**
-     * @var array
-     */
-    public $globalTemplates = [];
-
-    /**
-     * @var
-     */
-    public $attributes;
-
-    /**
-     * @var bool
-     */
-    public $containerTemplate = false;
-
-    /**
-     * @var array
-     */
-    public $containerParams = true;
-
-    /**
-     * @var bool
-     */
-    public $isContainer = true;
-
-    /**
-     * @var string
-     */
-    public $hidden = '';
-
-    /**
-     * @var array
-     */
-    public $errors = [];
-
-    /**
-     * @var array
-     */
-    public $oldInputs = [];
-
-    /**
-     * @var
-     */
-    public $bound = null;
-
     /**
      * Widget constructor.
      * @param ErrorStore $errorStore
@@ -111,52 +22,6 @@ class Widget implements WidgetInterface
         $this->config = config('lara_form');
         $this->errors = $errorStore;
         $this->oldInputs = $oldInputStore;
-        $this->addTemplate($params);
-        $this->addContainerAttributes($params);
-    }
-
-    /**
-     * @param $data
-     */
-    public function setModel($data)
-    {
-        $this->bound = new BoundStore($data);
-
-    }
-
-    /**
-     * @param $templates
-     */
-    protected function addTemplate($templates)
-    {
-        if (!empty($templates['local'])) {
-            foreach ($templates['local'] as $key => $value) {
-                if (isset($this->config['templates'][$key])) {
-                    $this->localTemplates[$key] = $value;
-                }
-            }
-        }
-        if (!empty($templates['global'])) {
-            foreach ($templates['global'] as $key => $value) {
-                if (isset($this->config['templates'][$key])) {
-                    $this->globalTemplates[$key] = $value;
-                }
-            }
-        };
-    }
-
-    /**
-     * @param $params
-     */
-    protected function addContainerAttributes($params)
-    {
-        if (isset($params['divGlobal'])) {
-
-        }
-        if (isset($params['divLocal'])) {
-
-        }
-       //TODO create system for dinamic controll by container filds
     }
 
     /**
@@ -166,15 +31,15 @@ class Widget implements WidgetInterface
      */
     protected function getTemplate($templateName, $unset = true)
     {
-        $template = null;
-        if (!empty($this->localTemplates[$templateName])) {
+
+        $template = $this->config['templates'][$templateName];
+        if (!empty($this->inlineTemplates[$templateName])) {
+            $template = $this->inlineTemplates[$templateName];
+        } elseif (!empty($this->localTemplates[$templateName])) {
             $template = $this->localTemplates[$templateName];
         } elseif (!empty($this->globalTemplates[$templateName])) {
             $template = $this->globalTemplates[$templateName];
-        } elseif (!empty($this->config['templates'][$templateName])) {
-            $template = $this->config['templates'][$templateName];
         }
-
         return $template;
     }
 
@@ -273,8 +138,9 @@ class Widget implements WidgetInterface
                 return $value;
             }
         });
+
         foreach ($attributes as $index => $attribute) {
-            if (is_string((string)$index)) {
+            if (is_string($index)) {
                 $attr .= $index . '="' . $attribute . '" ';
             } else {
                 $attr .= $attribute . ' ';
@@ -317,12 +183,7 @@ class Widget implements WidgetInterface
             'hidden' => $this->hidden,
             'content' => $this->html,
         ];
-        $containerAttributes += $this->setError($this->name);
-        $containerAttributes += $this->getContatinerAttributes();
-        if (!$this->containerParams || !$this->isContainer) {
-            $this->containerParams = true;
-            return $this->html;
-        }
+
         if ($this->containerTemplate) {
             $container = $this->containerTemplate;
         } elseif ($this->htmlAttributes['type'] !== 'hidden') {
@@ -330,13 +191,22 @@ class Widget implements WidgetInterface
         } else {
             return $this->html;
         }
+
+        if (!is_array($this->containerParams['inline']) or
+            !is_array($this->containerParams['local']) or
+            !is_array($this->containerParams['global'])) {
+            $container = strip_tags($container);
+        }
+
+        $containerAttributes += $this->setError($this->name);
+        $containerAttributes += $this->getContainerAllAttributes();
         return $this->formatTemplate($container, $containerAttributes);
     }
 
     /**
      * @return array
      */
-    private function getContatinerAttributes()
+    private function getContainerAllAttributes()
     {
         $params = [
             'required' => '',
@@ -345,27 +215,47 @@ class Widget implements WidgetInterface
             'class' => '',
         ];
 
-        if (!is_array($this->containerParams)) {
-            return $params;
+        $globalParams = $this->getContainerAttributes($this->containerParams['global']);
+        $localParams = $this->getContainerAttributes($this->containerParams['local']);
+        $params = array_replace($params, $globalParams, $localParams);
+        return $params;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    protected function getContainerAttributes($data)
+    {
+        $params = [];
+        if (!empty($this->otherHtmlAttributes['required'])) {
+            if (!empty($data['required'])) {
+                $params['required'] = $data['required'];
+                unset($data['required']);
+            } else {
+                $params['required'] = 'required';
+            }
         }
-        if (!empty($this->containerParams['required'])) {
-            $params['required'] = $this->containerParams['required'];
-            unset($this->containerParams['required']);
+
+        if (!empty($data['type'])) {
+            $params['type'] = $data['type'];
+            unset($data['type']);
+        } else {
+            $params['type'] = isset($this->otherHtmlAttributes['type']) ? $this->otherHtmlAttributes['type'] : $this->htmlAttributes['type'];
         }
-        if (!empty($this->containerParams['type'])) {
-            $params['type'] = $this->containerParams['type'];
-            unset($this->containerParams['type']);
-        }
-        if (!empty($this->containerParams['class'])) {
-            $class = $this->containerParams['class'];
+
+        if (!empty($data['class'])) {
+            $class = $data['class'];
             if (!is_array($class)) {
                 $class = [$class];
             }
-            $this->htmlClass = $class;
+            $this->htmlClass += $class;
             $params['class'] = $this->formatClass();
-            unset($this->containerParams['class']);
+            unset($data['class']);
         }
-        $params['containerAttrs'] = $this->formatAttributes($this->containerParams);
+        if (!empty($data)) {
+            $params['containerAttrs'] = $this->formatAttributes($data);
+        }
         return $params;
     }
 
@@ -381,7 +271,6 @@ class Widget implements WidgetInterface
             'help' => '',
             'error' => ''
         ];
-
         if (!empty($this->errors->hasError($name))) {
             $helpBlockTemplate = $this->config['templates']['helpBlock'];
             $errorAttr['text'] = $this->errors->getError($name);
@@ -399,16 +288,6 @@ class Widget implements WidgetInterface
     {
         return str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name)));
     }
-
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getClassName($name)
-    {
-        return array_last(explode('\\', $name));
-    }
-
 
     /*
      *
@@ -511,13 +390,15 @@ class Widget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function setHidden($name, $value)
+    public function setHidden($name, $value = false)
     {
         $hiddenTemplate = $this->config['templates']['hiddenInput'];
-        $attr = [
-            'name' => $name,
-            'value' => $value,
-        ];
+
+        if ($value === false) {
+            $value = $this->config['default_value']['hidden'];
+        }
+
+        $attr = ['name' => $name, 'value' => $value,];
         return $this->formatTemplate($hiddenTemplate, $attr);
     }
 }

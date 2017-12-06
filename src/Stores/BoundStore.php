@@ -2,7 +2,9 @@
 
 namespace LaraForm\Stores;
 
-class BoundStore
+use LaraForm\Core\BaseStore;
+
+class BoundStore extends BaseStore
 {
     protected $data;
 
@@ -67,8 +69,4 @@ class BoundStore
         return $this->dataGet($target->{$key}, $keyParts, $default);
     }
 
-    protected function transformKey($key)
-    {
-        return str_replace(['[]', '[', ']'], ['', '.', ''], $key);
-    }
 }
