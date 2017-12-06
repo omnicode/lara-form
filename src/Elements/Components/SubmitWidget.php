@@ -18,13 +18,12 @@ class SubmitWidget extends BaseInputWidget
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
         $template = $this->getTemplate('button');
-
         $name = !empty($this->name) ? $this->name : '';
         $btnAttr = [
             'attrs' => $this->formatAttributes($attr),
-            'text' => $this->icon. $name,
+            'text' => $this->icon . $name,
         ];
-        return $this->html = $this->formatTemplate($template, $btnAttr);
+        return $this->formatTemplate($template, $btnAttr);
     }
 
 
@@ -37,20 +36,18 @@ class SubmitWidget extends BaseInputWidget
     {
         $btn = $this->config['css']['submitClass'];
         $btnColor = $this->config['css']['submitColor'];
-
+        $this->htmlClass[] = $btn;
         if (isset($attr['class'])) {
             $this->htmlClass[] = $attr['class'];
             unset($attr['class']);
-        }else{
-            $this->htmlClass[] = $btn;
+        } else {
             $this->htmlClass[] = $btnColor;
         }
         if (isset($attr['btn'])) {
             if ($attr['btn'] === true) {
                 $attr['btn'] = $btnColor;
             }
-            $this->htmlClass[] = $btn;
-            $this->htmlClass[] = $btn.'-'.$attr['btn'];
+            $this->htmlClass[] = $btn . '-' . $attr['btn'];
             unset($attr['btn']);
         }
         $iconTemplate = $this->getTemplate('icon');
@@ -58,7 +55,7 @@ class SubmitWidget extends BaseInputWidget
             $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
             unset($attr['icon']);
         }
-        if (!empty($attr['type']) && !in_array($attr['type'],['submit','button','reset'])) {
+        if (!empty($attr['type']) && !in_array($attr['type'], ['submit', 'button', 'reset'])) {
             $attr['type'] = 'submit';
         }
     }

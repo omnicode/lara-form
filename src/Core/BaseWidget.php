@@ -104,32 +104,10 @@ abstract class BaseWidget
     protected $bound = null;
 
     /**
-     * @param $data
-     */
-    public function setParams($data)
-    {
-        $this->addGlobalTemplate($data['global']);
-        $this->addLocalTemplate($data['local']);
-        $this->addInlineTemplate($data['inline']);
-        $this->addContainerGlobalAttributes($data['divGlobal']);
-        $this->addContainerLocalAttributes($data['divLocal']);
-        $this->addContainerInlineAttributes($data['divInline']);
-    }
-
-    /**
-     * @param $data
-     */
-    public function setModel($data)
-    {
-        $this->bound = new BoundStore($data);
-
-    }
-
-    /**
      * @param $templates
      */
     protected function addLocalTemplate($templates)
-    {
+    {   $this->localTemplates = [];
         foreach ($templates as $key => $value) {
             if (isset($this->config['templates'][$key])) {
                 $this->localTemplates[$key] = $value;
@@ -142,6 +120,7 @@ abstract class BaseWidget
      */
     protected function addInlineTemplate($templates)
     {
+        $this->inlineTemplates = [];
         foreach ($templates as $key => $value) {
             if (isset($this->config['templates'][$key])) {
                 $this->inlineTemplates[$key] = $value;

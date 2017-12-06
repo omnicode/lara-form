@@ -83,8 +83,9 @@ class FormProtection extends BaseFormProtection
      * @param bool $isAjax
      * @return bool
      */
-    public function validate($data, $isAjax = false)
+    public function validate($data, $isAjax = false,$currentUrl = false)
     {
+        $this->removeByTime();
         $tokenName = config('lara_form.label.form_protection', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
 
@@ -95,13 +96,19 @@ class FormProtection extends BaseFormProtection
         if (!session()->has($this->sessionPath($token))) {
             return false;
         }
-
         $checkedFields = $this->getCheckedFieldsBy($token);
-        $data = $this->removeUnlockFields($data, $token, $tokenName);
 
+        if ($currentUrl !== $checkedFields['_url']) {
+            return false;
+        }
+
+        $data = $this->removeUnlockFields($data, $token);
 
         if (!$isAjax) {
             session()->forget($this->sessionPath($token)); // TODO correct dellete all session or only $token
+        }
+        if (!empty($checkedFields['_url'])) {
+            unset($checkedFields['_url']);
         }
 
         if (array_keys($data) != array_keys($checkedFields)) {
@@ -113,11 +120,13 @@ class FormProtection extends BaseFormProtection
                 if (is_array($value)) {
                     // for array input
                     if (array_keys(array_dot($value)) != array_keys(array_dot($data[$field]))) {
+                        dd(88,$data[$field]);
                         return false;
                     }
                 } else {
                     //for hidden input
                     if ($checkedFields[$field] != $data[$field]) {
+                        dd(99,$data[$field]);
                         return false;
                     }
                 }
@@ -162,7 +171,7 @@ class FormProtection extends BaseFormProtection
         }
         $formHistory = session(config('lara_form.session.pre_path'));
         $between = count($formHistory) - $maxCount;
-        if ($intervalCount > 0) {
+        if ($between > 0) {
             $newHistory = array_slice($formHistory, 0, $between);
             session()->put(config('lara_form.session.pre_path'), $newHistory);
         }
@@ -264,22 +273,11 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
-     * @param $token
-     * @return mixed
-     */
-    private function getCreatedTime($token)
-    {
-        $path = $token . '.' . $this->pathForTime;
-        return session($this->sessionPath($path));
-    }
-
-    /**
      * @param $data
      * @param $token
-     * @param $tokenName
      * @return mixed
      */
-    private function removeUnlockFields($data, $token, $tokenName)
+    private function removeUnlockFields($data, $token)
     {
 
         $path = $token . '.' . $this->pathForUnlock;
@@ -293,8 +291,6 @@ class FormProtection extends BaseFormProtection
                 unset($data[$key]);
             }
         }
-
-        unset($data[$tokenName]);
         return $data;
     }
 }

@@ -22,7 +22,8 @@ return [
         'path_for' => [
             'check' => 'is_check',
             'unlock' => 'is_unlock',
-        ]
+            'time' => 'created_time'
+        ],
     ],
     'except' => [
         'stripe/*',
@@ -45,7 +46,7 @@ return [
         // Used for checkboxes in checkbox() and multiCheckbox().
         'checkbox' => '<input type="checkbox" name="{%name%}" value="{%value%}" {%attrs%}/>',
         // Wrapper container for checkboxes.
-        'checkboxContainer' => '<div class="checkbox {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%content%}</div>',
+        'checkboxContainer' => '<div class="checkbox {%type%}{%required%}{%class%}{%error%}" {%containerAttrs%}>{%content%}</div>',
         // Container for error items.
         'errorList' => '<div class="alert alert-danger {%class%}">
                             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -72,7 +73,7 @@ return [
         // Submit input element.
         'submit' => '<input type="{%type%} " value="{%name%}" {%attrs%}/>',
         // Container element used by control().
-        'inputContainer' => '<div class="form-group {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%label%}{%content%}{%help%}</div>',
+        'inputContainer' => '<div class="form-group {%type%}{%required%}{%class%}{%error%}" {%containerAttrs%}>{%label%}{%content%}{%help%}</div>',
         // Container element used by control() when a field has an error.
         'helpBlock' => '<span class="help-block {%class%}">{%text%}</span>',
         // Label element when inputs are not nested inside the label.

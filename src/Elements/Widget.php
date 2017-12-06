@@ -25,13 +25,33 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * @param $data
+     */
+    public function setParams($data)
+    {
+        $this->addGlobalTemplate($data['global']);
+        $this->addLocalTemplate($data['local']);
+        $this->addInlineTemplate($data['inline']);
+        $this->addContainerGlobalAttributes($data['divGlobal']);
+        $this->addContainerLocalAttributes($data['divLocal']);
+        $this->addContainerInlineAttributes($data['divInline']);
+    }
+
+    /**
+     * @param $data
+     */
+    public function setModel($data)
+    {
+        $this->bound = new BoundStore($data);
+
+    }
+    /**
      * @param $templateName
      * @param bool $unset
      * @return mixed|null
      */
     protected function getTemplate($templateName, $unset = true)
     {
-
         $template = $this->config['templates'][$templateName];
         if (!empty($this->inlineTemplates[$templateName])) {
             $template = $this->inlineTemplates[$templateName];
@@ -124,14 +144,14 @@ class Widget extends BaseWidget implements WidgetInterface
     public function formatAttributes($attributes)
     {
         $attr = '';
-        if (empty($attributes)) {
-            return $attr;
-        }
         if (!empty($this->unlokAttributes)) {
             $attributes = array_diff($attributes, $this->unlokAttributes);
         }
-        if (!isset($attributes['class'])) {
-            $attributes['class'] = $this->formatClass();
+        if (empty($attributes['class'])) {
+            $class = $this->formatClass();
+            if (!empty($class)) {
+                $attributes['class'] = $class;
+            }
         }
         $attributes = array_filter($attributes, function ($value) {
             if (!empty($value) && $value !== '' && $value !== false) {
@@ -143,7 +163,7 @@ class Widget extends BaseWidget implements WidgetInterface
             if (is_string($index)) {
                 $attr .= $index . '="' . $attribute . '" ';
             } else {
-                $attr .= $attribute . ' ';
+                $attr .= $attribute ;
             }
 
         }
@@ -217,7 +237,8 @@ class Widget extends BaseWidget implements WidgetInterface
 
         $globalParams = $this->getContainerAttributes($this->containerParams['global']);
         $localParams = $this->getContainerAttributes($this->containerParams['local']);
-        $params = array_replace($params, $globalParams, $localParams);
+        $inlineParams = $this->getContainerAttributes($this->containerParams['inline']);
+        $params = array_replace($params, $globalParams, $localParams,$inlineParams);
         return $params;
     }
 

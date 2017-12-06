@@ -37,6 +37,11 @@ class FormBuilder extends BaseFormBuilder
     protected $model;
 
     /**
+     * @var bool
+     */
+    protected $isForm = false;
+
+    /**
      * @var array
      */
     protected $localTemplates = [
@@ -52,9 +57,12 @@ class FormBuilder extends BaseFormBuilder
         'div' => [],
     ];
 
+    /**
+     * @var array
+     */
     protected $inlineTemplates = [
         'pattern' => [],
-        'div' => [],
+        'div' => []
     ];
 
     /**
@@ -92,12 +100,15 @@ class FormBuilder extends BaseFormBuilder
     public function create($model = null, $options = [])
     {
         $this->model = $model;
+        $this->isForm = true;
         $token = md5(str_random(80));
         $options['form_token'] = $token;
-        $formData = $this->makeSingleton('form', ['start', $options]);
         $this->formProtection->setToken($token);
         $this->formProtection->setTime();
+        $this->formProtection->removeByTime();
+        $this->formProtection->removeByCount();
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
+        $formData = $this->makeSingleton('form', ['start', $options]);
         $this->formProtection->setUnlockFields($unlockFields);
         if ($formData['method'] !== 'get') {
             $this->formProtection->addField('_url', $options, $formData['action']);
@@ -119,6 +130,7 @@ class FormBuilder extends BaseFormBuilder
         }
         $unlockFields[] = '_token';
         $unlockFields[] = '_method';
+        $unlockFields[] = config('lara_form.label.form_protection', 'laraform_token');
         return $unlockFields;
     }
 
@@ -131,11 +143,10 @@ class FormBuilder extends BaseFormBuilder
     {
         $this->formProtection->confirm();
         $end = $this->makeSingleton('form', ['end']);
+        $this->isForm = false;
         $this->maked = [];
-        $this->localTemplates = [
-            'pattern' => [],
-            'div' => [],
-        ];
+        $this->localTemplates['pattern'] = [];
+        $this->localTemplates['div'] = [];
         return $end;
     }
 
@@ -160,7 +171,7 @@ class FormBuilder extends BaseFormBuilder
             if ($method == 'hidden') {
                 $value = isset($attr['value']) ? $attr['value'] : config('lara_form.default_value.hidden');
             }
-            if (!in_array($method, ['submit', 'button', 'reset'])) {
+            if (!in_array($method, ['submit', 'button', 'reset']) && $this->isForm) {
                 $this->formProtection->addField($arrgs[0], $attr, $value);
             }
         }
