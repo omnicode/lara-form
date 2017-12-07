@@ -18,19 +18,23 @@ class TextareaWidget extends BaseInputWidget
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
+        $this->containerParams['inline']['type'] = !empty($this->containerParams['inline']['type']) ? $this->containerParams['inline']['type'] :'textarea';
         return $this->html = $this->toHtml($this->name, $attr, $template);
     }
 
     /**
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {
         $attr += $this->getValue($this->name);
-        $this->htmlClass[] = isset($attr['class']) ? $attr['class'] : $this->config['css']['textareaClass'];
+        $this->htmlClass = isset($attr['class']) ? $attr['class'] : $this->config['css']['textareaClass'];
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
         $attr['class'] = $this->formatClass();
+        parent::inspectionAttributes($attr);
     }
 }

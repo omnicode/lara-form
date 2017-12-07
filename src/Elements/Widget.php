@@ -46,6 +46,14 @@ class Widget extends BaseWidget implements WidgetInterface
 
     }
     /**
+     * @param $data
+     */
+    public function setFixedField($data)
+    {
+        $this->fixedField = $data;
+
+    }
+    /**
      * @param $templateName
      * @param bool $unset
      * @return mixed|null
@@ -91,10 +99,19 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {
-
+        if (!empty($attr['icon'])) {
+            $iconTemplate = $this->getTemplate('icon');
+            $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
+            unset($attr['icon']);
+        }
+        if (!empty($attr['required'])) {
+            $this->otherHtmlAttributes['required'] = 'required';
+        }
     }
 
     /**
@@ -144,26 +161,29 @@ class Widget extends BaseWidget implements WidgetInterface
     public function formatAttributes($attributes)
     {
         $attr = '';
-        if (!empty($this->unlokAttributes)) {
-            $attributes = array_diff($attributes, $this->unlokAttributes);
-        }
         if (empty($attributes['class'])) {
             $class = $this->formatClass();
-            if (!empty($class)) {
+            if ($class !== '') {
                 $attributes['class'] = $class;
             }
+        }
+        if (empty($attributes)) {
+            return $attr;
+        }
+        if (!empty($this->unlokAttributes)) {
+            $attributes = array_diff($attributes, $this->unlokAttributes);
         }
         $attributes = array_filter($attributes, function ($value) {
             if (!empty($value) && $value !== '' && $value !== false) {
                 return $value;
             }
         });
-
+        $this->otherHtmlAttributes = $attributes;
         foreach ($attributes as $index => $attribute) {
             if (is_string($index)) {
                 $attr .= $index . '="' . $attribute . '" ';
             } else {
-                $attr .= $attribute ;
+                $attr .= $attribute;
             }
 
         }
@@ -178,6 +198,18 @@ class Widget extends BaseWidget implements WidgetInterface
     {
         $class = '';
         if (!empty($this->htmlClass)) {
+            if (is_string($this->htmlClass)) {
+                $this->htmlClass = explode(' ', $this->htmlClass);
+            }
+            $this->htmlClass = array_filter($this->htmlClass, function ($val) {
+                $val = trim($val);
+                if (!empty($val) && $val !== '' && $val !== false) {
+                    return $val;
+                }
+            });
+            if (empty($this->htmlClass)) {
+                return $class;
+            }
             $uniqueClass = array_unique($this->htmlClass);
             $arrayClass = array_filter($uniqueClass, function ($value) {
                 if (!empty($value) || $value !== false || $value !== '') {
@@ -202,11 +234,12 @@ class Widget extends BaseWidget implements WidgetInterface
             'label' => $this->label,
             'hidden' => $this->hidden,
             'content' => $this->html,
+            'icon' => $this->icon
         ];
 
         if ($this->containerTemplate) {
             $container = $this->containerTemplate;
-        } elseif ($this->htmlAttributes['type'] !== 'hidden') {
+        } elseif (isset($this->htmlAttributes['type']) && $this->htmlAttributes['type'] !== 'hidden') {
             $container = $this->getTemplate('inputContainer');
         } else {
             return $this->html;
@@ -238,7 +271,7 @@ class Widget extends BaseWidget implements WidgetInterface
         $globalParams = $this->getContainerAttributes($this->containerParams['global']);
         $localParams = $this->getContainerAttributes($this->containerParams['local']);
         $inlineParams = $this->getContainerAttributes($this->containerParams['inline']);
-        $params = array_replace($params, $globalParams, $localParams,$inlineParams);
+        $params = array_replace($params, $globalParams, $localParams, $inlineParams);
         return $params;
     }
 
@@ -388,21 +421,6 @@ class Widget extends BaseWidget implements WidgetInterface
         }
     }
 
-    /**
-     * @param $attr
-     */
-    public function setContatinerParams(&$attr)
-    {
-        if (isset($attr['_div'])) {
-            if ($attr['_div'] === false) {
-                $this->containerParams = false;
-            }
-            if (is_array($attr['_div'])) {
-                $this->containerParams = $attr['_div'];
-            }
-            unset($attr['_div']);
-        }
-    }
 
     /**
      * @param $name

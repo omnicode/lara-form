@@ -23,7 +23,6 @@ class LaraFormMiddleware
 
             $formProtection = new FormProtection();
             $data = $request->all();
-
             foreach ($request->query() as $index => $key) {
                 unset($data[$index]);
             }
@@ -31,7 +30,7 @@ class LaraFormMiddleware
             $validate = $formProtection->validate($data, $isAjax,$request->url());
 
             if ($validate === false) {
-              abort(403, 'Your Action Is Forbidden');
+             // abort(403, 'Your Action Is Forbidden');
             }
 
             unset($request[config('lara_form.label.form_protection', 'laraform_token')]);
@@ -47,7 +46,7 @@ class LaraFormMiddleware
     private function isGlobalExceptionUrl($url)
     {
         $isExcept = false;
-        $excepts = Config::get('lara_form.except', []);
+        $excepts = Config::get('lara_form.except.url', []);
 
         foreach ($excepts as $except) {
             if (str_contains($except, '*')) {

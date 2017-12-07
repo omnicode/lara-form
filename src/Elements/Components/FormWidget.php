@@ -36,6 +36,12 @@ class FormWidget extends Widget
             $attr['enctype'] = 'multipart/form-data';
             $this->unlokAttributes[] = $attr['file'];
         }
+        if (!empty($attr['_unlockFields'])) {
+            unset($attr['_unlockFields']);
+        }
+        if (empty($attr['accept-charset'])) {
+            $attr['accept-charset'] = $this->config['charset'];
+        }
     }
 
     /**
@@ -53,7 +59,7 @@ class FormWidget extends Widget
         $this->unlokAttributes[] = $options['form_token'];
         $htmlAttributes['action'] = $action;
         $htmlAttributes['method'] = ($method == 'get') ? 'GET' : 'POST';
-        $htmlAttributes['accept-charset'] = $this->config['charset'];
+        $this->inspectionAttributes($options);
         $htmlAttributes += $options;
         $template = $this->getTemplate('formStart');
 

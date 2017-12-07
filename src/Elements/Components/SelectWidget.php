@@ -124,8 +124,7 @@ class SelectWidget extends Widget
     {
         $this->generateId($attr);
         $this->generateLabel($attr);
-        $this->setContatinerParams($attr);
-        if (isset($attr['class'])) {
+              if (isset($attr['class'])) {
             $this->htmlClass[] = $attr['class'];
             unset($attr['class']);
         } else {
@@ -180,6 +179,7 @@ class SelectWidget extends Widget
             }
             unset($attr['groupDisabled']);
         }
+        parent::inspectionAttributes($attr);
     }
 
     /**

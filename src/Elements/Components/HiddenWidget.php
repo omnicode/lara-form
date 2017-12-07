@@ -21,12 +21,17 @@ class HiddenWidget extends BaseInputWidget
 
     /**
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {
         if (isset($attr['type'])) {
+            $this->otherHtmlAttributes['type'] = $attr['type'];
             unset($attr['type']);
         }
         $attr['type'] = 'hidden';
+        $this->htmlAttributes['type'] = 'hidden';
+        parent::inspectionAttributes($attr);
     }
 }

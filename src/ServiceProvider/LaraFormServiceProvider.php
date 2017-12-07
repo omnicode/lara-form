@@ -21,7 +21,14 @@ class LaraFormServiceProvider extends ServiceProvider
         $this->registerFormBuilder();
         $this->configMerge();
         $this->registerMiddleware(LaraFormMiddleware::class);
+        $this->setCoreConfig();
 
+    }
+
+    public function setCoreConfig()
+    {
+        $baseConfig = require_once dirname (__DIR__) . '/Config/lara_form_core.php';
+        $this->app['config']->set('lara_form_core', $baseConfig);
     }
 
     /**

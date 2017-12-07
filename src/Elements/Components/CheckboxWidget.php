@@ -2,8 +2,13 @@
 
 namespace LaraForm\Elements\Components;
 
+use function GuzzleHttp\is_host_in_noproxy;
+
 class CheckboxWidget extends BaseInputWidget
 {
+
+    private $isOutputedMultiHidden = false;
+
     /**
      * @param $option
      * @return string
@@ -15,11 +20,23 @@ class CheckboxWidget extends BaseInputWidget
         $template = $this->getTemplate('checkbox');
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
+        return $this->renderCheckbox($attr, $template);
+    }
+
+    /**
+     * @param $attr
+     * @param $template
+     * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    private function renderCheckbox($attr, $template)
+    {
         if (strpos($this->name, '[]')) {
             $attr['multiple'] = true;
         }
+
         $this->inspectionAttributes($attr);
-        $this->setContatinerParams($attr);
         $this->containerTemplate = $this->getTemplate('checkboxContainer');
         $labelTemplate = $this->getTemplate('nestingLabel');
         $this->toHtml($this->name, $attr, $template);
@@ -30,10 +47,10 @@ class CheckboxWidget extends BaseInputWidget
             'attrs' => ''
         ];
         $this->html = $this->formatTemplate($labelTemplate, $labelAttr);
+        $this->otherHtmlAttributes['type'] = 'checkbox';
         $this->html = $this->completeTemplate();
         return $this->html;
     }
-
 
     /**
      * @param $attr
@@ -43,8 +60,18 @@ class CheckboxWidget extends BaseInputWidget
     public function inspectionAttributes(&$attr)
     {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['checkbox'];
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['checkboxClass'];
+        $this->htmlClass = isset($attr['class']) ? $attr['class'] : $this->config['css']['checkboxClass'];
 
+        if (empty($attr['value'])) {
+            $val = $this->getValue($this->name)['value'];
+            if (!is_array($val)) {
+                $val = [$val];
+            }
+            if (in_array($attr['value'], $val)) {
+                $attr['checked'] = true;
+            }
+        }
+        $attr['class'] = $this->formatClass();
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
@@ -60,12 +87,18 @@ class CheckboxWidget extends BaseInputWidget
         if (isset($attr['hidden']) && $attr['hidden'] == false) {
             unset($attr['hidden']);
         } else {
-            if (ends_with($this->name,'[]')) {
-                $hiddenName = str_ireplace('[]','',$this->name);
-            }else{
-                $hiddenName = $this->name;
+            if (!$this->isOutputedMultiHidden) {
+                if (ends_with($this->name, '[]')) {
+                    $hiddenName = str_ireplace('[]', '', $this->name);
+                } else {
+                    $hiddenName = $this->name;
+                }
+                if (!in_array($hiddenName, array_keys($this->fixedField))) {
+                    $this->hidden = $this->setHidden($hiddenName, $this->config['default_value']['hidden']);
+                }
             }
-            $this->hidden = $this->setHidden($hiddenName,$this->config['default_value']['hidden']);
         }
+        parent::inspectionAttributes($attr);
     }
+
 }

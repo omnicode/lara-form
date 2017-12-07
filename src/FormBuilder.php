@@ -62,7 +62,8 @@ class FormBuilder extends BaseFormBuilder
      */
     protected $inlineTemplates = [
         'pattern' => [],
-        'div' => []
+        'div' => [],
+        'group' => false
     ];
 
     /**
@@ -103,17 +104,21 @@ class FormBuilder extends BaseFormBuilder
         $this->isForm = true;
         $token = md5(str_random(80));
         $options['form_token'] = $token;
+        $formData = $this->makeSingleton('form', ['start', $options]);
+        $formHtml = $formData['html'];
+
+        if ($formData['method'] === 'get') {
+            return $formHtml;
+        }
+
         $this->formProtection->setToken($token);
         $this->formProtection->setTime();
+        $this->formProtection->setUrl($formData['action']);
         $this->formProtection->removeByTime();
         $this->formProtection->removeByCount();
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
-        $formData = $this->makeSingleton('form', ['start', $options]);
         $this->formProtection->setUnlockFields($unlockFields);
-        if ($formData['method'] !== 'get') {
-            $this->formProtection->addField('_url', $options, $formData['action']);
-        }
-        return $formData['html'];
+        return $formHtml;
     }
 
     /**
@@ -174,6 +179,7 @@ class FormBuilder extends BaseFormBuilder
             if (!in_array($method, ['submit', 'button', 'reset']) && $this->isForm) {
                 $this->formProtection->addField($arrgs[0], $attr, $value);
             }
+
         }
 
         $this->hasTemplate($arrgs);
@@ -190,7 +196,7 @@ class FormBuilder extends BaseFormBuilder
     private function makeSingleton($method, $arrgs)
     {
         $modelName = ucfirst($method);
-        $classNamspace = 'LaraForm\Elements\Components\\' . $modelName . 'Widget';
+        $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');
 
         if (!isset($this->maked[$modelName])) {
             $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore]);
@@ -198,6 +204,10 @@ class FormBuilder extends BaseFormBuilder
 
         if (!empty($this->model)) {
             $this->maked[$modelName]->setModel($this->model);
+        }
+
+        if (!empty($this->formProtection->fields)) {
+            $this->maked[$modelName]->setFixedField($this->formProtection->fields);
         }
 
         $templates = [
@@ -214,6 +224,7 @@ class FormBuilder extends BaseFormBuilder
 
         $this->inlineTemplates['pattern'] = [];
         $this->inlineTemplates['div'] = [];
+
         $this->maked[$modelName]->setParams($templates);
         return $this->maked[$modelName]->render($arrgs);
     }

@@ -29,5 +29,6 @@ class PasswordWidget extends BaseInputWidget
             unset($attr['type']);
         }
         $attr['type'] = 'password';
+        parent::inspectionAttributes($attr);
     }
 }

@@ -4,7 +4,10 @@ namespace LaraForm\Elements\Components;
 
 class FileWidget extends BaseInputWidget
 {
-    protected $template;
+    /**
+     * @var
+     */
+    protected $fileTemplate;
 
     /**
      * @param $option
@@ -17,15 +20,34 @@ class FileWidget extends BaseInputWidget
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
-        return $this->html = $this->toHtml($this->name, $attr, $this->template);
+        $this->containerTemplate = $this->getTemplate('fileContainer');
+        $this->otherHtmlAttributes['type'] = 'file';
+        return $this->toHtml($this->name, $attr, $this->fileTemplate);
     }
 
     /**
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['fileClass'];
+        $btn = $this->config['css']['submitClass'];
+        $btnColor = $this->config['css']['submitColor'];
+        $this->htmlClass[] = $btn;
+        if (isset($attr['class'])) {
+            $this->htmlClass[] = $attr['class'];
+            unset($attr['class']);
+        } else {
+            $this->htmlClass[] = $btnColor;
+        }
+        if (isset($attr['btn'])) {
+            if ($attr['btn'] === true) {
+                $attr['btn'] = $btnColor;
+            }
+            $this->htmlClass[] = $btn . '-' . $attr['btn'];
+            unset($attr['btn']);
+        }
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
@@ -33,15 +55,16 @@ class FileWidget extends BaseInputWidget
             unset($attr['value']);
         }
         if (isset($attr['multiple'])) {
-            $this->template = $this->config['templates']['fileMultiple'];
+            $this->fileTemplate = $this->config['templates']['fileMultiple'];
             unset($attr['multiple']);
         } else {
-            $this->template = $this->config['templates']['file'];
+            $this->fileTemplate = $this->config['templates']['file'];
         }
         if (isset($attr['accept'])) {
             if (is_array($attr['accept'])) {
                 $attr['accept'] = implode(', ', $attr['accept']);
             }
         }
+        parent::inspectionAttributes($attr);
     }
 }

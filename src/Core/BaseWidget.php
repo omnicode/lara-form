@@ -35,6 +35,10 @@ abstract class BaseWidget
     protected $label = '';
 
     /**
+     * @var string
+     */
+    protected $icon = '';
+    /**
      * @var
      */
     protected $name;
@@ -102,6 +106,11 @@ abstract class BaseWidget
      * @var
      */
     protected $bound = null;
+
+    /**
+     * @var array
+     */
+    protected $fixedField = [];
 
     /**
      * @param $templates

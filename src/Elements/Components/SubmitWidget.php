@@ -4,8 +4,6 @@ namespace LaraForm\Elements\Components;
 
 class SubmitWidget extends BaseInputWidget
 {
-    protected $icon = '';
-
     /**
      * @param $option
      * @return string
@@ -21,9 +19,11 @@ class SubmitWidget extends BaseInputWidget
         $name = !empty($this->name) ? $this->name : '';
         $btnAttr = [
             'attrs' => $this->formatAttributes($attr),
-            'text' => $this->icon . $name,
+            'text' => $name,
         ];
-        return $this->formatTemplate($template, $btnAttr);
+        $this->html = $this->formatTemplate($template, $btnAttr);
+        $this->containerTemplate = $this->config['templates']['submitContainer'];
+        return $this->completeTemplate();
     }
 
 
@@ -50,14 +50,13 @@ class SubmitWidget extends BaseInputWidget
             $this->htmlClass[] = $btn . '-' . $attr['btn'];
             unset($attr['btn']);
         }
-        $iconTemplate = $this->getTemplate('icon');
-        if (!empty($attr['icon'])) {
-            $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
-            unset($attr['icon']);
-        }
-        if (!empty($attr['type']) && !in_array($attr['type'], ['submit', 'button', 'reset'])) {
+        if (!empty($attr['type']) && in_array($attr['type'], ['submit', 'button', 'reset'])) {
+            $this->otherHtmlAttributes['type'] = $attr['type'];
+        } else {
+            $this->otherHtmlAttributes['type'] = 'submit';
             $attr['type'] = 'submit';
         }
+        parent::inspectionAttributes($attr);
     }
 
 }

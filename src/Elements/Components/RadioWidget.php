@@ -13,13 +13,21 @@ class RadioWidget extends BaseInputWidget
     public function render($option)
     {
         $template = $this->config['templates']['radio'];
+        $this->containerTemplate = $this->getTemplate('radioContainer');
+        $labelTemplate = $this->getTemplate('nestingLabel');
+
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
-        if (empty($attr['id'])) {
-            $attr['id'] = $this->name . '-' . $attr['value'];
-        }
-        $this->html = $this->toHtml($this->name, $attr, $template);
+        $this->toHtml($this->name, $attr, $template);
+        $labelAttr = [
+            'hidden' => $this->hidden,
+            'content' => $this->html,
+            'text' => isset($attr['label']) ? $attr['label'] : $this->getLabelName($this->name),
+            'attrs' => ''
+        ];
+        $this->html = $this->formatTemplate($labelTemplate, $labelAttr);
+        $this->otherHtmlAttributes['type'] = 'radio';
         $this->html = $this->completeTemplate();
         return $this->html;
     }
@@ -32,18 +40,23 @@ class RadioWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-        $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
-        $attr['class'] = isset($attr['class']) ? $attr['class'] : $this->config['css']['radioClass'];
+        $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['radio'];
+        $this->htmlClass = isset($attr['class']) ? $attr['class'] : $this->config['css']['radioClass'];
+        $attr['class'] = $this->formatClass();
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
         if (isset($attr['checked'])) {
             $attr['checked'] = 'checked';
         }
-        if (isset($attr['hidden']) && $attr['hidden'] == false) {
+       /* if (isset($attr['hidden']) && $attr['hidden'] == false) {
             unset($attr['hidden']);
         } else {
             $this->hidden = $this->setHidden($this->name, '');
+        }*/
+        if (empty($attr['id'])) {
+            $attr['id'] = $this->name . '-' . $attr['value'];
         }
+        parent::inspectionAttributes($attr);
     }
 }

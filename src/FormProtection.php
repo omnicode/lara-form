@@ -20,7 +20,7 @@ class FormProtection extends BaseFormProtection
     /**
      * @var array
      */
-    protected $fields;
+    public $fields;
 
     /**
      * @var
@@ -42,7 +42,21 @@ class FormProtection extends BaseFormProtection
      */
     protected $pathForUnlock;
 
+    /**
+     * @var mixed
+     */
+    protected $pathForUrl;
+
+    /**
+     * @var
+     */
     protected $created_time;
+
+    /**
+     * @var
+     */
+    protected $url;
+
 
     /**
      * FormProtection constructor.
@@ -53,6 +67,7 @@ class FormProtection extends BaseFormProtection
         $this->pathForUnlock = config('lara_form.session.path_for.unlock', 'is_unlock');
         $this->pathForCheck = config('lara_form.session.path_for.check', 'is_check');
         $this->pathForTime = config('lara_form.session.path_for.time', 'created_time');
+        $this->pathForUrl = config('lara_form.session.path_for.action', '_action');
         $this->fields = [];
     }
 
@@ -64,9 +79,20 @@ class FormProtection extends BaseFormProtection
         $this->token = $token;
     }
 
+    /**
+     *
+     */
     public function setTime()
     {
         $this->created_time = time();
+    }
+
+    /**
+     * @param $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 
     /**
@@ -81,14 +107,14 @@ class FormProtection extends BaseFormProtection
     /**
      * @param $data
      * @param bool $isAjax
+     * @param bool $currentUrl
      * @return bool
      */
-    public function validate($data, $isAjax = false,$currentUrl = false)
+    public function validate($data, $isAjax = false, $currentUrl = false)
     {
         $this->removeByTime();
         $tokenName = config('lara_form.label.form_protection', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
-
         if (!$token) {
             return false;
         }
@@ -96,19 +122,15 @@ class FormProtection extends BaseFormProtection
         if (!session()->has($this->sessionPath($token))) {
             return false;
         }
-        $checkedFields = $this->getCheckedFieldsBy($token);
-
-        if ($currentUrl !== $checkedFields['_url']) {
+        if(!$this->isValidAction($token,$currentUrl)){
             return false;
         }
 
+        $checkedFields = $this->getCheckedFieldsBy($token);
         $data = $this->removeUnlockFields($data, $token);
 
         if (!$isAjax) {
             session()->forget($this->sessionPath($token)); // TODO correct dellete all session or only $token
-        }
-        if (!empty($checkedFields['_url'])) {
-            unset($checkedFields['_url']);
         }
 
         if (array_keys($data) != array_keys($checkedFields)) {
@@ -120,13 +142,11 @@ class FormProtection extends BaseFormProtection
                 if (is_array($value)) {
                     // for array input
                     if (array_keys(array_dot($value)) != array_keys(array_dot($data[$field]))) {
-                        dd(88,$data[$field]);
                         return false;
                     }
                 } else {
                     //for hidden input
                     if ($checkedFields[$field] != $data[$field]) {
-                        dd(99,$data[$field]);
                         return false;
                     }
                 }
@@ -145,8 +165,11 @@ class FormProtection extends BaseFormProtection
         if (!$maxTime) {
             return false;
         }
-        $maxSeccounds = $maxTime * 60 * 60;
         $formHistory = session(config('lara_form.session.pre_path'));
+        if (empty($formHistory)) {
+            return false;
+        }
+        $maxSeccounds = $maxTime * 60 * 60;
         $timeName = config('lara_form.session.path_for.time');
         $currentTime = time();
         $betweenTime = $currentTime - $maxSeccounds;
@@ -170,9 +193,8 @@ class FormProtection extends BaseFormProtection
             return false;
         }
         $formHistory = session(config('lara_form.session.pre_path'));
-        $between = count($formHistory) - $maxCount;
-        if ($between > 0) {
-            $newHistory = array_slice($formHistory, 0, $between);
+        if (count($formHistory) > $maxCount) {
+            $newHistory = array_slice($formHistory, -$maxCount);
             session()->put(config('lara_form.session.pre_path'), $newHistory);
         }
     }
@@ -221,7 +243,6 @@ class FormProtection extends BaseFormProtection
     public function addArrayInputField($field)
     {
         $arr = explode('[', $field);
-
         foreach ($arr as $key => $item) {
             $arr[$key] = rtrim($item, ']');
         }
@@ -246,6 +267,7 @@ class FormProtection extends BaseFormProtection
             $this->pathForCheck => $this->fields,
             $this->pathForUnlock => $this->unlockFields,
             $this->pathForTime => $this->created_time,
+            $this->pathForUrl => $this->url,
         ];
         $this->fields = [];
         $this->unlockFields = [];
@@ -273,6 +295,36 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * @param $token
+     * @param $currentUrl
+     * @return bool
+     */
+    public function isValidAction($token, $currentUrl)
+    {
+        $path = $token . '.' . $this->pathForUnlock;
+        $unlockFields = session($this->sessionPath($path));
+        if (in_array('action', $unlockFields)) {
+            return true;
+        }
+        $action = $this->getAction($token);
+        if ($action == $currentUrl) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /***
+     * @param $token
+     * @return mixed
+     */
+    protected function getAction($token)
+    {
+        $path = $token . '.' . $this->pathForUrl;
+        return session($this->sessionPath($path));
+    }
+
+    /**
      * @param $data
      * @param $token
      * @return mixed
@@ -282,7 +334,6 @@ class FormProtection extends BaseFormProtection
 
         $path = $token . '.' . $this->pathForUnlock;
         $unlockFields = session($this->sessionPath($path));
-
         foreach ($data as $key => $value) {
             if (ends_with($key, '[]')) {
                 $key = substr($key, 0, -2);

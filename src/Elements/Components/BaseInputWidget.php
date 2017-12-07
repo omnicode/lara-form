@@ -13,7 +13,8 @@ class BaseInputWidget extends Widget
         'checkbox',
         'radio',
         'submit',
-        'textarea'
+        'textarea',
+        'file'
     ];
 
     /**
@@ -26,10 +27,12 @@ class BaseInputWidget extends Widget
 
     /**
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {
-
+       parent::inspectionAttributes($attr);
     }
 
     /**
@@ -53,7 +56,6 @@ class BaseInputWidget extends Widget
         }
 
         $this->generalInspectionAttributes($attr, $cTemplate);
-        $this->setContatinerParams($attr);
         $this->htmlAttributes['name'] = $name;
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
         $this->html = $this->formatTemplate($template, $this->htmlAttributes);
@@ -87,10 +89,10 @@ class BaseInputWidget extends Widget
         }
         $notLabel = ['hidden', 'submit', 'reset', 'button'];
         if (!in_array($this->htmlAttributes['type'], $notLabel)) {
-            if (isset($attr['label']) && $attr['label'] !== false) {
+            if (!empty($attr['label'])) {
                 $this->renderLabel($attr['label'], $attr);
                 $this->unlokAttributes['label'] = $attr['label'];
-            } else {
+            } elseif(!isset($attr['label'])) {
                 $this->renderLabel($this->name, $attr);
             }
         }
@@ -100,6 +102,7 @@ class BaseInputWidget extends Widget
             $this->unlokAttributes['class'] = $attr['class'];
         }
         $this->otherHtmlAttributes = $attr;
+        parent::inspectionAttributes($attr);
     }
 
 }

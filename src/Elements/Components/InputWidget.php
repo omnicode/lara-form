@@ -28,6 +28,6 @@ class InputWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-
+         parent::inspectionAttributes($attr);
     }
 }
