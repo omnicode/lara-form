@@ -19,7 +19,7 @@ return [
     'session' => [
         'pre_path' => 'laraforms',
         'max_time' => 2, // by hour
-        'max_count' => 5,
+        'max_count' => 50,
         'path_for' => [
             'check' => 'is_check',
             'unlock' => 'is_unlock',
@@ -27,11 +27,25 @@ return [
             'action' => '_action',
         ],
     ],
-    'ajax' => true,   // bool true (delete),  array [ urls for
+    'ajax_request' => [
+        'is_removed' => true,
+        'url' => [
+            //'http://so.loc/comments/store'
+        ],
+        'action' => [
+            'CommentController@store'
+        ],
+        'route' => [
+            //'comments.store'
+        ]
+    ],
     'except' => [
         'url' => [
             'stripe/*',
             'user-settings/intro-pop-up'
+        ],
+        'route' => [
+            //'comments.store'
         ],
         'field' => [
 
@@ -50,13 +64,13 @@ return [
     ],
     'templates' => [
         // Used for button elements in button().
-        'button' => '<button {%attrs%}>{%text%}</button>',
+        'button' => '<button {%attrs%}>{%icon%}{%text%}</button>',
         // Used for checkboxes in checkbox() and multiCheckbox().
         'checkbox' => '<input type="checkbox" name="{%name%}" value="{%value%}" {%attrs%}/>',
         // Wrapper container for checkboxes.
         'checkboxContainer' => '<div class="checkbox {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%content%}</div>',
         // Wrapper container for radio.
-        'radioContainer' => '<div class="radio {%type%}{%required%}{%class%}{%error%}" {%containerAttrs%}>{%content%}</div>',
+        'radioContainer' => '<div class="radio {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%content%}</div>',
         // Container for error items.
         'errorList' => '<div class="alert alert-danger {%class%}">
                             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -83,7 +97,7 @@ return [
         // Submit input element.
         'submit' => '<input type="{%type%}" value="{%name%}" {%attrs%}/>',
         // Container element used by control().
-        'inputContainer' => '<div class="form-group {%type%}{%required%}{%class%}{%error%}" {%containerAttrs%}>{%label%}{%content%}{%help%}</div>',
+        'inputContainer' => '<div class="form-group {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%label%}{%content%}{%help%}</div>',
         // Container element used by control() when a field has an error.
         'helpBlock' => '<span class="help-block {%class%}">{%text%}</span>',
         // Label element when inputs are not nested inside the label.

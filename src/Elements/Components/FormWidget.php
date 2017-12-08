@@ -196,6 +196,6 @@ class FormWidget extends Widget
      */
     public function getClassName($name)
     {
-        return array_last(explode('\\', $name));
+        return class_basename($name);
     }
 }

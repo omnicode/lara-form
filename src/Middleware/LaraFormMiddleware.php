@@ -19,18 +19,17 @@ class LaraFormMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->method() != 'GET' && !$this->isGlobalExceptionUrl($request->getUri())) {
+        if ($request->method() != 'GET' && !$this->isGlobalException($request)) {
 
             $formProtection = new FormProtection();
             $data = $request->all();
             foreach ($request->query() as $index => $key) {
                 unset($data[$index]);
             }
-            $isAjax = $request->ajax();
-            $validate = $formProtection->validate($data, $isAjax,$request->url());
+            $validate = $formProtection->validate($request, $data);
 
             if ($validate === false) {
-             // abort(403, 'Your Action Is Forbidden');
+                abort(403, 'Your Action Is Forbidden');
             }
 
             unset($request[config('lara_form.label.form_protection', 'laraform_token')]);
@@ -40,27 +39,38 @@ class LaraFormMiddleware
     }
 
     /**
-     * @param $url
+     * @param $request
      * @return bool
      */
-    private function isGlobalExceptionUrl($url)
+    private function isGlobalException($request)
     {
         $isExcept = false;
-        $excepts = Config::get('lara_form.except.url', []);
+        $exceptUrls = config('lara_form.except.url',[]);;
+        $exceptRoutes = config('lara_form.except.route',[]);;
 
-        foreach ($excepts as $except) {
-            if (str_contains($except, '*')) {
-                if (ends_with($except, '*')) {
-                    if (starts_with($url, url(substr($except, 0, -1)))) {
+        if (!empty($exceptUrls)) {
+            $uri = $request->getUri();
+            foreach ($exceptUrls as $except) {
+                if (str_contains($except, '*')) {
+                    if (ends_with($except, '*')) {
+                        if (starts_with($uri, url(substr($except, 0, -1)))) {
+                            $isExcept = true;
+                            break;
+                        }
+                    }
+                } else {
+                    if (url($except) == $uri) {
                         $isExcept = true;
                         break;
                     }
                 }
-            } else {
-                if (url($except) == $url) {
-                    $isExcept = true;
-                    break;
-                }
+            }
+        }
+
+        if (!empty($exceptRoutes)) {
+            $routeName = $request->route()->getName();
+            if (in_array($routeName, $exceptRoutes)) {
+                $isExcept = true;
             }
         }
 

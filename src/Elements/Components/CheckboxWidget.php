@@ -3,11 +3,15 @@
 namespace LaraForm\Elements\Components;
 
 use function GuzzleHttp\is_host_in_noproxy;
+use function Symfony\Component\Debug\Tests\testHeader;
 
 class CheckboxWidget extends BaseInputWidget
 {
 
-    private $isOutputedMultiHidden = false;
+    /**
+     * @var bool
+     */
+    private $isHidden = false;
 
     /**
      * @param $option
@@ -87,18 +91,64 @@ class CheckboxWidget extends BaseInputWidget
         if (isset($attr['hidden']) && $attr['hidden'] == false) {
             unset($attr['hidden']);
         } else {
-            if (!$this->isOutputedMultiHidden) {
-                if (ends_with($this->name, '[]')) {
-                    $hiddenName = str_ireplace('[]', '', $this->name);
-                } else {
-                    $hiddenName = $this->name;
-                }
-                if (!in_array($hiddenName, array_keys($this->fixedField))) {
-                    $this->hidden = $this->setHidden($hiddenName, $this->config['default_value']['hidden']);
-                }
+
+            if (ends_with($this->name, '[]')) {
+                $hiddenName = str_ireplace('[]', '', $this->name);
+            } else {
+                $hiddenName = $this->name;
+            }
+
+            if (!$this->isHidden) {
+                $this->isHide($hiddenName);
+                $this->hidden = $this->setHidden($hiddenName, $this->config['default_value']['hidden']);
+            } else {
+                $this->isHide($hiddenName);
+                $this->hidden = '';
             }
         }
+
         parent::inspectionAttributes($attr);
+    }
+
+    private function transform($field)
+    {
+        $arr = explode('[', $field);
+        foreach ($arr as $key => $item) {
+            $arr[$key] = rtrim($item, ']');
+        }
+
+        $field = implode('.', $arr);
+        if (ends_with($field, '.')) {
+            array_set($this->fields, substr($field, 0, -1), []);
+        } elseif (str_contains('..', $field)) {
+            dd('as');
+        } else {
+            array_set($this->fields, $field, '');
+        }
+    }
+
+    private function isHide($name)
+    {
+//        if (strpos('[', $name)) {
+//            $name = $this->transform($name);
+//        }
+        if ($this->in_array_r($name, array_keys($this->fixedField), true)) {
+            $this->isHidden = true;
+        } else {
+            $this->isHidden = false;
+        }
+    }
+
+    //TODO add system for multi checkbox created once hidden
+    private function in_array_r($needle, $haystack, $strict = false)
+    {
+        foreach ($haystack as $item) {
+            if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

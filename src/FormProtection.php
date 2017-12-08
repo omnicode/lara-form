@@ -3,6 +3,7 @@
 namespace LaraForm;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Http\Request;
 use LaraForm\Core\BaseFormProtection;
 
 class FormProtection extends BaseFormProtection
@@ -57,6 +58,10 @@ class FormProtection extends BaseFormProtection
      */
     protected $url;
 
+    /**
+     * @var
+     */
+    protected $ajax;
 
     /**
      * FormProtection constructor.
@@ -68,6 +73,7 @@ class FormProtection extends BaseFormProtection
         $this->pathForCheck = config('lara_form.session.path_for.check', 'is_check');
         $this->pathForTime = config('lara_form.session.path_for.time', 'created_time');
         $this->pathForUrl = config('lara_form.session.path_for.action', '_action');
+        $this->ajax = config('lara_form.ajax_request');
         $this->fields = [];
     }
 
@@ -105,35 +111,49 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * @param Request $request
      * @param $data
-     * @param bool $isAjax
-     * @param bool $currentUrl
      * @return bool
+     * @internal param bool $isAjax
+     * @internal param bool $currentUrl
      */
-    public function validate($data, $isAjax = false, $currentUrl = false)
+    public function validate(Request $request, $data)
     {
         $this->removeByTime();
         $tokenName = config('lara_form.label.form_protection', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
+
         if (!$token) {
+            dd(1);
             return false;
         }
 
         if (!session()->has($this->sessionPath($token))) {
+            dd(2);
             return false;
         }
-        if(!$this->isValidAction($token,$currentUrl)){
+
+        if (!$this->isValidAction($token, $request->url())) {
+            dd(3);
             return false;
         }
 
         $checkedFields = $this->getCheckedFieldsBy($token);
         $data = $this->removeUnlockFields($data, $token);
 
-        if (!$isAjax) {
-            session()->forget($this->sessionPath($token)); // TODO correct dellete all session or only $token
+        if ($request->ajax()) {
+            $isAjax = $this->verificationForAjax($request);
+
+            if ($isAjax) {
+                session()->forget($this->sessionPath($token));
+            }
+        } else {
+            session()->forget($this->sessionPath($token));
         }
 
+
         if (array_keys($data) != array_keys($checkedFields)) {
+            dd(4);
             return false;
         }
 
@@ -142,11 +162,13 @@ class FormProtection extends BaseFormProtection
                 if (is_array($value)) {
                     // for array input
                     if (array_keys(array_dot($value)) != array_keys(array_dot($data[$field]))) {
+                        dd(5);
                         return false;
                     }
                 } else {
                     //for hidden input
                     if ($checkedFields[$field] != $data[$field]) {
+                        dd(6);
                         return false;
                     }
                 }
@@ -157,11 +179,37 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * @param $request
+     * @return bool
+     */
+    protected function verificationForAjax($request)
+    {
+        if (!empty($this->ajax['url']) && in_array($request->url(), $this->ajax['url'])) {
+            return false;
+        }
+        if (!empty($this->ajax['action'])) {
+            $controllerAction = class_basename($request->route()->getAction()['controller']);
+            if (in_array($controllerAction, $this->ajax['action'])) {
+                return false;
+            }
+        }
+
+        if (!empty($this->ajax['route'])) {
+            $routeName = $request->route()->getName();
+            if (in_array($routeName, $this->ajax['route'])) {
+                return false;
+            }
+        }
+
+        return $this->ajax['is_removed'];
+    }
+
+    /**
      * @return bool
      */
     public function removeByTime()
     {
-        $maxTime = \config('lara_form.session.max_time', false);
+        $maxTime = config('lara_form.session.max_time', false);
         if (!$maxTime) {
             return false;
         }
@@ -248,7 +296,6 @@ class FormProtection extends BaseFormProtection
         }
 
         $field = implode('.', $arr);
-
         if (ends_with($field, '.')) {
             array_set($this->fields, substr($field, 0, -1), []);
         } elseif (str_contains('..', $field)) {
@@ -331,14 +378,17 @@ class FormProtection extends BaseFormProtection
      */
     private function removeUnlockFields($data, $token)
     {
-
         $path = $token . '.' . $this->pathForUnlock;
         $unlockFields = session($this->sessionPath($path));
+        $globalUnloc = config('lara_form.except.field');
+        if (!empty($globalUnloc)) {
+            $unlockFields = array_merge($globalUnloc, $unlockFields);
+        }
         foreach ($data as $key => $value) {
             if (ends_with($key, '[]')) {
                 $key = substr($key, 0, -2);
             }
-            if (starts_with($key, $unlockFields)) { //TODO only str_equals
+            if (starts_with($key, $unlockFields)) {
                 unset($data[$key]);
             }
         }
