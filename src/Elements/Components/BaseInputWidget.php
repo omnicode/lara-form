@@ -32,7 +32,7 @@ class BaseInputWidget extends Widget
      */
     public function inspectionAttributes(&$attr)
     {
-       parent::inspectionAttributes($attr);
+        parent::inspectionAttributes($attr);
     }
 
     /**
@@ -48,7 +48,7 @@ class BaseInputWidget extends Widget
         if (!$cTemplate) {
             if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
                 $template = $this->getTemplate($attr['type']);
-            }else{
+            } else {
                 $template = $this->getTemplate('input');
             }
         } else {
@@ -92,14 +92,13 @@ class BaseInputWidget extends Widget
             if (!empty($attr['label'])) {
                 $this->renderLabel($attr['label'], $attr);
                 $this->unlokAttributes['label'] = $attr['label'];
-            } elseif(!isset($attr['label'])) {
+            } elseif (!isset($attr['label'])) {
                 $this->renderLabel($this->name, $attr);
             }
         }
-        if (!isset($attr['class']) && $this->htmlAttributes['type'] !== 'hidden') {
-            $this->htmlClass[] = $this->config['css']['inputClass'];
-        } elseif (isset($attr['class']) && $attr['class'] == false) {
-            $this->unlokAttributes['class'] = $attr['class'];
+        if ($this->htmlAttributes['type'] !== 'hidden') {
+            $this->generateClass($attr, $this->config['css']['inputClass']);
+            $attr['class'] = $this->formatClass();
         }
         $this->otherHtmlAttributes = $attr;
         parent::inspectionAttributes($attr);

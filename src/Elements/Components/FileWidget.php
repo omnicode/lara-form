@@ -34,13 +34,8 @@ class FileWidget extends BaseInputWidget
     {
         $btn = $this->config['css']['submitClass'];
         $btnColor = $this->config['css']['submitColor'];
-        $this->htmlClass[] = $btn;
-        if (isset($attr['class'])) {
-            $this->htmlClass[] = $attr['class'];
-            unset($attr['class']);
-        } else {
-            $this->htmlClass[] = $btnColor;
-        }
+        $default = $btn.' '.$btnColor;
+        $this->generateClass($attr,$default);
         if (isset($attr['btn'])) {
             if ($attr['btn'] === true) {
                 $attr['btn'] = $btnColor;

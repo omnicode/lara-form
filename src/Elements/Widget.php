@@ -45,6 +45,7 @@ class Widget extends BaseWidget implements WidgetInterface
         $this->bound = new BoundStore($data);
 
     }
+
     /**
      * @param $data
      */
@@ -53,6 +54,7 @@ class Widget extends BaseWidget implements WidgetInterface
         $this->fixedField = $data;
 
     }
+
     /**
      * @param $templateName
      * @param bool $unset
@@ -338,15 +340,15 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @return mixed
      */
-    public function getId($name)
+    protected function getId($name)
     {
-        return str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name)));
+        return lcfirst(str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name))));
     }
 
     /*
      *
      */
-    public function setLabel($option)
+    protected function setLabel($option)
     {
         $template = $this->config['templates']['label'];
         $name = array_shift($option);
@@ -367,14 +369,15 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      * @param $inputName
      * @param $option
+     * @param bool $treatment
      * @return string
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function renderLabel($inputName, $option)
+    protected function renderLabel($inputName, $option, $treatment = false)
     {
         $for = isset($option['id']) ? $option['id'] : $inputName;
-        $labelName = $this->getLabelName($inputName);
+        $labelName = $treatment ? $inputName : $this->getLabelName($inputName);
         $this->label = $this->setLabel([$labelName, ['for' => $for]]);
         return $this->label;
     }
@@ -383,7 +386,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @return string
      */
-    public function getLabelName($name)
+    protected function getLabelName($name)
     {
         return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
     }
@@ -391,7 +394,7 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      * @param $attr
      */
-    public function generateId(&$attr)
+    protected function generateId(&$attr)
     {
         if (isset($attr['id']) && $attr['id'] == false) {
             $this->unlokAttributes['id'] = $attr['id'];
@@ -411,16 +414,39 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function generateLabel(&$attr)
+    protected function generateLabel(&$attr)
     {
         if (isset($attr['label']) && $attr['label'] !== false) {
-            $this->renderLabel($attr['label'], $attr);
+            $this->renderLabel($attr['label'], $attr, true);
             $this->unlokAttributes[] = $attr['label'];
         } else {
             $this->renderLabel($this->name, $attr);
         }
     }
 
+    /**
+     * @param $attr
+     * @param $default
+     */
+    protected function generateClass(&$attr, $default)
+    {
+        if (isset($attr['class'])) {
+            if ($attr['class'] === false) {
+                $this->htmlClass[] = false;
+            }elseif (starts_with( $attr['class'],'+')) {
+                $replacedClass = str_ireplace('+', '', $attr['class']);
+                $this->htmlClass[] = $default ;
+                if (strlen($replacedClass) > 0) {
+                    $this->htmlClass[] = $replacedClass;
+                }
+            } else {
+                $this->htmlClass[] = $attr['class'];
+            }
+            unset($attr['class']);
+        } else {
+            $this->htmlClass[] = $default;
+        }
+    }
 
     /**
      * @param $name

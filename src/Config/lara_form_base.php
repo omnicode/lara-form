@@ -30,22 +30,21 @@ return [
     'ajax_request' => [
         'is_removed' => true,
         'url' => [
-            //'http://so.loc/comments/store'
+
         ],
         'action' => [
             'CommentController@store'
         ],
         'route' => [
-            //'comments.store'
+
         ]
     ],
     'except' => [
         'url' => [
-            'stripe/*',
-            'user-settings/intro-pop-up'
+            
         ],
         'route' => [
-            //'comments.store'
+
         ],
         'field' => [
 
@@ -101,7 +100,7 @@ return [
         // Container element used by control() when a field has an error.
         'helpBlock' => '<span class="help-block {%class%}">{%text%}</span>',
         // Label element when inputs are not nested inside the label.
-        'label' => '<label {%attrs%}>{%text%}</label>',
+        'label' => '<label {%attrs%}>{%icon%}{%text%}</label>',
         // Label element used for radio and multi-checkbox inputs.
         'nestingLabel' => '{%hidden%}<label {%attrs%}>{%content%}{%text%}</label>',
         // Legends created by allControls()
@@ -117,7 +116,7 @@ return [
         // Select element,
         'select' => '<select name="{%name%}" {%attrs%}>{%content%}</select>',
         // Multi-select element,
-        'selectMultiple' => '<select name="{%name%}{%%}" multiple="multiple" {%attrs%}>{%content%}</select>',
+        'selectMultiple' => '<select name="{%name%}[]" multiple="multiple" {%attrs%}>{%content%}</select>',
         // Radio input element,
         'radio' => '<input type="radio" name="{%name%}" value="{%value%}" {%attrs%}/>',
         // Textarea input element,

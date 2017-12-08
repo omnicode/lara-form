@@ -64,8 +64,8 @@ class CheckboxWidget extends BaseInputWidget
     public function inspectionAttributes(&$attr)
     {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['checkbox'];
-        $this->htmlClass = isset($attr['class']) ? $attr['class'] : $this->config['css']['checkboxClass'];
-
+        $this->generateClass($attr,$this->config['css']['checkboxClass']);
+        $attr['class'] = $this->formatClass();
         if (empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
             if (!is_array($val)) {

@@ -45,7 +45,6 @@ class SelectWidget extends Widget
         $attr = !empty($params[0]) ? $params[0] : [];
         $this->inspectionAttributes($attr);
         $optionsHtml = $this->renderOptions();
-
         $selectAttrs = [
             'content' => $optionsHtml,
             'name' => $this->name,
@@ -124,12 +123,7 @@ class SelectWidget extends Widget
     {
         $this->generateId($attr);
         $this->generateLabel($attr);
-              if (isset($attr['class'])) {
-            $this->htmlClass[] = $attr['class'];
-            unset($attr['class']);
-        } else {
-            $this->htmlClass[] = $this->config['css']['selectClass'];
-        }
+        $this->generateClass($attr,$this->config['css']['selectClass']);
         $attr['class'] = $this->formatClass();
         if (strpos($this->name, '[]')) {
             $attr['multiple'] = true;
