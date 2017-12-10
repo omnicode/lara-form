@@ -27,10 +27,8 @@ class HiddenWidget extends BaseInputWidget
     public function inspectionAttributes(&$attr)
     {
         if (isset($attr['type'])) {
-            $this->otherHtmlAttributes['type'] = $attr['type'];
             unset($attr['type']);
         }
-        $attr['type'] = 'hidden';
         $this->htmlAttributes['type'] = 'hidden';
         parent::inspectionAttributes($attr);
     }

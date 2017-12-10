@@ -8,7 +8,7 @@ class FormWidget extends Widget
 {
     /**
      * @param $option
-     * @return string
+     * @return array|string
      * @throws \RuntimeException
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -175,7 +175,7 @@ class FormWidget extends Widget
     {
         if (empty($this->routes)) {
             collect(Route::getRoutes())->map(function ($route) {
-                $this->routes[$route->getName()] = $this->getClassName($route->getActionName());
+                $this->routes[$route->getName()] = class_basename($route->getActionName());
             });
         }
 
@@ -188,14 +188,5 @@ class FormWidget extends Widget
     public function getCurrentRoute()
     {
         return Route::getCurrentRoute();
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getClassName($name)
-    {
-        return class_basename($name);
     }
 }

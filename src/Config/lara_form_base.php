@@ -8,7 +8,7 @@ return [
     'label' => [
         'form_protection' => 'laraform_token',
         'select_empty' => '--Select--',
-        'submit' => 'Save',
+        'submit_name' => 'Save',
         'idPrefix' => false
     ],
     'default_value' => [
@@ -41,7 +41,7 @@ return [
     ],
     'except' => [
         'url' => [
-            
+
         ],
         'route' => [
 

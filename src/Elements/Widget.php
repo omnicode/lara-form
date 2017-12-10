@@ -106,6 +106,8 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     public function inspectionAttributes(&$attr)
     {
+        $this->generateId($attr);
+
         if (!empty($attr['icon'])) {
             $iconTemplate = $this->getTemplate('icon');
             $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
