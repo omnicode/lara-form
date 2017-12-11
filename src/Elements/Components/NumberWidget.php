@@ -12,10 +12,7 @@ class NumberWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $this->name = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
-        $this->inspectionAttributes($attr);
-        return $this->toHtml($this->name, $attr);
+        return parent::render($option);
     }
 
 
@@ -26,9 +23,7 @@ class NumberWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-        if (isset($attr['type'])) {
-            unset($attr['type']);
-        }
+        $this->otherHtmlAttributes['type'] = 'number';
         $attr['type'] = 'number';
         parent::inspectionAttributes($attr);
     }

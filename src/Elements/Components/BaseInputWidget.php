@@ -19,10 +19,16 @@ class BaseInputWidget extends Widget
 
     /**
      * @param $option
+     * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function render($option)
     {
-
+        $this->name = array_shift($option);
+        $attr = !empty($option[0]) ? $option[0] : [];
+        $this->inspectionAttributes($attr);
+        return $this->formatInputField($this->name, $attr);
     }
 
     /**
@@ -43,7 +49,7 @@ class BaseInputWidget extends Widget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function toHtml($name, $attr, $cTemplate = false)
+    public function formatInputField($name, $attr, $cTemplate = false)
     {
         if (!$cTemplate) {
             if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
@@ -70,8 +76,6 @@ class BaseInputWidget extends Widget
      */
     public function generalInspectionAttributes(&$attr, $cTemplate)
     {
-        $this->generateId($attr);
-
         if (isset($attr['type'])) {
             $this->htmlAttributes['type'] = $attr['type'];
             $this->unlokAttributes['type'] = $attr['type'];
@@ -83,22 +87,15 @@ class BaseInputWidget extends Widget
             $this->htmlAttributes['value'] = $attr['value'];
             $this->unlokAttributes['value'] = $attr['value'];
         }
-        $notD = ['hidden', 'submit', 'reset', 'button', 'radio', 'checkbox', 'label'];
-        if (!in_array($this->htmlAttributes['type'], $notD) && !$cTemplate) {
+        $notId = ['hidden', 'submit', 'reset', 'button', 'radio', 'checkbox', 'label'];
+        if (!in_array($this->htmlAttributes['type'], $notId) && !$cTemplate) {
             $attr += $this->getValue($this->name);
         }
-        $notLabel = ['hidden', 'submit', 'reset', 'button'];
-        if (!in_array($this->htmlAttributes['type'], $notLabel)) {
-            if (!empty($attr['label'])) {
-                $this->renderLabel($attr['label'], $attr);
-                $this->unlokAttributes['label'] = $attr['label'];
-            } elseif (!isset($attr['label'])) {
-                $this->renderLabel($this->name, $attr);
-            }
+        if (!in_array($this->htmlAttributes['type'], ['hidden', 'submit', 'reset', 'button'])) {
+            $this->generateLabel($attr);
         }
         if ($this->htmlAttributes['type'] !== 'hidden') {
             $this->generateClass($attr, $this->config['css']['inputClass']);
-            $attr['class'] = $this->formatClass();
         }
         $this->otherHtmlAttributes = $attr;
         parent::inspectionAttributes($attr);

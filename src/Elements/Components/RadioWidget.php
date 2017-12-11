@@ -19,7 +19,7 @@ class RadioWidget extends BaseInputWidget
         $this->name = array_shift($option);
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
-        $this->toHtml($this->name, $attr, $template);
+        $this->formatInputField($this->name, $attr, $template);
         $labelAttr = [
             'hidden' => $this->hidden,
             'content' => $this->html,
@@ -42,7 +42,6 @@ class RadioWidget extends BaseInputWidget
     {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['radio'];
         $this->generateClass($attr,$this->config['css']['radioClass']);
-        $attr['class'] = $this->formatClass();
         if (isset($attr['type'])) {
             unset($attr['type']);
         }

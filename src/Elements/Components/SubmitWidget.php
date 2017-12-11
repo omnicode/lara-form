@@ -38,8 +38,6 @@ class SubmitWidget extends BaseInputWidget
         $btn = $this->config['css']['submitClass'];
         $btnColor = $this->config['css']['submitColor'];
         $defaut = $btn.' '.$btnColor;
-        $this->generateClass($attr,$defaut);
-        $attr['class'] = $this->formatClass();
         if (isset($attr['btn'])) {
             if ($attr['btn'] === true) {
                 $attr['btn'] = $btnColor;
@@ -47,6 +45,7 @@ class SubmitWidget extends BaseInputWidget
             $this->htmlClass[] = $btn . '-' . $attr['btn'];
             unset($attr['btn']);
         }
+        $this->generateClass($attr,$defaut);
         if (!empty($attr['type']) && in_array($attr['type'], ['submit', 'button', 'reset'])) {
             $this->otherHtmlAttributes['type'] = $attr['type'];
         } else {

@@ -121,7 +121,6 @@ return [
         'radio' => '<input type="radio" name="{%name%}" value="{%value%}" {%attrs%}/>',
         // Textarea input element,
         'textarea' => '<textarea name="{%name%}" {%attrs%}>{%value%}</textarea>',
-
         // Container for submit buttons.
         'submitContainer' => '<div class="submit {%class%}">{%content%}</div>',
         // Container for file inputs.

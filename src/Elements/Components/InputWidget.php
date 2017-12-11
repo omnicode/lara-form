@@ -20,7 +20,7 @@ class InputWidget extends BaseInputWidget
         $this->name = $option[0];
         $attr = !empty($option[1]) ? $option[1] : [];
         $this->inspectionAttributes($attr);
-        return $this->toHtml($this->name, $attr);
+        return $this->formatInputField($this->name, $attr);
     }
 
     /**

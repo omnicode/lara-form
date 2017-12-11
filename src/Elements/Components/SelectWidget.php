@@ -124,7 +124,6 @@ class SelectWidget extends Widget
         $this->generateId($attr);
         $this->generateLabel($attr);
         $this->generateClass($attr,$this->config['css']['selectClass']);
-        $attr['class'] = $this->formatClass();
         if (strpos($this->name, '[]')) {
             $attr['multiple'] = true;
             $this->name = str_ireplace('[]', '', $this->name);

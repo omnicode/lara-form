@@ -2,9 +2,6 @@
 
 namespace LaraForm\Elements\Components;
 
-use function GuzzleHttp\is_host_in_noproxy;
-use function Symfony\Component\Debug\Tests\testHeader;
-
 class CheckboxWidget extends BaseInputWidget
 {
 
@@ -43,7 +40,7 @@ class CheckboxWidget extends BaseInputWidget
         $this->inspectionAttributes($attr);
         $this->containerTemplate = $this->getTemplate('checkboxContainer');
         $labelTemplate = $this->getTemplate('nestingLabel');
-        $this->toHtml($this->name, $attr, $template);
+        $this->formatInputField($this->name, $attr, $template);
         $labelAttr = [
             'hidden' => $this->hidden,
             'content' => $this->html,
@@ -65,7 +62,6 @@ class CheckboxWidget extends BaseInputWidget
     {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['checkbox'];
         $this->generateClass($attr,$this->config['css']['checkboxClass']);
-        $attr['class'] = $this->formatClass();
         if (empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
             if (!is_array($val)) {
@@ -75,7 +71,6 @@ class CheckboxWidget extends BaseInputWidget
                 $attr['checked'] = true;
             }
         }
-        $attr['class'] = $this->formatClass();
         if (isset($attr['type'])) {
             unset($attr['type']);
         }

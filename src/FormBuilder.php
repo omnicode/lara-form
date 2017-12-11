@@ -100,6 +100,9 @@ class FormBuilder extends BaseFormBuilder
      */
     public function create($model = null, $options = [])
     {
+        if ($this->isForm) {
+            abort(300,'Your action is not correct ,have is open and not closed tag form!');
+        }
         $this->model = $model;
         $this->isForm = true;
         $token = md5(str_random(80));
@@ -176,7 +179,7 @@ class FormBuilder extends BaseFormBuilder
             if ($method == 'hidden') {
                 $value = isset($attr['value']) ? $attr['value'] : config('lara_form.default_value.hidden');
             }
-            if (!in_array($method, ['submit', 'button', 'reset']) && $this->isForm) {
+            if (!in_array($method, ['submit', 'button', 'reset', 'label']) && $this->isForm) {
                 $this->formProtection->addField($arrgs[0], $attr, $value);
             }
 

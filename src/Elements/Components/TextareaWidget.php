@@ -19,7 +19,7 @@ class TextareaWidget extends BaseInputWidget
         $attr = !empty($option[0]) ? $option[0] : [];
         $this->inspectionAttributes($attr);
         $this->containerParams['inline']['type'] = !empty($this->containerParams['inline']['type']) ? $this->containerParams['inline']['type'] :'textarea';
-        return $this->html = $this->toHtml($this->name, $attr, $template);
+        return $this->html = $this->formatInputField($this->name, $attr, $template);
     }
 
     /**
@@ -29,12 +29,10 @@ class TextareaWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-        $attr += $this->getValue($this->name);
-        $this->htmlClass = isset($attr['class']) ? $attr['class'] : $this->config['css']['textareaClass'];
+        $this->generateClass($attr,$this->config['css']['textareaClass']);
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
-        $attr['class'] = $this->formatClass();
         parent::inspectionAttributes($attr);
     }
 }

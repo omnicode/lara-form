@@ -12,10 +12,7 @@ class EmailWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $this->name = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
-        $this->inspectionAttributes($attr);
-        return $this->html = $this->toHtml($this->name, $attr);
+        return parent::render($option);
     }
 
 
