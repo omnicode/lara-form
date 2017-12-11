@@ -6,6 +6,9 @@ use LaraForm\Core\BaseStore;
 
 class ErrorStore extends BaseStore
 {
+    /**
+     * @var mixed
+     */
     private $session;
 
     /**

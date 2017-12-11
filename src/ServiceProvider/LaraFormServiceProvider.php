@@ -25,6 +25,9 @@ class LaraFormServiceProvider extends ServiceProvider
 
     }
 
+    /**
+     *
+     */
     public function setCoreConfig()
     {
         $baseConfig = require_once dirname (__DIR__) . '/Config/lara_form_core.php';

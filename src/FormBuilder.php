@@ -101,13 +101,14 @@ class FormBuilder extends BaseFormBuilder
     public function create($model = null, $options = [])
     {
         if ($this->isForm) {
-            abort(300,'Your action is not correct ,have is open and not closed tag form!');
+            abort(300,'Your action is not correct, have is open and not closed tag form!');
         }
+        
         $this->model = $model;
         $this->isForm = true;
         $token = md5(str_random(80));
         $options['form_token'] = $token;
-        $formData = $this->makeSingleton('form', ['start', $options]);
+        $formData = $this->make('form', ['start', $options]);
         $formHtml = $formData['html'];
 
         if ($formData['method'] === 'get') {
@@ -150,7 +151,7 @@ class FormBuilder extends BaseFormBuilder
     public function end()
     {
         $this->formProtection->confirm();
-        $end = $this->makeSingleton('form', ['end']);
+        $end = $this->make('form', ['end']);
         $this->isForm = false;
         $this->maked = [];
         $this->localTemplates['pattern'] = [];
@@ -186,7 +187,7 @@ class FormBuilder extends BaseFormBuilder
         }
 
         $this->hasTemplate($arrgs);
-        return $this->makeSingleton($method, $arrgs);
+        return $this->make($method, $arrgs);
     }
 
     /**
@@ -196,7 +197,7 @@ class FormBuilder extends BaseFormBuilder
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
      */
-    private function makeSingleton($method, $arrgs)
+    private function make($method, $arrgs)
     {
         $modelName = ucfirst($method);
         $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');

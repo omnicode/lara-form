@@ -6,23 +6,43 @@ use LaraForm\Core\BaseStore;
 
 class BoundStore extends BaseStore
 {
+    /**
+     * @var
+     */
     protected $data;
 
+    /**
+     * BoundStore constructor.
+     * @param $data
+     */
     public function __construct($data)
     {
         $this->data = $data;
     }
 
+    /**
+     * @param $name
+     * @param null $default
+     * @return mixed
+     */
     public function get($name, $default = null)
     {
         return $this->dotGet($this->transformKey($name), $default);
     }
 
+    /**
+     * @return mixed
+     */
     public function data()
     {
         return $this->data;
     }
 
+    /**
+     * @param $dotKey
+     * @param $default
+     * @return mixed
+     */
     protected function dotGet($dotKey, $default)
     {
         $keyParts = explode('.', $dotKey);
@@ -30,6 +50,12 @@ class BoundStore extends BaseStore
         return $this->dataGet($this->data, $keyParts, $default);
     }
 
+    /**
+     * @param $target
+     * @param $keyParts
+     * @param $default
+     * @return mixed
+     */
     protected function dataGet($target, $keyParts, $default)
     {
         if (count($keyParts) == 0) {
@@ -47,6 +73,12 @@ class BoundStore extends BaseStore
         return $default;
     }
 
+    /**
+     * @param $target
+     * @param $keyParts
+     * @param $default
+     * @return mixed
+     */
     protected function arrayGet($target, $keyParts, $default)
     {
         $key = array_shift($keyParts);
@@ -58,6 +90,12 @@ class BoundStore extends BaseStore
         return $this->dataGet($target[$key], $keyParts, $default);
     }
 
+    /**
+     * @param $target
+     * @param $keyParts
+     * @param $default
+     * @return mixed
+     */
     protected function objectGet($target, $keyParts, $default)
     {
         $key = array_shift($keyParts);
