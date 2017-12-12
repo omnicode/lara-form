@@ -5,22 +5,18 @@ namespace LaraForm\Elements\Components;
 class RadioWidget extends BaseInputWidget
 {
     /**
-     * @param $option
      * @return string
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
-        $this->parseParams($option);
         return $this->renderRadio($this->attr);
     }
 
     /**
      * @param $attr
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     private function renderRadio($attr)
     {
@@ -33,8 +29,6 @@ class RadioWidget extends BaseInputWidget
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Elements\Components;
+namespace Tests\Elements\Components;
 
 use LaraForm\Elements\Components\HiddenWidget;
 

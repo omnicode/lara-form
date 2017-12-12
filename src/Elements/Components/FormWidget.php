@@ -7,21 +7,14 @@ use LaraForm\Elements\Widget;
 class FormWidget extends Widget
 {
     /**
-     * @param $option
-     * @return array|string
-     * @throws \RuntimeException
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return array|string|void
      */
-    public function render($option)
+    public function render()
     {
-
-        $methodName = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
-        if ($methodName === 'start') {
-            return $this->start($attr);
+        if ($this->name === 'start') {
+            return $this->start($this->attr);
         }
-        if ($methodName === 'end') {
+        if ($this->name === 'end') {
             return $this->end();
         }
 
@@ -47,9 +40,6 @@ class FormWidget extends Widget
     /**
      * @param $options
      * @return array
-     * @throws \RuntimeException
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function start($options)
     {
@@ -82,8 +72,6 @@ class FormWidget extends Widget
 
     /**
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function end()
     {
@@ -117,8 +105,6 @@ class FormWidget extends Widget
     /**
      * @param array $options
      * @return array|mixed|string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function getAction(&$options = [])
     {

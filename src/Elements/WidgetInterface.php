@@ -11,7 +11,7 @@ namespace LaraForm\Elements;
 
 interface WidgetInterface
 {
-    public function render($option);
+    public function render();
 
     public function inspectionAttributes(&$attr);
 

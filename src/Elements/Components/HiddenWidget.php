@@ -6,20 +6,15 @@ class HiddenWidget extends BaseInputWidget
 {
 
     /**
-     * @param $option
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
-        return parent::render($option);
+        return parent::render();
     }
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

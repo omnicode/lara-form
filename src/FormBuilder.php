@@ -94,9 +94,10 @@ class FormBuilder extends BaseFormBuilder
     /**
      * @param null $model
      * @param array $options
-     * @return string
+     * @return mixed
      * @throws \Exception
-     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
      */
     public function create($model = null, $options = [])
     {
@@ -195,8 +196,6 @@ class FormBuilder extends BaseFormBuilder
      * @param $method
      * @param $arrgs
      * @return mixed
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \LogicException
      */
     private function make($method, $arrgs)
     {
@@ -231,6 +230,7 @@ class FormBuilder extends BaseFormBuilder
         $this->inlineTemplates['div'] = [];
 
         $this->maked[$modelName]->setParams($templates);
+        $this->maked[$modelName]->setArguments($arrgs);
         return $this->maked[$modelName]->render($arrgs);
     }
 

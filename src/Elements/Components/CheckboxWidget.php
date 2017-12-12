@@ -11,22 +11,16 @@ class CheckboxWidget extends BaseInputWidget
     private $isHidden = false;
 
     /**
-     * @param $option
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
-        $this->parseParams($option);
         return $this->renderCheckbox($this->attr);
     }
 
     /**
      * @param $attr
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     private function renderCheckbox($attr)
     {
@@ -42,8 +36,6 @@ class CheckboxWidget extends BaseInputWidget
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

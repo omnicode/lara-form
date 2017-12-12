@@ -14,12 +14,9 @@ use LaraForm\Elements\Widget;
 class ErrorListWidget extends Widget
 {
     /**
-     * @param $option
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
         if (empty($this->errors->hasErrors())) {
             return $this->html;
@@ -35,6 +32,9 @@ class ErrorListWidget extends Widget
         return $this->formatTemplate($ul,['content' => $list]);
     }
 
+    /**
+     * @param $attr
+     */
     public function inspectionAttributes(&$attr)
     {
 

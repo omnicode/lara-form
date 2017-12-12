@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Elements;
+namespace Tests\Elements;
 
 use LaraForm\Elements\Widget;
 

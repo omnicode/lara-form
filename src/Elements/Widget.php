@@ -47,6 +47,18 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * @param $arguments
+     */
+    public function setArguments($arguments)
+    {
+        $this->name = array_shift($arguments);
+        $this->attr = array_shift($arguments);
+        if (is_null($this->attr)) {
+            $this->attr = [];
+        }
+    }
+
+    /**
      * @param $data
      */
     public function setFixedField($data)
@@ -91,20 +103,15 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
-     * @param $option
-     * @return array
+     *
      */
-    public function render($option)
+    public function render()
     {
-        $this->name = $option[0];
-        $attr = !empty($option[1]) ? $option[1] : [];
-        return $attr;
+
     }
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {
@@ -122,8 +129,6 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      * @param $name
      * @return array
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function setError($name)
     {
@@ -176,8 +181,6 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $option
      * @param bool $treatment
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function renderLabel($inputName, $option, $treatment = false)
     {
@@ -216,8 +219,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function generateLabel(&$attr)
     {
@@ -259,10 +260,8 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * @param $name
-     * @param $value
+     * @param bool $value
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function setHidden($name, $value = false)
     {

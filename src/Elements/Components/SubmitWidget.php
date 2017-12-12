@@ -5,14 +5,12 @@ namespace LaraForm\Elements\Components;
 class SubmitWidget extends BaseInputWidget
 {
     /**
-     * @param $option
      * @return string
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
-        $this->parseParams($option);
         $this->inspectionAttributes($this->attr);
         $template = $this->getTemplate('button');
         $defaultName = $this->config['label']['submit_name'] ? $this->config['label']['submit_name'] : '';
@@ -29,8 +27,6 @@ class SubmitWidget extends BaseInputWidget
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

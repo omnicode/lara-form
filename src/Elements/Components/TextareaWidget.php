@@ -7,14 +7,10 @@ use LaraForm\Elements\Widget;
 class TextareaWidget extends BaseInputWidget
 {
     /**
-     * @param $option
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
-        $this->parseParams($option);
         $template = $this->getTemplate('textarea');
         $this->inspectionAttributes($this->attr);
         $this->containerParams['inline']['type'] = !empty($this->containerParams['inline']['type']) ? $this->containerParams['inline']['type'] :'textarea';
@@ -23,8 +19,6 @@ class TextareaWidget extends BaseInputWidget
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

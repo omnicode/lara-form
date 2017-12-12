@@ -10,14 +10,10 @@ class FileWidget extends BaseInputWidget
     protected $fileTemplate;
 
     /**
-     * @param $option
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
-        $this->parseParams($option);
         $this->inspectionAttributes($this->attr);
         $this->containerTemplate = $this->getTemplate('fileContainer');
         return $this->formatInputField($this->name, $this->attr, $this->fileTemplate);
@@ -25,8 +21,6 @@ class FileWidget extends BaseInputWidget
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {

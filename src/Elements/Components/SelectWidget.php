@@ -34,14 +34,12 @@ class SelectWidget extends Widget
 
 
     /**
-     * @param $params
-     * @return string
+     * @return mixed|string|void
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($params)
+    public function render()
     {
-        $this->parseParams($params);
         $this->inspectionAttributes($this->attr);
         $optionsHtml = $this->renderOptions();
         $selectAttrs = [

@@ -18,22 +18,16 @@ class BaseInputWidget extends Widget
     ];
 
     /**
-     * @param $option
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
-        $this->parseParams($option);
         $this->inspectionAttributes($this->attr);
         return $this->formatInputField($this->name, $this->attr);
     }
 
     /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {
@@ -45,8 +39,6 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param bool $cTemplate
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function formatInputField($name, $attr, $cTemplate = false)
     {
@@ -72,8 +64,6 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param array $labelAttrs
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function formatNestingLabel($template, $attr , $labelAttrs = [])
     {
@@ -94,8 +84,6 @@ class BaseInputWidget extends Widget
     /**
      * @param $attr
      * @param $cTemplate
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function generalInspectionAttributes(&$attr, $cTemplate)
     {

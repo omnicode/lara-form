@@ -7,12 +7,9 @@ use LaraForm\Elements\Widget;
 class LabelWidget extends Widget
 {
     /**
-     * @param $option
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render($option)
+    public function render()
     {
         return $this->setLabel($option);
     }

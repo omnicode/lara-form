@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Stores;
+namespace Tests\Stores;
 
 use LaraForm\Stores\ErrorStore;
 

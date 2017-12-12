@@ -181,9 +181,7 @@ abstract class BaseWidget
     /**
      * @param $template
      * @param $attributes
-     * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return mixed
      */
     protected function formatTemplate($template, $attributes)
     {
@@ -203,8 +201,6 @@ abstract class BaseWidget
 
     /**
      * @param $template
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     private function transformTemplate(&$template)
     {
@@ -287,9 +283,7 @@ abstract class BaseWidget
     }
 
     /**
-     * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return mixed|string
      */
     protected function completeTemplate()
     {
@@ -375,14 +369,5 @@ abstract class BaseWidget
             $params['containerAttrs'] = $this->formatAttributes($data);
         }
         return $params;
-    }
-
-    /**
-     * @param $option
-     */
-    protected function parseParams($option)
-    {
-        $this->name = array_shift($option);
-        $this->attr = !empty($option[0]) ? $option[0] : [];
     }
 }
