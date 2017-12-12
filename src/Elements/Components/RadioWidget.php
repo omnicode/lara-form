@@ -17,9 +17,18 @@ class RadioWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-        $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['radio'];
         $this->generateClass($attr, $this->config['css']['radioClass']);
         $this->generateLabel($attr);
+        $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['radio'];
+        if (!empty($attr['value'])) {
+            $val = $this->getValue($this->name)['value'];
+            if (!is_array($val)) {
+                $val = [$val];
+            }
+            if (in_array($attr['value'], $val)) {
+                $attr['checked'] = true;
+            }
+        }
         if (isset($attr['type'])) {
             unset($attr['type']);
         }

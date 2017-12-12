@@ -42,7 +42,7 @@ class CheckboxWidget extends BaseInputWidget
         $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['checkbox'];
         $this->generateClass($attr, $this->config['css']['checkboxClass']);
         $this->generateLabel($attr);
-        if (empty($attr['value'])) {
+        if (!empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
             if (!is_array($val)) {
                 $val = [$val];
