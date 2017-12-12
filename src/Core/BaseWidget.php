@@ -46,6 +46,11 @@ abstract class BaseWidget
     /**
      * @var array
      */
+    protected $attr = [];
+
+    /**
+     * @var array
+     */
     protected $routes = [];
 
     /**
@@ -370,5 +375,14 @@ abstract class BaseWidget
             $params['containerAttrs'] = $this->formatAttributes($data);
         }
         return $params;
+    }
+
+    /**
+     * @param $option
+     */
+    protected function parseParams($option)
+    {
+        $this->name = array_shift($option);
+        $this->attr = !empty($option[0]) ? $option[0] : [];
     }
 }

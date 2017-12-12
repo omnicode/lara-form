@@ -18,39 +18,26 @@ class CheckboxWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $template = $this->getTemplate('checkbox');
-        $this->name = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
-        return $this->renderCheckbox($attr, $template);
+        $this->parseParams($option);
+        return $this->renderCheckbox($this->attr);
     }
 
     /**
      * @param $attr
-     * @param $template
      * @return string
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    private function renderCheckbox($attr, $template)
+    private function renderCheckbox($attr)
     {
         if (strpos($this->name, '[]')) {
             $attr['multiple'] = true;
         }
-
+        $template = $this->getTemplate('checkbox');
         $this->inspectionAttributes($attr);
         $this->containerTemplate = $this->getTemplate('checkboxContainer');
-        $labelTemplate = $this->getTemplate('nestingLabel');
-        $this->formatInputField($this->name, $attr, $template);
-        $labelAttr = [
-            'hidden' => $this->hidden,
-            'content' => $this->html,
-            'text' => isset($attr['label']) ? $attr['label'] : $this->getLabelName($this->name),
-            'attrs' => ''
-        ];
-        $this->html = $this->formatTemplate($labelTemplate, $labelAttr);
         $this->otherHtmlAttributes['type'] = 'checkbox';
-        $this->html = $this->completeTemplate();
-        return $this->html;
+        return $this->formatNestingLabel($template, $attr);
     }
 
     /**
@@ -61,7 +48,8 @@ class CheckboxWidget extends BaseInputWidget
     public function inspectionAttributes(&$attr)
     {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['checkbox'];
-        $this->generateClass($attr,$this->config['css']['checkboxClass']);
+        $this->generateClass($attr, $this->config['css']['checkboxClass']);
+        $this->generateLabel($attr);
         if (empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
             if (!is_array($val)) {

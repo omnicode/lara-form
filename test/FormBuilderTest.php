@@ -25,10 +25,19 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     protected $oldInputStore;
 
 
+    /**
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
     public function setUp()
     {
         $this->formProtection = app(FormProtection::class);
         $this->errorStore = app(ErrorStore::class);
         $this->oldInputStore = app(OldInputStore::class);
+    }
+
+    public function createTest()
+    {
+        
     }
 }

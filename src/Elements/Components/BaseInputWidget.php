@@ -25,10 +25,9 @@ class BaseInputWidget extends Widget
      */
     public function render($option)
     {
-        $this->name = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
-        $this->inspectionAttributes($attr);
-        return $this->formatInputField($this->name, $attr);
+        $this->parseParams($option);
+        $this->inspectionAttributes($this->attr);
+        return $this->formatInputField($this->name, $this->attr);
     }
 
     /**
@@ -65,6 +64,30 @@ class BaseInputWidget extends Widget
         $this->htmlAttributes['name'] = $name;
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
         $this->html = $this->formatTemplate($template, $this->htmlAttributes);
+        return $this->completeTemplate();
+    }
+
+    /**
+     * @param $template
+     * @param $attr
+     * @param array $labelAttrs
+     * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    protected function formatNestingLabel($template, $attr , $labelAttrs = [])
+    {
+        $labelTemplate = $this->getTemplate('nestingLabel');
+        $this->formatInputField($this->name, $attr, $template);
+
+        $templateAttr = [
+            'hidden' => $this->hidden,
+            'content' => $this->html,
+            'text' => !empty($attr['label']) ? $attr['label'] : '',
+            'attrs' => $this->formatAttributes($labelAttrs)
+        ];
+
+        $this->html = $this->formatTemplate($labelTemplate, $templateAttr);
         return $this->completeTemplate();
     }
 

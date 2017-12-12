@@ -120,6 +120,7 @@ class FormBuilder extends BaseFormBuilder
         $this->formProtection->setUrl($formData['action']);
         $this->formProtection->removeByTime();
         $this->formProtection->removeByCount();
+
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
         $this->formProtection->setUnlockFields($unlockFields);
         return $formHtml;

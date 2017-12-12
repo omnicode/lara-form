@@ -14,12 +14,11 @@ class TextareaWidget extends BaseInputWidget
      */
     public function render($option)
     {
+        $this->parseParams($option);
         $template = $this->getTemplate('textarea');
-        $this->name = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
-        $this->inspectionAttributes($attr);
+        $this->inspectionAttributes($this->attr);
         $this->containerParams['inline']['type'] = !empty($this->containerParams['inline']['type']) ? $this->containerParams['inline']['type'] :'textarea';
-        return $this->html = $this->formatInputField($this->name, $attr, $template);
+        return $this->html = $this->formatInputField($this->name, $this->attr, $template);
     }
 
     /**

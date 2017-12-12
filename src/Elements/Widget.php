@@ -92,10 +92,13 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * @param $option
+     * @return array
      */
     public function render($option)
     {
-
+        $this->name = $option[0];
+        $attr = !empty($option[1]) ? $option[1] : [];
+        return $attr;
     }
 
     /**

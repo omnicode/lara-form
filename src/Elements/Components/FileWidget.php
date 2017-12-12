@@ -17,11 +17,10 @@ class FileWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $this->name = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
-        $this->inspectionAttributes($attr);
+        $this->parseParams($option);
+        $this->inspectionAttributes($this->attr);
         $this->containerTemplate = $this->getTemplate('fileContainer');
-        return $this->formatInputField($this->name, $attr, $this->fileTemplate);
+        return $this->formatInputField($this->name, $this->attr, $this->fileTemplate);
     }
 
     /**

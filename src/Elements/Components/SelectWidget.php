@@ -41,14 +41,13 @@ class SelectWidget extends Widget
      */
     public function render($params)
     {
-        $this->name = array_shift($params);
-        $attr = !empty($params[0]) ? $params[0] : [];
-        $this->inspectionAttributes($attr);
+        $this->parseParams($params);
+        $this->inspectionAttributes($this->attr);
         $optionsHtml = $this->renderOptions();
         $selectAttrs = [
             'content' => $optionsHtml,
             'name' => $this->name,
-            'attrs' => $this->formatAttributes($attr)
+            'attrs' => $this->formatAttributes($this->attr)
         ];
         $this->htmlAttributes['type'] = 'select';
         $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
@@ -63,7 +62,7 @@ class SelectWidget extends Widget
      */
     protected function renderOptions($gropup = false)
     {
-        $optionTemplate = $this->getTemplate('option', false);
+        $optionTemplate = $this->getTemplate('option');
         if ($gropup) {
             $options = $gropup;
         } else {

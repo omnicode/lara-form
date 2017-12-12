@@ -12,14 +12,13 @@ class SubmitWidget extends BaseInputWidget
      */
     public function render($option)
     {
-        $this->name = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
-        $this->inspectionAttributes($attr);
+        $this->parseParams($option);
+        $this->inspectionAttributes($this->attr);
         $template = $this->getTemplate('button');
         $defaultName = $this->config['label']['submit_name'] ? $this->config['label']['submit_name'] : '';
         $name = !empty($this->name) ? $this->name : $defaultName;
         $btnAttr = [
-            'attrs' => $this->formatAttributes($attr),
+            'attrs' => $this->formatAttributes($this->attr),
             'text' => $name,
         ];
         $this->html = $this->formatTemplate($template, $btnAttr);
