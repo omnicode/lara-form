@@ -238,7 +238,7 @@ abstract class BaseWidget
                 return $value;
             }
         });
-        $this->otherHtmlAttributes = $attributes;
+        $this->otherHtmlAttributes += $attributes;
         foreach ($attributes as $index => $attribute) {
             if (is_string($index)) {
                 $attr .= $index . '="' . $attribute . '" ';

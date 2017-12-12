@@ -109,9 +109,9 @@ class FormBuilder extends BaseFormBuilder
         $this->formProtection->setUrl($formData['action']);
         $this->formProtection->removeByTime();
         $this->formProtection->removeByCount();
-
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
         $this->formProtection->setUnlockFields($unlockFields);
+
         return $formHtml;
     }
 
@@ -122,10 +122,7 @@ class FormBuilder extends BaseFormBuilder
     {
         $this->formProtection->confirm();
         $end = $this->make('form', ['end']);
-        $this->isForm = false;
-        $this->maked = [];
-        $this->localTemplates['pattern'] = [];
-        $this->localTemplates['div'] = [];
+        $this->resetOldData();
         return $end;
     }
 
@@ -215,7 +212,9 @@ class FormBuilder extends BaseFormBuilder
         if (empty($this->maked[$modelName])) {
             $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore]);
         }
+
         $widget = $this->maked[$modelName];
+
         if (!empty($this->model)) {
             $widget->setModel($this->model);
         }
@@ -223,6 +222,7 @@ class FormBuilder extends BaseFormBuilder
         if (!empty($this->formProtection->fields)) {
             $widget->setFixedField($this->formProtection->fields);
         }
+
         $data = $this->complateTemplatesAndParams();
         $widget->setArguments($arrgs);
         $widget->setParams($data);
@@ -282,5 +282,16 @@ class FormBuilder extends BaseFormBuilder
             $this->inlineTemplates['div'] = $attr[1]['div'];
             unset($attr[1]['div']);
         }
+    }
+
+    /**
+     *
+     */
+    private function resetOldData()
+    {
+        $this->isForm = false;
+        $this->maked = [];
+        $this->localTemplates['pattern'] = [];
+        $this->localTemplates['div'] = [];
     }
 }

@@ -4,7 +4,7 @@ namespace LaraForm\Elements\Components;
 
 use LaraForm\Elements\Widget;
 
-class TextareaWidget extends BaseInputWidget
+class TextareaWidget extends Widget
 {
     /**
      * @return string
@@ -13,8 +13,13 @@ class TextareaWidget extends BaseInputWidget
     {
         $template = $this->getTemplate('textarea');
         $this->inspectionAttributes($this->attr);
-        $this->containerParams['inline']['type'] = !empty($this->containerParams['inline']['type']) ? $this->containerParams['inline']['type'] :'textarea';
-        return $this->html = $this->formatInputField($this->name, $this->attr, $template);
+        $attributes = [
+            'name' => $this->name,
+            'attrs' => $this->formatAttributes($this->attr)
+        ];
+        $attributes += $this->getValue($this->name);
+        $this->html = $this->formatTemplate($template, $attributes);
+        return $this->completeTemplate();
     }
 
     /**
@@ -22,10 +27,13 @@ class TextareaWidget extends BaseInputWidget
      */
     public function inspectionAttributes(&$attr)
     {
-        $this->generateClass($attr,$this->config['css']['textareaClass']);
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
+        $this->containerTemplate = $this->getTemplate('inputContainer');
+        $this->otherHtmlAttributes['type'] = 'textarea';
+        $this->generateClass($attr, $this->config['css']['textareaClass']);
+        $this->generateLabel($attr);
         parent::inspectionAttributes($attr);
     }
 }

@@ -81,14 +81,10 @@ return [
         'file' => '<input type="file" name="{%name%}" style="display: none" {%attrs%}/>',
         // File input used by file().
         'fileMultiple' => '<input type="file" name="{%name%}"  multiple="multiple" style="display: none" {%attrs%}/>',
-        // Fieldset element used by allControls().
-        'fieldset' => '<fieldset {%attrs%}>{%content%}</fieldset>',
         // Open tag used by create().
         'formStart' => '<form {%attrs%}>',
         // Close tag used by end().
         'formEnd' => '</form>',
-        // General grouping container for control(). Defines input/label ordering.
-        'formGroup' => '{%label%}{%input%}',
         // Generic input element.
         'input' => '<input type="{%type%}" name="{%name%}" {%attrs%}/>',
         // hidden for default value
@@ -103,12 +99,6 @@ return [
         'label' => '<label {%attrs%}>{%icon%}{%text%}</label>',
         // Label element used for radio and multi-checkbox inputs.
         'nestingLabel' => '{%hidden%}<label {%attrs%}>{%content%}{%text%}</label>',
-        // Legends created by allControls()
-        'legend' => '<legend>{%text%}</legend>',
-        // Multi-Checkbox input set title element.
-        'multicheckboxTitle' => '<legend>{%text%}</legend>',
-        // Multi-Checkbox wrapping container.
-        'multicheckboxWrapper' => '<fieldset {%attrs%}>{%content%}</fieldset>',
         // Option element used in select pickers.
         'option' => '<option value="{%value%}" {%attrs%}>{%text%}</option>',
         // Option group element used in select pickers.
