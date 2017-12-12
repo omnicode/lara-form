@@ -10,27 +10,27 @@ class SelectWidget extends Widget
     /**
      * @var
      */
-    protected $selectTemplate;
+    private $selectTemplate;
 
     /**
      * @var bool
      */
-    protected $selected = [];
+    private $selected = [];
 
     /**
      * @var array
      */
-    protected $optionDisabled = [];
+    private $optionDisabled = [];
 
     /**
      * @var array
      */
-    protected $groupDisabled = [];
+    private $groupDisabled = [];
 
     /**
      * @var
      */
-    protected $optionsArray;
+    private $optionsArray;
 
 
     /**
@@ -53,68 +53,7 @@ class SelectWidget extends Widget
     }
 
     /**
-     * @param bool $gropup
-     * @return bool|string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    protected function renderOptions($gropup = false)
-    {
-        $optionTemplate = $this->getTemplate('option');
-        if ($gropup) {
-            $options = $gropup;
-        } else {
-            $options = $this->optionsArray;
-        }
-        if (empty($options)) {
-            return false;
-        }
-        $optionsHtml = '';
-        foreach ($options as $index => $option) {
-            $optAttrs = [];
-            if (is_array($option)) {
-                $optionsHtml .= $this->renderOptgroup($index, $option);
-                continue;
-            }
-            $optAttrs += $this->isDisabled($index);
-            $optAttrs += $this->isSelected($index);
-            $rep = [
-                'text' => $option,
-                'value' => $index,
-                'attrs' => $this->formatAttributes($optAttrs)
-            ];
-            $optionsHtml .= $this->formatTemplate($optionTemplate, $rep);
-        }
-        return $optionsHtml;
-    }
-
-    /**
-     * @param $groupName
-     * @param $options
-     * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    protected function renderOptgroup($groupName, $options)
-    {
-        $optgroupTemplate = $this->getTemplate('optgroup', false);
-        $childOptionsHtml = $this->renderOptions($options);
-        $groupAttrs = [];
-        if (!empty($this->groupDisabled)) {
-            $groupAttrs = $this->isDisabled($groupName, $this->groupDisabled);
-        }
-        $rep = [
-            'label' => $groupName,
-            'content' => $childOptionsHtml,
-            'attrs' => $this->formatAttributes($groupAttrs)
-        ];
-        return $this->formatTemplate($optgroupTemplate, $rep);
-    }
-
-    /**
      * @param $attr
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function inspectionAttributes(&$attr)
     {
@@ -173,11 +112,70 @@ class SelectWidget extends Widget
     }
 
     /**
+     * @param bool $gropup
+     * @return bool|string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    private function renderOptions($gropup = false)
+    {
+        $optionTemplate = $this->getTemplate('option');
+        if ($gropup) {
+            $options = $gropup;
+        } else {
+            $options = $this->optionsArray;
+        }
+        if (empty($options)) {
+            return false;
+        }
+        $optionsHtml = '';
+        foreach ($options as $index => $option) {
+            $optAttrs = [];
+            if (is_array($option)) {
+                $optionsHtml .= $this->renderOptgroup($index, $option);
+                continue;
+            }
+            $optAttrs += $this->isDisabled($index);
+            $optAttrs += $this->isSelected($index);
+            $rep = [
+                'text' => $option,
+                'value' => $index,
+                'attrs' => $this->formatAttributes($optAttrs)
+            ];
+            $optionsHtml .= $this->formatTemplate($optionTemplate, $rep);
+        }
+        return $optionsHtml;
+    }
+
+    /**
+     * @param $groupName
+     * @param $options
+     * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    private function renderOptgroup($groupName, $options)
+    {
+        $optgroupTemplate = $this->getTemplate('optgroup', false);
+        $childOptionsHtml = $this->renderOptions($options);
+        $groupAttrs = [];
+        if (!empty($this->groupDisabled)) {
+            $groupAttrs = $this->isDisabled($groupName, $this->groupDisabled);
+        }
+        $rep = [
+            'label' => $groupName,
+            'content' => $childOptionsHtml,
+            'attrs' => $this->formatAttributes($groupAttrs)
+        ];
+        return $this->formatTemplate($optgroupTemplate, $rep);
+    }
+
+    /**
      * @param $str
      * @param array|bool $disabled
      * @return array
      */
-    protected function isDisabled($str, array $disabled = [])
+    private function isDisabled($str, array $disabled = [])
     {
         if (empty($disabled)) {
             $disabled = $this->optionDisabled;
@@ -193,7 +191,7 @@ class SelectWidget extends Widget
      * @param $str
      * @return array
      */
-    protected function isSelected($str)
+    private function isSelected($str)
     {
         $arr = [];
         if (in_array($str, $this->selected, true)) {

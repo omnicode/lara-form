@@ -182,7 +182,7 @@ class FormProtection extends BaseFormProtection
      * @param $request
      * @return bool
      */
-    protected function verificationForAjax($request)
+    private function verificationForAjax($request)
     {
         if (!empty($this->ajax['url']) && in_array($request->url(), $this->ajax['url'])) {
             return false;

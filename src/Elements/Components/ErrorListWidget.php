@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Admin
- * Date: 01-Dec-17
- * Time: 06:07 PM
- */
 
 namespace LaraForm\Elements\Components;
-
 
 use LaraForm\Elements\Widget;
 

@@ -6,25 +6,10 @@ class RadioWidget extends BaseInputWidget
 {
     /**
      * @return string
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function render()
     {
         return $this->renderRadio($this->attr);
-    }
-
-    /**
-     * @param $attr
-     * @return string
-     */
-    private function renderRadio($attr)
-    {
-        $template = $this->config['templates']['radio'];
-        $this->inspectionAttributes($attr);
-        $this->containerTemplate = $this->getTemplate('radioContainer');
-        $this->otherHtmlAttributes['type'] = 'radio';
-        return $this->formatNestingLabel($template,$attr);
     }
 
     /**
@@ -50,5 +35,18 @@ class RadioWidget extends BaseInputWidget
             $attr['id'] = $this->name . '-' . $attr['value'];
         }
         parent::inspectionAttributes($attr);
+    }
+
+    /**
+     * @param $attr
+     * @return string
+     */
+    private function renderRadio($attr)
+    {
+        $template = $this->config['templates']['radio'];
+        $this->inspectionAttributes($attr);
+        $this->containerTemplate = $this->getTemplate('radioContainer');
+        $this->otherHtmlAttributes['type'] = 'radio';
+        return $this->formatNestingLabel($template,$attr);
     }
 }

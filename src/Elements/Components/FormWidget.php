@@ -41,7 +41,7 @@ class FormWidget extends Widget
      * @param $options
      * @return array
      */
-    protected function start($options)
+    private function start($options)
     {
         $method = $this->getMethod($options);
         $action = $this->getAction($options);
@@ -73,7 +73,7 @@ class FormWidget extends Widget
     /**
      * @return string
      */
-    protected function end()
+    private function end()
     {
         $template = $this->getTemplate('formEnd');
         return $this->formatTemplate($template, false);
@@ -81,32 +81,10 @@ class FormWidget extends Widget
 
 
     /**
-     * @param $options
-     * @return null|string
-     * @internal param $model
-     * @internal param bool $unSet
-     */
-    protected function getMethod(&$options)
-    {
-        $method = 'post';
-        if (isset($options['method'])) {
-            if (in_array($options['method'], ['get', 'post', 'put', 'patch', 'delete'])) {
-                $method = $options['method'];
-            }
-            $this->unlokAttributes[] = $options['method'];
-        } elseif (!empty($this->bound)) {
-            $method = 'put';
-        }
-
-        return $method;
-    }
-
-
-    /**
      * @param array $options
      * @return array|mixed|string
      */
-    public function getAction(&$options = [])
+    private function getAction(&$options = [])
     {
         if (!empty($options['route'])) {
             $route = $options['route'];
@@ -154,10 +132,32 @@ class FormWidget extends Widget
         return route($routeName, $action);
     }
 
+
+    /**
+     * @param $options
+     * @return null|string
+     * @internal param $model
+     * @internal param bool $unSet
+     */
+    private function getMethod(&$options)
+    {
+        $method = 'post';
+        if (isset($options['method'])) {
+            if (in_array($options['method'], ['get', 'post', 'put', 'patch', 'delete'])) {
+                $method = $options['method'];
+            }
+            $this->unlokAttributes[] = $options['method'];
+        } elseif (!empty($this->bound)) {
+            $method = 'put';
+        }
+
+        return $method;
+    }
+
     /**
      * @return array
      */
-    public function getRoutes()
+    private function getRoutes()
     {
         if (empty($this->routes)) {
             collect(Route::getRoutes())->map(function ($route) {
@@ -171,7 +171,7 @@ class FormWidget extends Widget
     /**
      * @return mixed
      */
-    public function getCurrentRoute()
+    private function getCurrentRoute()
     {
         return Route::getCurrentRoute();
     }

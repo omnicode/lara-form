@@ -7,7 +7,7 @@ class FileWidget extends BaseInputWidget
     /**
      * @var
      */
-    protected $fileTemplate;
+    private $fileTemplate;
 
     /**
      * @return string

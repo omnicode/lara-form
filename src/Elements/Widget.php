@@ -15,9 +15,8 @@ class Widget extends BaseWidget implements WidgetInterface
      * Widget constructor.
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
-     * @param array $params
      */
-    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore, $params = [])
+    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore)
     {
         $this->config = config('lara_form');
         $this->errors = $errorStore;
@@ -88,7 +87,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @return array
      */
-    public function getValue($name)
+    protected function getValue($name)
     {
         $value = '';
         $data = [];
@@ -100,6 +99,25 @@ class Widget extends BaseWidget implements WidgetInterface
         }
         $data['value'] = $value;
         return $data;
+    }
+
+    /**
+     * @param $name
+     * @return array
+     */
+    public function setError($name)
+    {
+        $errorParams = [
+            'help' => '',
+            'error' => ''
+        ];
+        if (!empty($this->errors->hasError($name))) {
+            $helpBlockTemplate = $this->config['templates']['helpBlock'];
+            $errorAttr['text'] = $this->errors->getError($name);
+            $errorParams['help'] = $this->formatTemplate($helpBlockTemplate, $errorAttr);
+            $errorParams['error'] = $this->config['css']['errorClass'];
+        }
+        return $errorParams;
     }
 
     /**
@@ -126,37 +144,10 @@ class Widget extends BaseWidget implements WidgetInterface
         }
     }
 
-    /**
-     * @param $name
-     * @return array
-     */
-    public function setError($name)
-    {
-        $errorParams = [
-            'help' => '',
-            'error' => ''
-        ];
-        if (!empty($this->errors->hasError($name))) {
-            $helpBlockTemplate = $this->config['templates']['helpBlock'];
-            $errorAttr['text'] = $this->errors->getError($name);
-            $errorParams['help'] = $this->formatTemplate($helpBlockTemplate, $errorAttr);
-            $errorParams['error'] = $this->config['css']['errorClass'];
-        }
-        return $errorParams;
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     */
-    protected function getId($name)
-    {
-        return lcfirst(str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name))));
-    }
-
     /*
      *
      */
+
     protected function setLabel($option)
     {
         $template = $this->config['templates']['label'];
@@ -175,7 +166,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
         return $this->formatTemplate($template, $rep);
     }
-
     /**
      * @param $inputName
      * @param $option
@@ -188,15 +178,6 @@ class Widget extends BaseWidget implements WidgetInterface
         $labelName = $treatment ? $inputName : $this->getLabelName($inputName);
         $this->label = $this->setLabel([$labelName, ['for' => $for]]);
         return $this->label;
-    }
-
-    /**
-     * @param $name
-     * @return string
-     */
-    protected function getLabelName($name)
-    {
-        return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
     }
 
     /**
@@ -263,7 +244,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param bool $value
      * @return string
      */
-    public function setHidden($name, $value = false)
+    protected function setHidden($name, $value = false)
     {
         $hiddenTemplate = $this->config['templates']['hiddenInput'];
 
@@ -273,5 +254,23 @@ class Widget extends BaseWidget implements WidgetInterface
 
         $attr = ['name' => $name, 'value' => $value,];
         return $this->formatTemplate($hiddenTemplate, $attr);
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    private function getLabelName($name)
+    {
+        return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    private function getId($name)
+    {
+        return lcfirst(str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name))));
     }
 }

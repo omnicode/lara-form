@@ -40,7 +40,7 @@ class BaseInputWidget extends Widget
      * @param bool $cTemplate
      * @return string
      */
-    public function formatInputField($name, $attr, $cTemplate = false)
+    protected function formatInputField($name, $attr, $cTemplate = false)
     {
         if (!$cTemplate) {
             if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
@@ -85,7 +85,7 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param $cTemplate
      */
-    public function generalInspectionAttributes(&$attr, $cTemplate)
+    private function generalInspectionAttributes(&$attr, $cTemplate)
     {
         if (isset($attr['type'])) {
             $this->htmlAttributes['type'] = $attr['type'];
