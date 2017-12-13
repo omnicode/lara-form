@@ -12,6 +12,30 @@ use LaraForm\Stores\OldInputStore;
 class Widget extends BaseWidget implements WidgetInterface
 {
     /**
+     *
+     */
+    public function render()
+    {
+
+    }
+
+    /**
+     * @param $attr
+     */
+    public function inspectionAttributes(&$attr)
+    {
+        if (!empty($attr['icon'])) {
+            $iconTemplate = $this->getTemplate('icon');
+            $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
+            unset($attr['icon']);
+        }
+
+        if (!empty($attr['required'])) {
+            $this->otherHtmlAttributes['required'] = 'required';
+        }
+    }
+
+    /**
      * Widget constructor.
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
@@ -52,53 +76,10 @@ class Widget extends BaseWidget implements WidgetInterface
     {
         $this->name = array_shift($arguments);
         $this->attr = array_shift($arguments);
+
         if (is_null($this->attr)) {
             $this->attr = [];
         }
-    }
-
-    /**
-     * @param $data
-     */
-    public function setFixedField($data)
-    {
-        $this->fixedField = $data;
-
-    }
-
-    /**
-     * @param $templateName
-     * @return mixed
-     */
-    protected function getTemplate($templateName)
-    {
-        $template = $this->config['templates'][$templateName];
-        if (!empty($this->inlineTemplates[$templateName])) {
-            $template = $this->inlineTemplates[$templateName];
-        } elseif (!empty($this->localTemplates[$templateName])) {
-            $template = $this->localTemplates[$templateName];
-        } elseif (!empty($this->globalTemplates[$templateName])) {
-            $template = $this->globalTemplates[$templateName];
-        }
-        return $template;
-    }
-
-    /**
-     * @param $name
-     * @return array
-     */
-    protected function getValue($name)
-    {
-        $value = '';
-        $data = [];
-        if (!empty($this->bound)) {
-            $value = $this->bound->get($name, null);
-        }
-        if ($this->oldInputs->hasOldInput()) {
-            $value = $this->oldInputs->getOldInput($name);
-        }
-        $data['value'] = $value;
-        return $data;
     }
 
     /**
@@ -111,37 +92,56 @@ class Widget extends BaseWidget implements WidgetInterface
             'help' => '',
             'error' => ''
         ];
+
         if (!empty($this->errors->hasError($name))) {
             $helpBlockTemplate = $this->config['templates']['helpBlock'];
             $errorAttr['text'] = $this->errors->getError($name);
             $errorParams['help'] = $this->formatTemplate($helpBlockTemplate, $errorAttr);
             $errorParams['error'] = $this->config['css']['errorClass'];
         }
+
+
         return $errorParams;
     }
 
     /**
-     *
+     * @param $templateName
+     * @return mixed
      */
-    public function render()
+    protected function getTemplate($templateName)
     {
+        $template = $this->config['templates'][$templateName];
 
+        if (!empty($this->inlineTemplates[$templateName])) {
+            $template = $this->inlineTemplates[$templateName];
+        } elseif (!empty($this->localTemplates[$templateName])) {
+            $template = $this->localTemplates[$templateName];
+        } elseif (!empty($this->globalTemplates[$templateName])) {
+            $template = $this->globalTemplates[$templateName];
+        }
+
+        return $template;
     }
 
     /**
-     * @param $attr
+     * @param $name
+     * @return array
      */
-    public function inspectionAttributes(&$attr)
+    protected function getValue($name)
     {
-        $this->generateId($attr);
-        if (!empty($attr['icon'])) {
-            $iconTemplate = $this->getTemplate('icon');
-            $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
-            unset($attr['icon']);
+        $value = '';
+        $data = [];
+
+        if (!empty($this->bound)) {
+            $value = $this->bound->get($name, null);
         }
-        if (!empty($attr['required'])) {
-            $this->otherHtmlAttributes['required'] = 'required';
+
+        if ($this->oldInputs->hasOldInput()) {
+            $value = $this->oldInputs->getOldInput($name);
         }
+
+        $data['value'] = $value;
+        return $data;
     }
 
     /*
@@ -166,6 +166,7 @@ class Widget extends BaseWidget implements WidgetInterface
 
         return $this->formatTemplate($template, $rep);
     }
+
     /**
      * @param $inputName
      * @param $option
@@ -182,19 +183,23 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * @param $attr
+     * @param bool $multi
      */
-    protected function generateId(&$attr)
+    protected function generateId(&$attr, $multi = false)
     {
         if (isset($attr['id']) && $attr['id'] == false) {
             $this->unlokAttributes['id'] = $attr['id'];
         } else {
             $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
-        }
-        if ($this->config['label']['idPrefix'] && !isset($attr['idPrefix'])) {
-            $attr['id'] = $this->config['label']['idPrefix'] . $attr['id'];
-        } elseif (isset($attr['idPrefix']) && $attr['id'] !== false) {
-            $attr['id'] = $attr['idPrefix'] . $attr['id'];
-            $this->unlokAttributes['idPrefix'] = $attr['idPrefix'];
+            if ($this->config['label']['idPrefix'] && !isset($attr['idPrefix'])) {
+                $attr['id'] = $this->config['label']['idPrefix'] . $attr['id'];
+            } elseif (isset($attr['idPrefix']) && $attr['id'] !== false) {
+                $attr['id'] = $attr['idPrefix'] . $attr['id'];
+                $this->unlokAttributes['idPrefix'] = $attr['idPrefix'];
+            }
+            if ($multi && isset($attr['value'])) {
+                $attr['id'] .= '-' . $attr['value'];
+            }
         }
     }
 
@@ -219,21 +224,25 @@ class Widget extends BaseWidget implements WidgetInterface
     protected function generateClass(&$attr, $default, $format = true)
     {
         if (isset($attr['class'])) {
+
             if ($attr['class'] === false) {
                 $this->htmlClass[] = false;
             } elseif (starts_with($attr['class'], '+')) {
                 $replacedClass = str_ireplace('+', '', $attr['class']);
                 $this->htmlClass[] = $default;
+
                 if (strlen($replacedClass) > 0) {
                     $this->htmlClass[] = $replacedClass;
                 }
             } else {
                 $this->htmlClass[] = $attr['class'];
             }
+
             unset($attr['class']);
         } else {
             $this->htmlClass[] = $default;
         }
+
         if ($format) {
             $attr['class'] = $this->formatClass();
         }
@@ -260,7 +269,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @return string
      */
-    private function getLabelName($name)
+    protected function getLabelName($name)
     {
         return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
     }

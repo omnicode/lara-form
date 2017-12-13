@@ -89,9 +89,11 @@ class FormWidget extends Widget
         if (!empty($options['route'])) {
             $route = $options['route'];
             unset($options['route']);
+
             if (!is_array($route)) {
                 $route = [$route];
             }
+
             return route(...$route);
         }
 
@@ -103,11 +105,13 @@ class FormWidget extends Widget
 
         if (isset($options['action'])) {
             $action = $options['action'];
+
             if (!is_array($action)) {
                 //if action is url
                 if (filter_var($action, FILTER_VALIDATE_URL)) {
                     return $action;
                 }
+
                 $action = [$action];
             }
         } else {

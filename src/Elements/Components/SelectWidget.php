@@ -42,11 +42,13 @@ class SelectWidget extends Widget
     {
         $this->inspectionAttributes($this->attr);
         $optionsHtml = $this->renderOptions();
+
         $selectAttrs = [
             'content' => $optionsHtml,
             'name' => $this->name,
             'attrs' => $this->formatAttributes($this->attr)
         ];
+
         $this->htmlAttributes['type'] = 'select';
         $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
         return $this->completeTemplate();
@@ -60,31 +62,38 @@ class SelectWidget extends Widget
         $this->generateId($attr);
         $this->generateLabel($attr);
         $this->generateClass($attr,$this->config['css']['selectClass']);
+
         if (strpos($this->name, '[]')) {
             $attr['multiple'] = true;
             $this->name = str_ireplace('[]', '', $this->name);
         }
+
         if (isset($attr['multiple'])) {
             $this->selectTemplate = $this->getTemplate('selectMultiple');
             unset($attr['multiple']);
         } else {
             $this->selectTemplate = $this->getTemplate('select');
         }
+
         if (!empty($attr['options'])) {
             $this->optionsArray = is_array($attr['options']) ? $attr['options'] : [$attr['options']];
             unset($attr['options']);
         }
+
         if (isset($attr['empty']) && $attr['empty'] !== false) {
             array_unshift($this->optionsArray, $attr['empty']);
             unset($attr['empty']);
         } else {
             $emptyValue = $this->config['label']['select_empty'];
+
             if ($emptyValue) {
                 array_unshift($this->optionsArray, $emptyValue);
             }
         }
+
         if (isset($attr['selected'])) {
             $this->selected = $attr['selected'];
+
             if (!is_array($this->selected)) {
                 $this->selected = [$this->selected];
             }
@@ -94,15 +103,19 @@ class SelectWidget extends Widget
         if (isset($attr['disabled']) && $attr['disabled'] != false) {
             $attr['disabled'] = 'disabled';
         }
+
         if (isset($attr['optionDisabled']) && $attr['optionDisabled'] !== false) {
             $this->optionDisabled = $attr['optionDisabled'];
+
             if (!is_array($this->optionDisabled)) {
                 $this->optionDisabled = [$this->optionDisabled];
             }
             unset($attr['optionDisabled']);
         }
+
         if (isset($attr['groupDisabled']) && $attr['groupDisabled'] !== false) {
             $this->groupDisabled = $attr['groupDisabled'];
+
             if (!is_array($this->groupDisabled)) {
                 $this->groupDisabled = [$this->groupDisabled];
             }

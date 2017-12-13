@@ -187,6 +187,7 @@ class FormProtection extends BaseFormProtection
         if (!empty($this->ajax['url']) && in_array($request->url(), $this->ajax['url'])) {
             return false;
         }
+
         if (!empty($this->ajax['action'])) {
             $controllerAction = class_basename($request->route()->getAction()['controller']);
             if (in_array($controllerAction, $this->ajax['action'])) {
@@ -210,24 +211,32 @@ class FormProtection extends BaseFormProtection
     public function removeByTime()
     {
         $maxTime = config('lara_form.session.max_time', false);
+
         if (!$maxTime) {
             return false;
         }
+
         $formHistory = session(config('lara_form.session.pre_path'));
+
         if (empty($formHistory)) {
             return false;
         }
+
         $maxSeccounds = $maxTime * 60 * 60;
         $timeName = config('lara_form.session.path_for.time');
         $currentTime = time();
         $betweenTime = $currentTime - $maxSeccounds;
+
         $newHistory = array_filter($formHistory, function ($value) use ($timeName, $betweenTime) {
+
             if (isset($value[$timeName])) {
+
                 if ($value[$timeName] > $betweenTime) {
                     return $value;
                 }
             }
         });
+
         session()->put(config('lara_form.session.pre_path'), $newHistory);
     }
 
@@ -237,10 +246,13 @@ class FormProtection extends BaseFormProtection
     public function removeByCount()
     {
         $maxCount = \config('lara_form.session.max_count', false);
+
         if (!$maxCount) {
             return false;
         }
+
         $formHistory = session(config('lara_form.session.pre_path'));
+
         if (count($formHistory) > $maxCount) {
             $newHistory = array_slice($formHistory, -$maxCount);
             session()->put(config('lara_form.session.pre_path'), $newHistory);
@@ -257,10 +269,12 @@ class FormProtection extends BaseFormProtection
         if (is_string($unlockFields)) {
             $unlockFields = [$unlockFields];
         } else {
+
             if (!is_array($unlockFields)) {
                 throw new \Exception('You can only set string or array');
             }
         }
+
         return $unlockFields;
     }
 
@@ -275,7 +289,9 @@ class FormProtection extends BaseFormProtection
             unset($this->fields[$field]);
             $this->unlockFields[] = $field; // TODO allows unlock array input
         } else {
+
             if (!starts_with($field, $this->unlockFields)) {
+
                 if (str_contains($field, '[') && str_contains($field, ']')) {
                     $this->addArrayInputField($field);
                 } else {
@@ -296,6 +312,7 @@ class FormProtection extends BaseFormProtection
         }
 
         $field = implode('.', $arr);
+
         if (ends_with($field, '.')) {
             array_set($this->fields, substr($field, 0, -1), []);
         } elseif (str_contains('..', $field)) {
@@ -316,6 +333,7 @@ class FormProtection extends BaseFormProtection
             $this->pathForTime => $this->created_time,
             $this->pathForUrl => $this->url,
         ];
+
         $this->fields = [];
         $this->unlockFields = [];
         session([$this->sessionPath() => $data]);
@@ -381,9 +399,11 @@ class FormProtection extends BaseFormProtection
         $path = $token . '.' . $this->pathForUnlock;
         $unlockFields = session($this->sessionPath($path));
         $globalUnloc = config('lara_form.except.field');
+
         if (!empty($globalUnloc)) {
             $unlockFields = array_merge($globalUnloc, $unlockFields);
         }
+
         foreach ($data as $key => $value) {
             if (ends_with($key, '[]')) {
                 $key = substr($key, 0, -2);

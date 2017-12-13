@@ -45,7 +45,6 @@ class ErrorStore extends BaseStore
         }
 
         $key = $this->transformKey($key);
-
         return $this->getErrors()->first($key);
     }
 

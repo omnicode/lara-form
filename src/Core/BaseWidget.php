@@ -38,6 +38,7 @@ abstract class BaseWidget
      * @var string
      */
     protected $icon = '';
+
     /**
      * @var
      */
@@ -113,16 +114,14 @@ abstract class BaseWidget
     protected $bound = null;
 
     /**
-     * @var array
-     */
-    protected $fixedField = [];
-
-    /**
      * @param $templates
      */
     protected function addLocalTemplate($templates)
-    {   $this->localTemplates = [];
+    {
+        $this->localTemplates = [];
+
         foreach ($templates as $key => $value) {
+
             if (isset($this->config['templates'][$key])) {
                 $this->localTemplates[$key] = $value;
             }
@@ -136,6 +135,7 @@ abstract class BaseWidget
     {
         $this->inlineTemplates = [];
         foreach ($templates as $key => $value) {
+
             if (isset($this->config['templates'][$key])) {
                 $this->inlineTemplates[$key] = $value;
             }
@@ -148,6 +148,7 @@ abstract class BaseWidget
     protected function addGlobalTemplate($templates)
     {
         foreach ($templates as $key => $value) {
+
             if (isset($this->config['templates'][$key])) {
                 $this->globalTemplates[$key] = $value;
             }
@@ -188,14 +189,15 @@ abstract class BaseWidget
         if (empty($attributes)) {
             return $template;
         }
+
         $from = [];
         $to = [];
-        $this->transformTemplate($template);
         foreach ($attributes as $index => $attribute) {
             $from[] = '{%' . $index . '%}';
             $to[] = $attribute;
         }
 
+        $this->transformTemplate($template);
         return str_ireplace($from, $to, $template);
     }
 
@@ -208,9 +210,11 @@ abstract class BaseWidget
         $end = $this->config['seperator']['end'];
         $seperatorsStart = ['[', '{', '('];
         $seperatorsEnd = [']', '}', ')'];
+
         if (!starts_with($start, $seperatorsStart) && !ends_with($end, $seperatorsEnd)) {
             abort(300, 'Sintax error, allowed symbols for start ' . implode(',', $seperatorsStart) . ' and for end ' . implode(',', $seperatorsEnd));
         }
+
         $template = str_ireplace([$start, $end], ['{%', '%}'], $template);
     }
 
@@ -223,23 +227,30 @@ abstract class BaseWidget
         $attr = '';
         if (empty($attributes['class'])) {
             $class = $this->formatClass();
+
             if ($class !== '') {
                 $attributes['class'] = $class;
             }
         }
+
         if (empty($attributes)) {
             return $attr;
         }
+
         if (!empty($this->unlokAttributes)) {
             $attributes = array_diff($attributes, $this->unlokAttributes);
         }
+
         $attributes = array_filter($attributes, function ($value) {
             if (!empty($value) && $value !== '' && $value !== false) {
                 return $value;
             }
         });
+
         $this->otherHtmlAttributes += $attributes;
+
         foreach ($attributes as $index => $attribute) {
+
             if (is_string($index)) {
                 $attr .= $index . '="' . $attribute . '" ';
             } else {
@@ -257,27 +268,35 @@ abstract class BaseWidget
     protected function formatClass()
     {
         $class = '';
+
         if (!empty($this->htmlClass)) {
+
             if (is_string($this->htmlClass)) {
                 $this->htmlClass = explode(' ', $this->htmlClass);
             }
+
             $this->htmlClass = array_filter($this->htmlClass, function ($val) {
                 $val = trim($val);
+
                 if (!empty($val) && $val !== '' && $val !== false) {
                     return $val;
                 }
             });
+
             if (empty($this->htmlClass)) {
                 return $class;
             }
+
             $uniqueClass = array_unique($this->htmlClass);
             $arrayClass = array_filter($uniqueClass, function ($value) {
+
                 if (!empty($value) || $value !== false || $value !== '') {
                     return $value;
                 }
             });
             $class = implode(' ', $arrayClass);
         }
+
         $this->htmlClass = [];
         return $class;
     }
@@ -340,7 +359,9 @@ abstract class BaseWidget
     protected function getContainerAttributes($data)
     {
         $params = [];
+
         if (!empty($this->otherHtmlAttributes['required'])) {
+
             if (!empty($data['required'])) {
                 $params['required'] = $data['required'];
                 unset($data['required']);
@@ -358,16 +379,20 @@ abstract class BaseWidget
 
         if (!empty($data['class'])) {
             $class = $data['class'];
+
             if (!is_array($class)) {
                 $class = [$class];
             }
+
             $this->htmlClass += $class;
             $params['class'] = $this->formatClass();
             unset($data['class']);
         }
+
         if (!empty($data)) {
             $params['containerAttrs'] = $this->formatAttributes($data);
         }
+
         return $params;
     }
 }

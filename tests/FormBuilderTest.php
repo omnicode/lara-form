@@ -8,7 +8,7 @@ use LaraForm\FormProtection;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 
-class FormBuilderTest extends \PHPUnit_Framework_TestCase
+class FormBuilderTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var FormProtection
@@ -30,7 +30,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
      *
      */
     public function setUp()
-    {
+    {   parent::setUp();
         $this->formProtection = app(FormProtection::class);
         $this->errorStore = app(ErrorStore::class);
         $this->oldInputStore = app(OldInputStore::class);

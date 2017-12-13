@@ -43,11 +43,13 @@ class BaseInputWidget extends Widget
     protected function formatInputField($name, $attr, $cTemplate = false)
     {
         if (!$cTemplate) {
+
             if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
                 $template = $this->getTemplate($attr['type']);
             } else {
                 $template = $this->getTemplate('input');
             }
+
         } else {
             $template = $cTemplate;
         }
@@ -73,7 +75,7 @@ class BaseInputWidget extends Widget
         $templateAttr = [
             'hidden' => $this->hidden,
             'content' => $this->html,
-            'text' => !empty($attr['label']) ? $attr['label'] : '',
+            'text' => !empty($attr['label']) ? $attr['label'] : $this->getLabelName($this->name),
             'attrs' => $this->formatAttributes($labelAttrs)
         ];
 
@@ -93,21 +95,27 @@ class BaseInputWidget extends Widget
         } else {
             $this->htmlAttributes['type'] = 'text';
         }
+
         $this->htmlAttributes['value'] = '';
         if (!empty($attr['value']) && $cTemplate) {
             $this->htmlAttributes['value'] = $attr['value'];
             $this->unlokAttributes['value'] = $attr['value'];
         }
+
         $notId = ['hidden', 'submit', 'reset', 'button', 'radio', 'checkbox', 'label'];
+
         if (!in_array($this->htmlAttributes['type'], $notId) && !$cTemplate) {
             $attr += $this->getValue($this->name);
         }
+
         if (!in_array($this->htmlAttributes['type'], ['hidden', 'submit', 'reset', 'button'])) {
             $this->generateLabel($attr);
         }
+
         if ($this->htmlAttributes['type'] !== 'hidden') {
             $this->generateClass($attr, $this->config['css']['inputClass']);
         }
+        $this->generateId($attr);
         $this->otherHtmlAttributes = $attr;
         parent::inspectionAttributes($attr);
     }

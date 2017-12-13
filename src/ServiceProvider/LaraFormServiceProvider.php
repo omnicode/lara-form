@@ -17,10 +17,10 @@ class LaraFormServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerFormProtection();
-        $this->registerFormElements();
+        $this->registerMiddleware(LaraFormMiddleware::class);
+        $this->registerStores();
         $this->registerFormBuilder();
         $this->configMerge();
-        $this->registerMiddleware(LaraFormMiddleware::class);
         $this->setCoreConfig();
 
     }
@@ -35,7 +35,7 @@ class LaraFormServiceProvider extends ServiceProvider
     }
 
     /**
-     * @throws \LogicException
+     *
      */
     public function boot()
     {
@@ -94,7 +94,7 @@ class LaraFormServiceProvider extends ServiceProvider
     /**
      *
      */
-    protected function registerFormElements()
+    protected function registerStores()
     {
         $this->app->singleton('laraform.error', function ($app) {
             return new ErrorStore();

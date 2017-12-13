@@ -27,31 +27,39 @@ class FileWidget extends BaseInputWidget
         $btn = $this->config['css']['submitClass'];
         $btnColor = $this->config['css']['submitColor'];
         $default = $btn.' '.$btnColor;
+
         if (isset($attr['btn'])) {
+
             if ($attr['btn'] === true) {
                 $attr['btn'] = $btnColor;
             }
+
             $this->htmlClass[] = $btn . '-' . $attr['btn'];
             unset($attr['btn']);
         }
-        $this->generateClass($attr,$default,false);
+
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
+
         if (isset($attr['value'])) {
             unset($attr['value']);
         }
+
         if (isset($attr['multiple'])) {
             $this->fileTemplate = $this->config['templates']['fileMultiple'];
             unset($attr['multiple']);
         } else {
             $this->fileTemplate = $this->config['templates']['file'];
         }
+
         if (isset($attr['accept'])) {
+
             if (is_array($attr['accept'])) {
                 $attr['accept'] = implode(', ', $attr['accept']);
             }
         }
+        $this->generateClass($attr,$default,false);
         $this->otherHtmlAttributes['type'] = 'file';
         parent::inspectionAttributes($attr);
     }

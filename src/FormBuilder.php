@@ -134,24 +134,29 @@ class FormBuilder extends BaseFormBuilder
     public function setTemplate($templateName, $templateValue = false, $global = false)
     {
         if (is_array($templateName)) {
+
             if (isset($templateName['_options']['div'])) {
+
                 if (!empty($templateName['_options']['global'])) {
                     $this->globalTemplates['div'] = $templateName['_options']['div'];
                 } else {
                     $this->localTemplates['div'] = $templateName['_options']['div'];
                 }
             }
+
             if (!empty($templateName['_options']['global'])) {
                 unset($templateName['_options']['global']);
                 foreach ($templateName as $key => $value) {
                     $this->globalTemplates['pattern'][$key] = $value;
                 }
             } else {
+
                 foreach ($templateName as $key => $value) {
                     $this->localTemplates['pattern'][$key] = $value;
                 }
             }
         } elseif ($templateValue) {
+
             if ($global) {
                 $this->globalTemplates['pattern'][$templateName] = $templateValue;
             } else {
@@ -170,19 +175,22 @@ class FormBuilder extends BaseFormBuilder
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
 
         if (isset($attr['type'])) {
+
             if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file', 'textarea', 'hidden'])) {
                 $method = $attr['type'];
             }
         }
+
         if (isset($arrgs[0])) {
             $value = '';
+
             if ($method == 'hidden') {
                 $value = isset($attr['value']) ? $attr['value'] : config('lara_form.default_value.hidden');
             }
+
             if (!in_array($method, ['submit', 'button', 'reset', 'label']) && $this->isForm) {
                 $this->formProtection->addField($arrgs[0], $attr, $value);
             }
-
         }
 
         $this->hasTemplate($arrgs);
@@ -217,10 +225,6 @@ class FormBuilder extends BaseFormBuilder
 
         if (!empty($this->model)) {
             $widget->setModel($this->model);
-        }
-
-        if (!empty($this->formProtection->fields)) {
-            $widget->setFixedField($this->formProtection->fields);
         }
 
         $data = $this->complateTemplatesAndParams();
@@ -259,10 +263,12 @@ class FormBuilder extends BaseFormBuilder
     private function getGeneralUnlockFieldsBy(&$options)
     {
         $unlockFields = [];
+
         if (!empty($options['_unlockFields'])) {
             $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use
             unset($options['_unlockFields']);
         }
+
         $unlockFields[] = '_token';
         $unlockFields[] = '_method';
         $unlockFields[] = config('lara_form.label.form_protection', 'laraform_token');
@@ -278,6 +284,7 @@ class FormBuilder extends BaseFormBuilder
             $this->inlineTemplates['pattern'] = $attr[1]['template'];
             unset($attr[1]['template']);
         }
+
         if (isset($attr[1]['div'])) {
             $this->inlineTemplates['div'] = $attr[1]['div'];
             unset($attr[1]['div']);

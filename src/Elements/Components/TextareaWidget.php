@@ -33,6 +33,7 @@ class TextareaWidget extends Widget
         $this->containerTemplate = $this->getTemplate('inputContainer');
         $this->otherHtmlAttributes['type'] = 'textarea';
         $this->generateClass($attr, $this->config['css']['textareaClass']);
+        $this->generateId($attr);
         $this->generateLabel($attr);
         parent::inspectionAttributes($attr);
     }

@@ -10,7 +10,7 @@ class PasswordWidget extends BaseInputWidget
      */
     public function render()
     {
-      return parent::render();
+        return parent::render();
     }
 
 
