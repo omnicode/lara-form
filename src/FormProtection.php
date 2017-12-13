@@ -124,17 +124,14 @@ class FormProtection extends BaseFormProtection
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
 
         if (!$token) {
-            dd(1);
             return false;
         }
 
         if (!session()->has($this->sessionPath($token))) {
-            dd(2);
             return false;
         }
 
         if (!$this->isValidAction($token, $request->url())) {
-            dd(3);
             return false;
         }
 
@@ -153,7 +150,6 @@ class FormProtection extends BaseFormProtection
 
 
         if (array_keys($data) != array_keys($checkedFields)) {
-            dd(4);
             return false;
         }
 
@@ -162,13 +158,11 @@ class FormProtection extends BaseFormProtection
                 if (is_array($value)) {
                     // for array input
                     if (array_keys(array_dot($value)) != array_keys(array_dot($data[$field]))) {
-                        dd(5);
                         return false;
                     }
                 } else {
                     //for hidden input
                     if ($checkedFields[$field] != $data[$field]) {
-                        dd(6);
                         return false;
                     }
                 }
@@ -285,7 +279,10 @@ class FormProtection extends BaseFormProtection
      */
     public function addField($field, &$options = [], $value = '')
     {
-        if (!empty($options['_unlock']) || !empty($options['disabled'])) {
+        if (!empty($options['disabled'])) {
+             return;
+        }
+        if (!empty($options['_unlock'])) {
             unset($this->fields[$field]);
             $this->unlockFields[] = $field; // TODO allows unlock array input
         } else {
@@ -371,7 +368,9 @@ class FormProtection extends BaseFormProtection
         if (in_array('action', $unlockFields)) {
             return true;
         }
+
         $action = $this->getAction($token);
+
         if ($action == $currentUrl) {
             return true;
         }
