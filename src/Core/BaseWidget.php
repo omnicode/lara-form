@@ -266,14 +266,12 @@ abstract class BaseWidget
         $class = '';
 
         if (!empty($this->htmlClass)) {
-
-            if (is_string($this->htmlClass)) {
+            if (!is_array($this->htmlClass)) {
                 $this->htmlClass = explode(' ', $this->htmlClass);
             }
 
             $this->htmlClass = array_filter($this->htmlClass, function ($val) {
                 $val = trim($val);
-
                 if (!empty($val) && $val !== '' && $val !== false) {
                     return $val;
                 }
@@ -284,13 +282,7 @@ abstract class BaseWidget
             }
 
             $uniqueClass = array_unique($this->htmlClass);
-            $arrayClass = array_filter($uniqueClass, function ($value) {
-
-                if (!empty($value) || $value !== false || $value !== '') {
-                    return $value;
-                }
-            });
-            $class = implode(' ', $arrayClass);
+            $class = implode(' ', $uniqueClass);
         }
 
         $this->htmlClass = [];

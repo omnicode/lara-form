@@ -72,6 +72,11 @@ class BaseInputWidget extends Widget
         $labelTemplate = $this->getTemplate('nestingLabel');
         $this->formatInputField($this->name, $attr, $template);
 
+        if (!empty($attr['type'])) {
+            $this->otherHtmlAttributes['type'] = $attr['type'];
+            unset($attr['type']);
+        }
+
         $templateAttr = [
             'hidden' => $this->hidden,
             'content' => $this->html,

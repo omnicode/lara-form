@@ -31,9 +31,7 @@ class RadioWidget extends BaseInputWidget
                 $attr['checked'] = true;
             }
         }
-        if (isset($attr['type'])) {
-            unset($attr['type']);
-        }
+
         if (isset($attr['checked'])) {
             $attr['checked'] = 'checked';
         }
@@ -42,9 +40,9 @@ class RadioWidget extends BaseInputWidget
          } else {
              $this->hidden = $this->setHidden($this->name, '');
          }*/
+        $attr['type'] = 'radio';
         $this->generateClass($attr, $this->config['css']['radioClass']);
         $this->generateId($attr,true);
-        $this->generateLabel($attr);
         parent::inspectionAttributes($attr);
     }
 

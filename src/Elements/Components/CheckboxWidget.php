@@ -17,7 +17,6 @@ class CheckboxWidget extends BaseInputWidget
         $template = $this->getTemplate('checkbox');
         $this->inspectionAttributes($this->attr);
         $this->containerTemplate = $this->getTemplate('checkboxContainer');
-        $this->otherHtmlAttributes['type'] = 'checkbox';
         return $this->formatNestingLabel($template, $this->attr);
     }
 
@@ -27,7 +26,6 @@ class CheckboxWidget extends BaseInputWidget
     public function inspectionAttributes(&$attr)
     {
         $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['checkbox'];
-        $this->generateClass($attr, $this->config['css']['checkboxClass']);
 
         if (!empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
@@ -39,10 +37,6 @@ class CheckboxWidget extends BaseInputWidget
             if (in_array($attr['value'], $val)) {
                 $attr['checked'] = true;
             }
-        }
-
-        if (isset($attr['type'])) {
-            unset($attr['type']);
         }
 
         if (isset($attr['checked'])) {
@@ -76,7 +70,8 @@ class CheckboxWidget extends BaseInputWidget
 
             $this->oldCheckboxNames[] = $this->name;
         }
-
+        $attr['type'] = 'checkbox';
+        $this->generateClass($attr, $this->config['css']['checkboxClass']);
         $this->generateId($attr,true);
         parent::inspectionAttributes($attr);
     }
