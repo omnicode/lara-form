@@ -60,21 +60,6 @@ abstract class BaseWidget
     protected $config;
 
     /**
-     * @var array
-     */
-    protected $localTemplates = [];
-
-    /**
-     * @var array
-     */
-    protected $globalTemplates = [];
-
-    /**
-     * @var array
-     */
-    protected $inlineTemplates = [];
-
-    /**
      * @var
      */
     protected $attributes;
@@ -87,11 +72,17 @@ abstract class BaseWidget
     /**
      * @var array
      */
-    protected $containerParams = [
-        'local' => [],
-        'global' => [],
-        'inline' => [],
-    ];
+    protected $containerParams = [];
+
+    /**
+     * @var array
+     */
+    protected $containerTemplates = [];
+
+    /**
+     * @var array
+     */
+    protected $classConcat = [];
 
     /**
      * @var string
@@ -113,70 +104,20 @@ abstract class BaseWidget
      */
     protected $bound = null;
 
+
     /**
-     * @param $templates
+     * @param $data
+     * @param $permission
      */
-    protected function addLocalTemplate($templates)
+    protected function addTemplateAndAttributes($data, $permission)
     {
-        $this->localTemplates = [];
-
-        foreach ($templates as $key => $value) {
-
+        $this->containerParams[$permission] = $data['div'];
+        $this->classConcat[$permission] = $data['class_concat'];
+        foreach ($data['pattern'] as $key => $value) {
             if (isset($this->config['templates'][$key])) {
-                $this->localTemplates[$key] = $value;
+                $this->containerTemplates[$permission][$key] = $value;
             }
         }
-    }
-
-    /**
-     * @param $templates
-     */
-    protected function addInlineTemplate($templates)
-    {
-        $this->inlineTemplates = [];
-        foreach ($templates as $key => $value) {
-
-            if (isset($this->config['templates'][$key])) {
-                $this->inlineTemplates[$key] = $value;
-            }
-        }
-    }
-
-    /**
-     * @param $templates
-     */
-    protected function addGlobalTemplate($templates)
-    {
-        foreach ($templates as $key => $value) {
-
-            if (isset($this->config['templates'][$key])) {
-                $this->globalTemplates[$key] = $value;
-            }
-        }
-    }
-
-    /**
-     * @param $params
-     */
-    protected function addContainerLocalAttributes($params)
-    {
-        $this->containerParams['local'] = $params;
-    }
-
-    /**
-     * @param $params
-     */
-    protected function addContainerGlobalAttributes($params)
-    {
-        $this->containerParams['global'] = $params;
-    }
-
-    /**
-     * @param $params
-     */
-    protected function addContainerInlineAttributes($params)
-    {
-        $this->containerParams['inline'] = $params;
     }
 
     /**
@@ -206,8 +147,8 @@ abstract class BaseWidget
      */
     private function transformTemplate(&$template)
     {
-        $start = $this->config['seperator']['start'];
-        $end = $this->config['seperator']['end'];
+        $start = $this->config['separator']['start'];
+        $end = $this->config['separator']['end'];
         $seperatorsStart = ['[', '{', '('];
         $seperatorsEnd = [']', '}', ')'];
 
@@ -266,7 +207,7 @@ abstract class BaseWidget
         $class = '';
 
         if (!empty($this->htmlClass)) {
-            if (!is_array($this->htmlClass)) {
+            if (is_string($this->htmlClass)) {
                 $this->htmlClass = explode(' ', $this->htmlClass);
             }
 
@@ -302,6 +243,7 @@ abstract class BaseWidget
             'icon' => $this->icon
         ];
 
+
         if ($this->containerTemplate) {
             $container = $this->containerTemplate;
         } elseif (isset($this->htmlAttributes['type']) && $this->htmlAttributes['type'] !== 'hidden') {
@@ -318,7 +260,34 @@ abstract class BaseWidget
 
         $containerAttributes += $this->setError($this->name);
         $containerAttributes += $this->getContainerAllAttributes();
+        $this->resetOldData();
         return $this->formatTemplate($container, $containerAttributes);
+    }
+
+    protected function resetOldData()
+    {
+        $this->icon = '';
+        $this->htmlClass = [];
+
+    }
+
+    /**
+     * @param $templateName
+     * @return mixed
+     */
+    protected function getTemplate($templateName)
+    {
+        $template = $this->config['templates'][$templateName];
+
+        if (!empty($this->containerTemplates['inline'][$templateName])) {
+            $template = $this->containerTemplates['inline'][$templateName];
+        } elseif (!empty($this->containerTemplates['local'][$templateName])) {
+            $template = $this->containerTemplates['local'][$templateName];
+        } elseif (!empty($this->containerTemplates['global'][$templateName])) {
+            $template = $this->containerTemplates['global'][$templateName];
+        }
+
+        return $template;
     }
 
     /**

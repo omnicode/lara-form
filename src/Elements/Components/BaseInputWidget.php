@@ -112,6 +112,7 @@ class BaseInputWidget extends Widget
         if (!in_array($this->htmlAttributes['type'], $notId) && !$cTemplate) {
             $attr += $this->getValue($this->name);
         }
+
         $this->generateId($attr);
         if (!in_array($this->htmlAttributes['type'], ['hidden', 'submit', 'reset', 'button'])) {
             $this->generateLabel($attr);

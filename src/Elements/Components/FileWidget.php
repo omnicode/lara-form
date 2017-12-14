@@ -54,13 +54,11 @@ class FileWidget extends BaseInputWidget
         }
 
         if (isset($attr['accept'])) {
-
             if (is_array($attr['accept'])) {
                 $attr['accept'] = implode(', ', $attr['accept']);
             }
         }
         $this->generateClass($attr,$default,false);
-        $this->otherHtmlAttributes['type'] = 'file';
         parent::inspectionAttributes($attr);
     }
 }

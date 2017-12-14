@@ -52,12 +52,9 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     public function setParams($data)
     {
-        $this->addGlobalTemplate($data['global']);
-        $this->addLocalTemplate($data['local']);
-        $this->addInlineTemplate($data['inline']);
-        $this->addContainerGlobalAttributes($data['divGlobal']);
-        $this->addContainerLocalAttributes($data['divLocal']);
-        $this->addContainerInlineAttributes($data['divInline']);
+        foreach ($data as $index => $item) {
+            $this->addTemplateAndAttributes($item, $index);
+        }
     }
 
     /**
@@ -102,24 +99,6 @@ class Widget extends BaseWidget implements WidgetInterface
         return $errorParams;
     }
 
-    /**
-     * @param $templateName
-     * @return mixed
-     */
-    protected function getTemplate($templateName)
-    {
-        $template = $this->config['templates'][$templateName];
-
-        if (!empty($this->inlineTemplates[$templateName])) {
-            $template = $this->inlineTemplates[$templateName];
-        } elseif (!empty($this->localTemplates[$templateName])) {
-            $template = $this->localTemplates[$templateName];
-        } elseif (!empty($this->globalTemplates[$templateName])) {
-            $template = $this->globalTemplates[$templateName];
-        }
-
-        return $template;
-    }
 
     /**
      * @param $name
@@ -153,6 +132,7 @@ class Widget extends BaseWidget implements WidgetInterface
         if (!isset($attr['for'])) {
             $attr['for'] = $name;
         }
+       // dd($this->htmlClass);
         $rep = [
             'attrs' => $this->formatAttributes($attr),
             'text' => $name,
@@ -211,6 +191,25 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * @return mixed
+     */
+    protected function getHtmlClassControl()
+    {
+        $concat = $this->config['label']['class_control']['class_concat'];
+
+        if (!$this->classConcat['inline']) {
+            $concat = $this->classConcat['inline'];
+        } elseif (!$this->classConcat['local']) {
+            $concat = $this->classConcat['local'];
+        } elseif (!$this->classConcat['global']) {
+            $concat = $this->classConcat['global'];
+        }
+
+        return $concat;
+
+    }
+
+    /**
      * @param $attr
      * @param $default
      * @param bool $format
@@ -221,18 +220,21 @@ class Widget extends BaseWidget implements WidgetInterface
 
             if ($attr['class'] === false) {
                 $this->htmlClass[] = false;
-            } elseif (starts_with($attr['class'], '+')) {
-                $replacedClass = str_ireplace('+', '', $attr['class']);
-                $this->htmlClass[] = $default;
-
-                if (strlen($replacedClass) > 0) {
-                    $this->htmlClass[] = $replacedClass;
-                }
             } else {
-                $this->htmlClass[] = $attr['class'];
-            }
+                $symbol = $this->config['label']['class_control']['class_concat_symbol'];
 
-            unset($attr['class']);
+                if ($this->getHtmlClassControl() && starts_with($attr['class'],$symbol)) {
+                    $replacedClass = substr($attr['class'], strlen($symbol));
+                    $this->htmlClass[] = $default;
+
+                    if (strlen($replacedClass) > 0) {
+                        $this->htmlClass[] = $replacedClass;
+                    }
+                } else {
+                    $this->htmlClass[] = $attr['class'];
+                }
+                unset($attr['class']);
+            }
         } else {
             $this->htmlClass[] = $default;
         }

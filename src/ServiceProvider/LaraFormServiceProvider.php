@@ -8,6 +8,7 @@ use LaraForm\FormProtection;
 use LaraForm\Middleware\LaraFormMiddleware;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
+use LaraForm\Stores\OptionStore;
 
 class LaraFormServiceProvider extends ServiceProvider
 {
@@ -102,6 +103,10 @@ class LaraFormServiceProvider extends ServiceProvider
         $this->app->singleton('laraform.oldInput', function ($app) {
             return new OldInputStore();
         });
+        $this->app->singleton('laraform.options', function ($app) {
+            return new OptionStore();
+        });
+
     }
 
     /**
@@ -114,7 +119,8 @@ class LaraFormServiceProvider extends ServiceProvider
             return new FormBuilder(
                 $app['laraform.protection'],
                 $app['laraform.error'],
-                $app['laraform.oldInput']
+                $app['laraform.oldInput'],
+                $app['laraform.options']
             );
         });
     }

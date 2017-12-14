@@ -1,7 +1,7 @@
 <?php
 return [
     'charset' => 'utf-8',
-    'seperator' => [
+    'separator' => [
         'start' => '{%', // [..., {..., (...
         'end' => '%}',   // ...], ...}, ...)
     ],
@@ -9,7 +9,11 @@ return [
         'form_protection' => 'laraform_token',
         'select_empty' => '--Select--',
         'submit_name' => 'Save',
-        'idPrefix' => false
+        'idPrefix' => false,
+        'class_control' => [
+            'class_concat' => true,
+            'class_concat_symbol' => '+'
+        ]
     ],
     'default_value' => [
         'checkbox' => 1,
@@ -28,12 +32,11 @@ return [
         ],
     ],
     'ajax_request' => [
-        'is_removed' => true,
         'url' => [
 
         ],
         'action' => [
-            'CommentController@store'
+
         ],
         'route' => [
 

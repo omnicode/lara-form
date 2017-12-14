@@ -7,6 +7,7 @@ use LaraForm\Core\BaseFormBuilder;
 use LaraForm\Stores\BoundStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
+use LaraForm\Stores\OptionStore;
 
 class FormBuilder extends BaseFormBuilder
 {
@@ -47,6 +48,7 @@ class FormBuilder extends BaseFormBuilder
     protected $localTemplates = [
         'pattern' => [],
         'div' => [],
+        'class_concat' => true
     ];
 
     /**
@@ -55,6 +57,7 @@ class FormBuilder extends BaseFormBuilder
     protected $globalTemplates = [
         'pattern' => [],
         'div' => [],
+        'class_concat' => true
     ];
 
     /**
@@ -63,24 +66,38 @@ class FormBuilder extends BaseFormBuilder
     protected $inlineTemplates = [
         'pattern' => [],
         'div' => [],
-        'group' => false
+        'class_concat' => true
     ];
+
+    /**
+     * @var
+     */
+    protected $widget;
+
+    /**
+     * @var OptionStore
+     */
+    protected $optionStore;
 
     /**
      * FormBuilder constructor.
      * @param FormProtection $formProtection
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
+     * @param OptionStore $optionStore
      */
     public function __construct(
         FormProtection $formProtection,
         ErrorStore $errorStore,
-        OldInputStore $oldInputStore
+        OldInputStore $oldInputStore,
+        OptionStore $optionStore
     ) {
         $this->formProtection = $formProtection;
         $this->errorStore = $errorStore;
         $this->oldInputStore = $oldInputStore;
+        $this->optionStore = $optionStore;
     }
+
     /**
      * @param null $model
      * @param array $options
@@ -134,26 +151,17 @@ class FormBuilder extends BaseFormBuilder
     public function setTemplate($templateName, $templateValue = false, $global = false)
     {
         if (is_array($templateName)) {
+            $options = [];
 
-            if (isset($templateName['_options']['div'])) {
-
-                if (!empty($templateName['_options']['global'])) {
-                    $this->globalTemplates['div'] = $templateName['_options']['div'];
-                } else {
-                    $this->localTemplates['div'] = $templateName['_options']['div'];
-                }
+            if (!empty($templateName['_options'])) {
+                $options = $templateName['_options'];
+                unset($templateName['_options']);
             }
 
-            if (!empty($templateName['_options']['global'])) {
-                unset($templateName['_options']['global']);
-                foreach ($templateName as $key => $value) {
-                    $this->globalTemplates['pattern'][$key] = $value;
-                }
+            if (!empty($options['global'])) {
+                $this->addTemplatesAndParams($templateName, $this->globalTemplates, $options);
             } else {
-
-                foreach ($templateName as $key => $value) {
-                    $this->localTemplates['pattern'][$key] = $value;
-                }
+                $this->addTemplatesAndParams($templateName, $this->localTemplates, $options);
             }
         } elseif ($templateValue) {
 
@@ -209,10 +217,10 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * @param $method
-     * @param $arrgs
+     * @param $arguments
      * @return mixed
      */
-    private function make($method, $arrgs)
+    private function make($method, $arguments)
     {
         $modelName = ucfirst($method);
         $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');
@@ -221,16 +229,38 @@ class FormBuilder extends BaseFormBuilder
             $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore]);
         }
 
-        $widget = $this->maked[$modelName];
+        $this->widget = $this->maked[$modelName];
 
         if (!empty($this->model)) {
-            $widget->setModel($this->model);
+            $this->widget->setModel($this->model);
         }
 
+        $this->optionStore->attr($arguments);
+        $this->optionStore->setBuilder($this);
+
+        if ($method === 'form') {
+            return $this->render();
+        }
+
+        return $this->optionStore;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function __toString()
+    {
+        return $this->render();
+    }
+
+    private function render()
+    {
         $data = $this->complateTemplatesAndParams();
-        $widget->setArguments($arrgs);
-        $widget->setParams($data);
-        return $widget->render();
+        $this->widget->setArguments($this->optionStore->getOprions());
+        $this->widget->setParams($data);
+        $this->optionStore->resetOptions();
+        return $this->widget->render();
     }
 
     /**
@@ -239,19 +269,17 @@ class FormBuilder extends BaseFormBuilder
     private function complateTemplatesAndParams()
     {
         $data = [
-            // for fields in form
-            'local' => $this->localTemplates['pattern'],
-            'divLocal' => $this->localTemplates['div'],
-            // for all page
-            'global' => $this->globalTemplates['pattern'],
-            'divGlobal' => $this->globalTemplates['div'],
             // for once filed
-            'inline' => $this->inlineTemplates['pattern'],
-            'divInline' => $this->inlineTemplates['div'],
+            'inline' => $this->inlineTemplates,
+            // for fields in form
+            'local' => $this->localTemplates,
+            // for all page
+            'global' => $this->globalTemplates,
         ];
 
         $this->inlineTemplates['pattern'] = [];
         $this->inlineTemplates['div'] = [];
+        $this->inlineTemplates['class_concat'] = true;
         return $data;
     }
 
@@ -265,7 +293,7 @@ class FormBuilder extends BaseFormBuilder
         $unlockFields = [];
 
         if (!empty($options['_unlockFields'])) {
-            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use
+            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']);
             unset($options['_unlockFields']);
         }
 
@@ -300,5 +328,26 @@ class FormBuilder extends BaseFormBuilder
         $this->maked = [];
         $this->localTemplates['pattern'] = [];
         $this->localTemplates['div'] = [];
+    }
+
+    /**
+     * @param $data
+     * @param $container
+     * @param $options
+     */
+    private function addTemplatesAndParams($data, &$container, $options)
+    {
+        if (!empty($options)) {
+            if (isset($options['div'])) {
+                $container['div'] = $options['div'];
+            }
+            if (isset($options['class_concat'])) {
+                $container['class_concat'] = $options['class_concat'];
+            }
+        }
+
+        foreach ($data as $key => $value) {
+            $container['pattern'][$key] = $value;
+        }
     }
 }

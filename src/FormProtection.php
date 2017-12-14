@@ -196,7 +196,7 @@ class FormProtection extends BaseFormProtection
             }
         }
 
-        return $this->ajax['is_removed'];
+        return true;
     }
 
     /**
