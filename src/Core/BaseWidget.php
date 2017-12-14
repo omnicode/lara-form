@@ -237,10 +237,6 @@ abstract class BaseWidget
             return $attr;
         }
 
-        if (!empty($this->unlokAttributes)) {
-            $attributes = array_diff($attributes, $this->unlokAttributes);
-        }
-
         $attributes = array_filter($attributes, function ($value) {
             if (!empty($value) && $value !== '' && $value !== false) {
                 return $value;

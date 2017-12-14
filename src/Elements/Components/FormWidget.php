@@ -27,7 +27,7 @@ class FormWidget extends Widget
     {
         if (!empty($attr['file'])) {
             $attr['enctype'] = 'multipart/form-data';
-            $this->unlokAttributes[] = $attr['file'];
+            unset($attr['file']);
         }
         if (!empty($attr['_unlockFields'])) {
             unset($attr['_unlockFields']);
@@ -35,6 +35,7 @@ class FormWidget extends Widget
         if (empty($attr['accept-charset'])) {
             $attr['accept-charset'] = $this->config['charset'];
         }
+        unset($attr['form_token']);
     }
 
     /**
@@ -46,7 +47,6 @@ class FormWidget extends Widget
         $method = $this->getMethod($options);
         $action = $this->getAction($options);
         $token = $options['form_token'];
-        $this->unlokAttributes[] = $options['form_token'];
         $htmlAttributes['action'] = $action;
         $htmlAttributes['method'] = ($method == 'get') ? 'GET' : 'POST';
         $this->inspectionAttributes($options);
@@ -150,7 +150,7 @@ class FormWidget extends Widget
             if (in_array($options['method'], ['get', 'post', 'put', 'patch', 'delete'])) {
                 $method = $options['method'];
             }
-            $this->unlokAttributes[] = $options['method'];
+            unset($options['method']);
         } elseif (!empty($this->bound)) {
             $method = 'put';
         }

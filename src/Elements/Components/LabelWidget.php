@@ -11,7 +11,7 @@ class LabelWidget extends Widget
      */
     public function render()
     {
-        return $this->setLabel($option);
+        return $this->setLabel($this->name,$this->attr);
     }
 
     /**

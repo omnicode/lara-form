@@ -75,10 +75,8 @@ class Widget extends BaseWidget implements WidgetInterface
     public function setArguments($arguments)
     {
         $this->name = array_shift($arguments);
-        $this->attr = array_shift($arguments);
-
-        if (is_null($this->attr)) {
-            $this->attr = [];
+        if (!empty($arguments[0])) {
+            $this->attr = array_shift($arguments);
         }
     }
 
@@ -148,22 +146,18 @@ class Widget extends BaseWidget implements WidgetInterface
      *
      */
 
-    protected function setLabel($option)
+    protected function setLabel($name, $attr)
     {
         $template = $this->config['templates']['label'];
-        $name = array_shift($option);
-        $attr = !empty($option[0]) ? $option[0] : [];
 
         if (!isset($attr['for'])) {
             $attr['for'] = $name;
         }
-
         $rep = [
             'attrs' => $this->formatAttributes($attr),
             'text' => $name,
             'icon' => $this->icon
         ];
-
         return $this->formatTemplate($template, $rep);
     }
 
@@ -177,7 +171,7 @@ class Widget extends BaseWidget implements WidgetInterface
     {
         $for = isset($option['id']) ? $option['id'] : $inputName;
         $labelName = $treatment ? $inputName : $this->getLabelName($inputName);
-        $this->label = $this->setLabel([$labelName, ['for' => $for]]);
+        $this->label = $this->setLabel($labelName, ['for' => $for]);
         return $this->label;
     }
 
@@ -188,14 +182,14 @@ class Widget extends BaseWidget implements WidgetInterface
     protected function generateId(&$attr, $multi = false)
     {
         if (isset($attr['id']) && $attr['id'] == false) {
-            $this->unlokAttributes['id'] = $attr['id'];
+            unset($attr['id']);
         } else {
             $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
             if ($this->config['label']['idPrefix'] && !isset($attr['idPrefix'])) {
                 $attr['id'] = $this->config['label']['idPrefix'] . $attr['id'];
             } elseif (isset($attr['idPrefix']) && $attr['id'] !== false) {
                 $attr['id'] = $attr['idPrefix'] . $attr['id'];
-                $this->unlokAttributes['idPrefix'] = $attr['idPrefix'];
+                unset($attr['idPrefix']);
             }
             if ($multi && isset($attr['value'])) {
                 $attr['id'] .= '-' . $attr['value'];
@@ -210,7 +204,7 @@ class Widget extends BaseWidget implements WidgetInterface
     {
         if (!empty($attr['label'])) {
             $this->renderLabel($attr['label'], $attr, true);
-            $this->unlokAttributes[] = $attr['label'];
+            unset($attr['label']);
         } elseif (!isset($attr['label'])) {
             $this->renderLabel($this->name, $attr);
         }

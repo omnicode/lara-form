@@ -67,7 +67,7 @@ class BaseInputWidget extends Widget
      * @param array $labelAttrs
      * @return string
      */
-    protected function formatNestingLabel($template, $attr , $labelAttrs = [])
+    protected function formatNestingLabel($template, $attr, $labelAttrs = [])
     {
         $labelTemplate = $this->getTemplate('nestingLabel');
         $this->formatInputField($this->name, $attr, $template);
@@ -91,7 +91,7 @@ class BaseInputWidget extends Widget
     {
         if (isset($attr['type'])) {
             $this->htmlAttributes['type'] = $attr['type'];
-            $this->unlokAttributes['type'] = $attr['type'];
+            unset($attr['type']);
         } else {
             $this->htmlAttributes['type'] = 'text';
         }
@@ -99,7 +99,7 @@ class BaseInputWidget extends Widget
         $this->htmlAttributes['value'] = '';
         if (!empty($attr['value']) && $cTemplate) {
             $this->htmlAttributes['value'] = $attr['value'];
-            $this->unlokAttributes['value'] = $attr['value'];
+            unset($attr['value']);
         }
 
         $notId = ['hidden', 'submit', 'reset', 'button', 'radio', 'checkbox', 'label'];
@@ -107,7 +107,7 @@ class BaseInputWidget extends Widget
         if (!in_array($this->htmlAttributes['type'], $notId) && !$cTemplate) {
             $attr += $this->getValue($this->name);
         }
-
+        $this->generateId($attr);
         if (!in_array($this->htmlAttributes['type'], ['hidden', 'submit', 'reset', 'button'])) {
             $this->generateLabel($attr);
         }
@@ -115,7 +115,7 @@ class BaseInputWidget extends Widget
         if ($this->htmlAttributes['type'] !== 'hidden') {
             $this->generateClass($attr, $this->config['css']['inputClass']);
         }
-        $this->generateId($attr);
+
         $this->otherHtmlAttributes = $attr;
         parent::inspectionAttributes($attr);
     }

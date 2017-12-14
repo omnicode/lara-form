@@ -67,9 +67,9 @@ return [
         // Used for checkboxes in checkbox() and multiCheckbox().
         'checkbox' => '<input type="checkbox" name="{%name%}" value="{%value%}" {%attrs%}/>',
         // Wrapper container for checkboxes.
-        'checkboxContainer' => '<div class="checkbox {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%content%}</div>',
+        'checkboxContainer' => '<div class="checkbox {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%content%}{%help%}</div>',
         // Wrapper container for radio.
-        'radioContainer' => '<div class="radio {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%content%}</div>',
+        'radioContainer' => '<div class="radio {%type%} {%required%} {%class%} {%error%}" {%containerAttrs%}>{%content%}{%help%}</div>',
         // Container for error items.
         'errorList' => '<div class="alert alert-danger {%class%}">
                             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
