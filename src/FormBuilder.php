@@ -257,6 +257,7 @@ class FormBuilder extends BaseFormBuilder
         $this->widget->setArguments($this->optionStore->getOprions());
         $this->widget->setParams($data);
         $this->optionStore->resetOptions();
+
         return $this->widget->render();
     }
 

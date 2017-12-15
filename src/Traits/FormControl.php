@@ -54,9 +54,9 @@ trait FormControl
         $methodName = array_shift($action);
 
         if (!strpos('@', $methodName)) {
-            $curr = $this->getCurrentRoute();
-            $controller = $this->getClassName(get_class($curr->getController()));
-            $methodName = $controller . '@' . $methodName;
+            $currentRoute = $this->getCurrentRoute();
+            $currentController = class_basename(get_class($currentRoute->getController()));
+            $methodName = $currentController . '@' . $methodName;
         }
 
         $routeName = array_search($methodName, $allRoutes);

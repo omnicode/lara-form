@@ -11,13 +11,19 @@ class SubmitWidget extends BaseInputWidget
     {
         $this->inspectionAttributes($this->attr);
         $template = $this->getTemplate('button');
-        $defaultName = $this->config['label']['submit_name'] ? $this->config['label']['submit_name'] : '';
-        $name = !empty($this->name) ? $this->name : $defaultName;
 
+        if ($this->name === false) {
+            $name = '';
+        } elseif (!empty($this->name)) {
+            $name = $this->name;
+        } else {
+            $name = $this->config['label']['submit_name'] ? $this->config['label']['submit_name'] : '';
+        }
         $btnAttr = [
             'attrs' => $this->formatAttributes($this->attr),
             'text' => $name,
         ];
+
 
         $this->html = $this->formatTemplate($template, $btnAttr);
         $this->containerTemplate = $this->config['templates']['submitContainer'];
@@ -32,7 +38,7 @@ class SubmitWidget extends BaseInputWidget
     {
         $btn = $this->config['css']['submitClass'];
         $btnColor = $this->config['css']['submitColor'];
-        $defaut = $btn.' '.$btnColor;
+        $defaut = $btn . ' ' . $btnColor;
 
         if (isset($attr['btn'])) {
 
@@ -44,7 +50,7 @@ class SubmitWidget extends BaseInputWidget
             unset($attr['btn']);
         }
 
-        $this->generateClass($attr,$defaut);
+        $this->generateClass($attr, $defaut);
 
         if (!empty($attr['type']) && in_array($attr['type'], ['submit', 'button', 'reset'])) {
             $this->otherHtmlAttributes['type'] = $attr['type'];

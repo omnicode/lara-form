@@ -305,6 +305,7 @@ class FormProtection extends BaseFormProtection
      */
     public function addArrayInputField($field)
     {
+
         $arr = explode('[', $field);
         foreach ($arr as $key => $item) {
             $arr[$key] = rtrim($item, ']');

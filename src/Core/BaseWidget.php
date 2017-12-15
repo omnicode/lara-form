@@ -261,6 +261,9 @@ abstract class BaseWidget
         return $this->formatTemplate($container, $containerAttributes);
     }
 
+    /**
+     *
+     */
     protected function resetOldData()
     {
         $this->icon = '';

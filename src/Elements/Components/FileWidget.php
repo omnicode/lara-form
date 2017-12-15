@@ -16,7 +16,14 @@ class FileWidget extends BaseInputWidget
     {
         $this->inspectionAttributes($this->attr);
         $this->containerTemplate = $this->getTemplate('fileContainer');
-        return $this->formatInputField($this->name, $this->attr, $this->fileTemplate);
+        if ($this->name === false) {
+            $name = '';
+        } elseif (!empty($this->name)) {
+            $name = $this->name;
+        } else {
+            $name = $this->config['label']['submit_name'] ? $this->config['label']['submit_name'] : '';
+        }
+        return $this->formatInputField($name, $this->attr, $this->fileTemplate);
     }
 
     /**
