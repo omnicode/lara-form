@@ -8,9 +8,11 @@ use LaraForm\Stores\BoundStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use LaraForm\Stores\OptionStore;
+use LaraForm\Traits\FormControl;
 
 class FormBuilder extends BaseFormBuilder
 {
+    use FormControl;
 
     /**
      * @var FormProtection
@@ -113,23 +115,28 @@ class FormBuilder extends BaseFormBuilder
         $this->model = $model;
         $this->isForm = true;
         $token = md5(str_random(80));
-        $options['form_token'] = $token;
-        $formData = $this->make('form', ['start', $options]);
-        $formHtml = $formData['html'];
+        $action = $this->getAction($options);
+        $method = $this->getMethod($options);
+        $options['_form_token'] = $token;
+        $options['_form_action'] = $action;
+        $options['_form_method'] = $method;
 
-        if ($formData['method'] === 'get') {
-            return $formHtml;
+        $form = $this->make('form', ['start', $options]);
+
+
+        if ($method === 'get') {
+            return $form;
         }
 
         $this->formProtection->setToken($token);
         $this->formProtection->setTime();
-        $this->formProtection->setUrl($formData['action']);
+        $this->formProtection->setUrl($action);
         $this->formProtection->removeByTime();
         $this->formProtection->removeByCount();
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
         $this->formProtection->setUnlockFields($unlockFields);
 
-        return $formHtml;
+        return $form;
     }
 
     /**
@@ -237,11 +244,6 @@ class FormBuilder extends BaseFormBuilder
 
         $this->optionStore->attr($arguments);
         $this->optionStore->setBuilder($this);
-
-        if ($method === 'form') {
-            return $this->render();
-        }
-
         return $this->optionStore;
     }
 
@@ -251,17 +253,13 @@ class FormBuilder extends BaseFormBuilder
      */
     public function __toString()
     {
-        return $this->render();
-    }
-
-    private function render()
-    {
         $data = $this->complateTemplatesAndParams();
         $this->widget->setArguments($this->optionStore->getOprions());
         $this->widget->setParams($data);
         $this->optionStore->resetOptions();
         return $this->widget->render();
     }
+
 
     /**
      * @return array

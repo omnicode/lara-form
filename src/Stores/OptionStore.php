@@ -23,8 +23,10 @@ class OptionStore extends BaseStore
      */
     public function __call($name, $value)
     {
+        $arrNames = preg_split('/(?=[A-Z])|(_)/',$name);
+        $attributeName = strtolower((implode('-',$arrNames)));
         $value = array_shift($value);
-        $this->attributes[1][$name] = $value;
+        $this->attributes[1][$attributeName] = $value;
         return $this;
     }
 
@@ -38,7 +40,11 @@ class OptionStore extends BaseStore
             $options = [$options];
         }
 
-        $this->attributes += $options;
+        if (isset($this->attributes[1])) {
+            $this->attributes[1] += $options;
+        }else{
+            $this->attributes += $options;
+        }
         return $this;
     }
 

@@ -49,10 +49,6 @@ abstract class BaseWidget
      */
     protected $attr = [];
 
-    /**
-     * @var array
-     */
-    protected $routes = [];
 
     /**
      * @var mixed
