@@ -7,7 +7,11 @@ use Route;
 
 trait FormControl
 {
-    protected $routes = [];
+    /**
+     * @var array
+     */
+    private $routes = [];
+
     /**
      * @param array $options
      * @return array|mixed|string
