@@ -178,15 +178,15 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
-     * @param $attr
+     *
      */
-    protected function generateLabel(&$attr)
+    protected function generateLabel()
     {
-        if (!empty($attr['label'])) {
-            $this->renderLabel($attr['label'], $attr, true);
-            unset($attr['label']);
-        } elseif (!isset($attr['label'])) {
-            $this->renderLabel($this->name, $attr);
+        if (!empty($this->attr['label'])) {
+            $this->renderLabel($this->attr['label'], $this->attr, true);
+            unset($this->attr['label']);
+        } elseif (!isset($this->attr['label'])) {
+            $this->renderLabel($this->name, $this->attr);
         }
     }
 

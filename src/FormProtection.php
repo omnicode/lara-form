@@ -124,14 +124,17 @@ class FormProtection extends BaseFormProtection
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
 
         if (!$token) {
+
             return false;
         }
 
         if (!session()->has($this->sessionPath($token))) {
+
             return false;
         }
 
         if (!$this->isValidAction($token, $request->url())) {
+
             return false;
         }
 
@@ -147,7 +150,6 @@ class FormProtection extends BaseFormProtection
         } else {
             session()->forget($this->sessionPath($token));
         }
-
 
         if (array_keys($data) != array_keys($checkedFields)) {
             return false;

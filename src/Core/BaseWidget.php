@@ -248,6 +248,7 @@ abstract class BaseWidget
             return $this->html;
         }
 
+
         if (!is_array($this->containerParams['inline']) or
             !is_array($this->containerParams['local']) or
             !is_array($this->containerParams['global'])) {

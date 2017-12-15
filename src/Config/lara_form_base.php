@@ -110,6 +110,8 @@ return [
         'select' => '<select name="{%name%}" {%attrs%}>{%content%}</select>',
         // Multi-select element,
         'selectMultiple' => '<select name="{%name%}[]" multiple="multiple" {%attrs%}>{%content%}</select>',
+        // Wrapper container for select tag.
+        'selectContainer' => '<div class="form-group {%type%} {%required%} {%class%} {%error%}">{%hidden%}{%label%}{%content%}{%help%}</div>',
         // Radio input element,
         'radio' => '<input type="radio" name="{%name%}" value="{%value%}" {%attrs%}/>',
         // Textarea input element,

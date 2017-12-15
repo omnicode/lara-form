@@ -50,6 +50,7 @@ class SelectWidget extends Widget
         ];
 
         $this->htmlAttributes['type'] = 'select';
+        $this->containerTemplate = $this->getTemplate('selectContainer');
         $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
         return $this->completeTemplate();
     }
@@ -60,16 +61,17 @@ class SelectWidget extends Widget
     public function inspectionAttributes(&$attr)
     {
         $this->generateId($attr);
-        $this->generateLabel($attr);
+        $this->generateLabel();
         $this->generateClass($attr,$this->config['css']['selectClass']);
 
-        if (strpos($this->name, '[]')) {
+        if (ends_with($this->name, '[]')) {
             $attr['multiple'] = true;
-            $this->name = str_ireplace('[]', '', $this->name);
+            $this->name = substr($this->name,0,-2);
         }
 
         if (isset($attr['multiple'])) {
             $this->selectTemplate = $this->getTemplate('selectMultiple');
+            $this->hidden = $this->setHidden($this->name,$this->config['default_value']['hidden']);
             unset($attr['multiple']);
         } else {
             $this->selectTemplate = $this->getTemplate('select');

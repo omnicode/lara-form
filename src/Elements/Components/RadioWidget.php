@@ -35,11 +35,7 @@ class RadioWidget extends BaseInputWidget
         if (isset($attr['checked'])) {
             $attr['checked'] = 'checked';
         }
-        /* if (isset($attr['hidden']) && $attr['hidden'] == false) {
-             unset($attr['hidden']);
-         } else {
-             $this->hidden = $this->setHidden($this->name, '');
-         }*/
+
         $attr['type'] = 'radio';
         $this->generateClass($attr, $this->config['css']['radioClass']);
         $this->generateId($attr,true);
