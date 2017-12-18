@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 class FileWidget extends BaseInputWidget
 {
@@ -14,14 +14,14 @@ class FileWidget extends BaseInputWidget
      */
     public function render()
     {
-        $this->inspectionAttributes($this->attr);
-        $this->containerTemplate = $this->getTemplate('fileContainer');
+        $this->checkAttributes($this->attr);
+        $this->currentTemplate = $this->getTemplate('fileContainer');
         if ($this->name === false) {
             $name = '';
         } elseif (!empty($this->name)) {
             $name = $this->name;
         } else {
-            $name = $this->config['label']['submit_name'] ? $this->config['label']['submit_name'] : '';
+            $name = $this->config['text']['submit_name'] ? $this->config['text']['submit_name'] : '';
         }
         return $this->formatInputField($name, $this->attr, $this->fileTemplate);
     }
@@ -29,10 +29,10 @@ class FileWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
-        $btn = $this->config['css']['submitClass'];
-        $btnColor = $this->config['css']['submitColor'];
+        $btn = $this->config['css']['class']['submitClass'];
+        $btnColor = $this->config['css']['class']['submitColor'];
         $default = $btn.' '.$btnColor;
 
         if (isset($attr['btn'])) {
@@ -66,6 +66,6 @@ class FileWidget extends BaseInputWidget
             }
         }
         $this->generateClass($attr,$default,false);
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 class HiddenWidget extends BaseInputWidget
 {
@@ -16,10 +16,10 @@ class HiddenWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
         $attr['type'] = 'hidden';
         $this->htmlAttributes['type'] = 'hidden';
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 }

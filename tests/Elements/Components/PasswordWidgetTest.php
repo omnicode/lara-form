@@ -2,7 +2,7 @@
 
 namespace Tests\Elements\Components;
 
-use LaraForm\Elements\Components\PasswordWidget;
+use LaraForm\Elements\Widgets\PasswordWidget;
 
 class PasswordWidgetTest extends \PHPUnit_Framework_TestCase
 {

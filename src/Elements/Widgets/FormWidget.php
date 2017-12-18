@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 
@@ -23,7 +23,7 @@ class FormWidget extends Widget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
         if (!empty($attr['file'])) {
             $attr['enctype'] = 'multipart/form-data';
@@ -51,7 +51,7 @@ class FormWidget extends Widget
         $token = $options['_form_token'];
         $htmlAttributes['action'] = $action;
         $htmlAttributes['method'] = ($method == 'get') ? 'GET' : 'POST';
-        $this->inspectionAttributes($options);
+        $this->checkAttributes($options);
         $htmlAttributes += $options;
         $template = $this->getTemplate('formStart');
 
@@ -66,7 +66,7 @@ class FormWidget extends Widget
             if ($method !== 'post') {
                 $form .= method_field(strtoupper($method));
             }
-            $form .= $this->setHidden($this->config['label']['form_protection'], $token);
+            $form .= $this->setHidden($this->config['token_name'], $token);
         }
 
         return $form;

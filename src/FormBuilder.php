@@ -4,7 +4,7 @@ namespace LaraForm;
 
 use Illuminate\Support\Facades\Config;
 use LaraForm\Core\BaseFormBuilder;
-use LaraForm\Stores\BoundStore;
+use LaraForm\Stores\BindStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use LaraForm\Stores\OptionStore;
@@ -298,7 +298,7 @@ class FormBuilder extends BaseFormBuilder
 
         $unlockFields[] = '_token';
         $unlockFields[] = '_method';
-        $unlockFields[] = config('lara_form.label.form_protection', 'laraform_token');
+        $unlockFields[] = config('lara_form.token_name', 'laraform_token');
         return $unlockFields;
     }
 

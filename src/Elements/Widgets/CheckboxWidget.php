@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 class CheckboxWidget extends BaseInputWidget
 {
@@ -15,17 +15,17 @@ class CheckboxWidget extends BaseInputWidget
     public function render()
     {
         $template = $this->getTemplate('checkbox');
-        $this->inspectionAttributes($this->attr);
-        $this->containerTemplate = $this->getTemplate('checkboxContainer');
+        $this->checkAttributes($this->attr);
+        $this->currentTemplate = $this->getTemplate('checkboxContainer');
         return $this->formatNestingLabel($template, $this->attr);
     }
 
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
-        $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['checkbox'];
+        $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
 
         if (!empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
@@ -65,14 +65,14 @@ class CheckboxWidget extends BaseInputWidget
                 } else {
                     $hiddenName = $this->name;
                 }
-                $this->hidden = $this->setHidden($hiddenName, $this->config['default_value']['hidden']);
+                $this->hidden = $this->setHidden($hiddenName, 0);
             }
 
             $this->oldCheckboxNames[] = $this->name;
         }
         $attr['type'] = 'checkbox';
-        $this->generateClass($attr, $this->config['css']['checkboxClass']);
+        $this->generateClass($attr, $this->config['css']['class']['checkboxClass']);
         $this->generateId($attr,true);
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 }

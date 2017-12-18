@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 class EmailWidget extends BaseInputWidget
 {
@@ -16,10 +16,10 @@ class EmailWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
         $this->otherHtmlAttributes['type'] = 'email';
         $attr['type'] = 'email';
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 }

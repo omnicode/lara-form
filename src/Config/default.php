@@ -1,34 +1,43 @@
 <?php
 return [
     'charset' => 'utf-8',
+    'token_name' => 'laraform_token',
     'separator' => [
         'start' => '{%', // [..., {..., (...
         'end' => '%}',   // ...], ...}, ...)
     ],
-    'label' => [
-        'form_protection' => 'laraform_token',
+    'text' => [
         'select_empty' => '--Select--',
         'submit_name' => 'Save',
-        'idPrefix' => false,
+
+    ],
+    'css' => [
+        'class' => [
+            'idPrefix' => false,
+            'errorClass' => 'has-error',
+            'inputClass' => 'form-control',
+            'selectClass' => 'form-control',
+            'checkboxClass' => false,
+            'radioClass' => false,
+            'fileClass' => false,
+            'textareaClass' => 'form-control',
+            'submitColor' => 'btn-default',
+            'submitClass' => 'btn'
+        ],
         'class_control' => [
-            'class_concat' => true,
-            'class_concat_symbol' => '+'
+            'concat' => true,
+            'concat_symbol' => '+'
         ]
     ],
-    'default_value' => [
-        'checkbox' => 1,
-        'hidden' => 0,
-        'radio' => 1
-    ],
     'session' => [
-        'pre_path' => 'laraforms',
-        'max_time' => 2, // by hour
+        'name' => 'laraforms',
+        'lifetime' => '1 hours', //Parse about any English textual datetime description
         'max_count' => 50,
-        'path_for' => [
+        'paths' => [
             'check' => 'is_check',
             'unlock' => 'is_unlock',
             'time' => 'created_time',
-            'action' => '_action',
+            'action' => 'action',
         ],
     ],
     'ajax_request' => [
@@ -52,17 +61,6 @@ return [
         'field' => [
 
         ],
-    ],
-    'css' => [
-        'errorClass' => 'has-error',
-        'inputClass' => 'form-control',
-        'selectClass' => 'form-control',
-        'checkboxClass' => false,
-        'radioClass' => false,
-        'fileClass' => false,
-        'textareaClass' => 'form-control',
-        'submitColor' => 'btn-default',
-        'submitClass' => 'btn',
     ],
     'templates' => [
         // Used for button elements in button().

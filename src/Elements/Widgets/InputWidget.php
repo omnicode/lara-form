@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 class InputWidget extends BaseInputWidget
 {
@@ -15,8 +15,8 @@ class InputWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 }

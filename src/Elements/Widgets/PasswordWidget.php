@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 
 class PasswordWidget extends BaseInputWidget
@@ -17,10 +17,10 @@ class PasswordWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
         $this->otherHtmlAttributes['type'] = 'password';
         $attr['type'] = 'password';
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 }

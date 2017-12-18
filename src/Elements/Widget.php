@@ -5,7 +5,7 @@ namespace LaraForm\Elements;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 use LaraForm\Core\BaseWidget;
-use LaraForm\Stores\BoundStore;
+use LaraForm\Stores\BindStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 
@@ -22,7 +22,7 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
         if (!empty($attr['icon'])) {
             $iconTemplate = $this->getTemplate('icon');
@@ -62,7 +62,7 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     public function setModel($data)
     {
-        $this->bound = new BoundStore($data);
+        $this->bind = app(BindStore::class,[$data]);
 
     }
 
@@ -92,9 +92,8 @@ class Widget extends BaseWidget implements WidgetInterface
             $helpBlockTemplate = $this->config['templates']['helpBlock'];
             $errorAttr['text'] = $this->errors->getError($name);
             $errorParams['help'] = $this->formatTemplate($helpBlockTemplate, $errorAttr);
-            $errorParams['error'] = $this->config['css']['errorClass'];
+            $errorParams['error'] = $this->config['css']['class']['errorClass'];
         }
-
 
         return $errorParams;
     }
@@ -109,8 +108,8 @@ class Widget extends BaseWidget implements WidgetInterface
         $value = '';
         $data = [];
 
-        if (!empty($this->bound)) {
-            $value = $this->bound->get($name, null);
+        if (!empty($this->bind)) {
+            $value = $this->bind->get($name, null);
         }
 
         if ($this->oldInputs->hasOldInput()) {
@@ -165,8 +164,8 @@ class Widget extends BaseWidget implements WidgetInterface
             unset($attr['id']);
         } else {
             $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
-            if ($this->config['label']['idPrefix'] && !isset($attr['idPrefix'])) {
-                $attr['id'] = $this->config['label']['idPrefix'] . $attr['id'];
+            if ($this->config['css']['class']['idPrefix'] && !isset($attr['idPrefix'])) {
+                $attr['id'] = $this->config['css']['class']['idPrefix'] . $attr['id'];
             } elseif (isset($attr['idPrefix']) && $attr['id'] !== false) {
                 $attr['id'] = $attr['idPrefix'] . $attr['id'];
                 unset($attr['idPrefix']);
@@ -195,7 +194,7 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     protected function getHtmlClassControl()
     {
-        $concat = $this->config['label']['class_control']['class_concat'];
+        $concat = $this->config['css']['class_control']['concat'];
 
         if (!$this->classConcat['inline']) {
             $concat = $this->classConcat['inline'];
@@ -221,7 +220,7 @@ class Widget extends BaseWidget implements WidgetInterface
             if ($attr['class'] === false) {
                 $this->htmlClass[] = false;
             } else {
-                $symbol = $this->config['label']['class_control']['class_concat_symbol'];
+                $symbol = $this->config['css']['class_control']['concat_symbol'];
 
                 if ($this->getHtmlClassControl() && starts_with($attr['class'],$symbol)) {
                     $replacedClass = substr($attr['class'], strlen($symbol));
@@ -254,7 +253,7 @@ class Widget extends BaseWidget implements WidgetInterface
         $hiddenTemplate = $this->config['templates']['hiddenInput'];
 
         if ($value === false) {
-            $value = $this->config['default_value']['hidden'];
+            $value = 0;
         }
 
         $attr = ['name' => $name, 'value' => $value,];

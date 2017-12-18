@@ -9,28 +9,40 @@ use LaraForm\FormProtection;
 
 class LaraFormMiddleware
 {
+    /**
+     * @var FormProtection
+     */
+    protected $formProtection;
+
+    /**
+     * LaraFormMiddleware constructor.
+     * @param FormProtection $formProtection
+     */
+    public function __construct(FormProtection $formProtection)
+    {
+        $this->formProtection = $formProtection;
+    }
 
     /**
      * @param Request $request
      * @param Closure $next
-     * @return \Illuminate\Http\RedirectResponse|mixed
+     * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
         if ($request->method() != 'GET' && !$this->isGlobalException($request)) {
 
-            $formProtection = new FormProtection();
             $data = $request->all();
             foreach ($request->query() as $index => $key) {
                 unset($data[$index]);
             }
-            $validate = $formProtection->validate($request, $data);
+            $validate = $this->formProtection->validate($request, $data);
 
             if ($validate === false) {
                 abort(403, 'Your Action Is Forbidden');
             }
 
-            unset($request[config('lara_form.label.form_protection', 'laraform_token')]);
+            unset($request[config('lara_form.token_name', 'laraform_token')]);
         }
 
         return $next($request);
@@ -43,8 +55,8 @@ class LaraFormMiddleware
     private function isGlobalException($request)
     {
         $isExcept = false;
-        $exceptUrls = config('lara_form.except.url',[]);;
-        $exceptRoutes = config('lara_form.except.route',[]);;
+        $exceptUrls = config('lara_form.except.url', []);;
+        $exceptRoutes = config('lara_form.except.route', []);;
 
         if (!empty($exceptUrls)) {
             $uri = $request->getUri();

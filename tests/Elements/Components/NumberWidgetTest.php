@@ -2,7 +2,7 @@
 
 namespace Tests\Elements\Components;
 
-use LaraForm\Elements\Components\NumberWidget;
+use LaraForm\Elements\Widgets\NumberWidget;
 
 class NumberWidgetTest extends \PHPUnit_Framework_TestCase
 {

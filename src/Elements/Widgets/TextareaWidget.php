@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 
@@ -12,7 +12,7 @@ class TextareaWidget extends Widget
     public function render()
     {
         $template = $this->getTemplate('textarea');
-        $this->inspectionAttributes($this->attr);
+        $this->checkAttributes($this->attr);
         $attributes = [
             'name' => $this->name,
             'attrs' => $this->formatAttributes($this->attr)
@@ -25,16 +25,16 @@ class TextareaWidget extends Widget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
         if (isset($attr['type'])) {
             unset($attr['type']);
         }
-        $this->containerTemplate = $this->getTemplate('inputContainer');
+        $this->currentTemplate = $this->getTemplate('inputContainer');
         $this->otherHtmlAttributes['type'] = 'textarea';
-        $this->generateClass($attr, $this->config['css']['textareaClass']);
+        $this->generateClass($attr, $this->config['css']['class']['textareaClass']);
         $this->generateId($attr);
         $this->generateLabel();
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 }

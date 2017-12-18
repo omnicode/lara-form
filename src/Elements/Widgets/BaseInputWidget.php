@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 
@@ -22,16 +22,16 @@ class BaseInputWidget extends Widget
      */
     public function render()
     {
-        $this->inspectionAttributes($this->attr);
+        $this->checkAttributes($this->attr);
         return $this->formatInputField($this->name, $this->attr);
     }
 
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 
     /**
@@ -54,7 +54,7 @@ class BaseInputWidget extends Widget
             $template = $cTemplate;
         }
 
-        $this->generalInspectionAttributes($attr, $cTemplate);
+        $this->generalcheckAttributes($attr, $cTemplate);
         $this->htmlAttributes['name'] = $name;
         $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
         $this->html = $this->formatTemplate($template, $this->htmlAttributes);
@@ -92,7 +92,7 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param $cTemplate
      */
-    private function generalInspectionAttributes(&$attr, $cTemplate)
+    private function generalcheckAttributes(&$attr, $cTemplate)
     {
         if (isset($attr['type'])) {
             $this->htmlAttributes['type'] = $attr['type'];
@@ -119,11 +119,11 @@ class BaseInputWidget extends Widget
         }
 
         if ($this->htmlAttributes['type'] !== 'hidden') {
-            $this->generateClass($attr, $this->config['css']['inputClass']);
+            $this->generateClass($attr, $this->config['css']['class']['inputClass']);
         }
 
         $this->otherHtmlAttributes = $attr;
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 
 }

@@ -63,7 +63,7 @@ abstract class BaseWidget
     /**
      * @var bool
      */
-    protected $containerTemplate = false;
+    protected $currentTemplate = false;
 
     /**
      * @var array
@@ -73,7 +73,7 @@ abstract class BaseWidget
     /**
      * @var array
      */
-    protected $containerTemplates = [];
+    protected $templates = [];
 
     /**
      * @var array
@@ -98,7 +98,7 @@ abstract class BaseWidget
     /**
      * @var
      */
-    protected $bound = null;
+    protected $bind = null;
 
 
     /**
@@ -111,7 +111,7 @@ abstract class BaseWidget
         $this->classConcat[$permission] = $data['class_concat'];
         foreach ($data['pattern'] as $key => $value) {
             if (isset($this->config['templates'][$key])) {
-                $this->containerTemplates[$permission][$key] = $value;
+                $this->templates[$permission][$key] = $value;
             }
         }
     }
@@ -218,12 +218,22 @@ abstract class BaseWidget
                 return $class;
             }
 
-            $uniqueClass = array_unique($this->htmlClass);
+            $uniqueClass = $this->array_iunique($this->htmlClass);
             $class = implode(' ', $uniqueClass);
         }
 
         $this->htmlClass = [];
         return $class;
+    }
+
+    /**
+     * @param $array
+     * @return array
+     */
+    private function array_iunique($array)
+    {
+        $lowered = array_map('mb_strtolower', $array);
+        return array_intersect_key($array, array_unique($lowered));
     }
 
     /**
@@ -240,8 +250,8 @@ abstract class BaseWidget
         ];
 
 
-        if ($this->containerTemplate) {
-            $container = $this->containerTemplate;
+        if ($this->currentTemplate) {
+            $container = $this->currentTemplate;
         } elseif (isset($this->htmlAttributes['type']) && $this->htmlAttributes['type'] !== 'hidden') {
             $container = $this->getTemplate('inputContainer');
         } else {
@@ -257,14 +267,14 @@ abstract class BaseWidget
 
         $containerAttributes += $this->setError($this->name);
         $containerAttributes += $this->getContainerAllAttributes();
-        $this->resetOldData();
+        $this->resetProperties();
         return $this->formatTemplate($container, $containerAttributes);
     }
 
     /**
      *
      */
-    protected function resetOldData()
+    protected function resetProperties()
     {
         $this->icon = '';
         $this->htmlClass = [];
@@ -281,12 +291,12 @@ abstract class BaseWidget
     {
         $template = $this->config['templates'][$templateName];
 
-        if (!empty($this->containerTemplates['inline'][$templateName])) {
-            $template = $this->containerTemplates['inline'][$templateName];
-        } elseif (!empty($this->containerTemplates['local'][$templateName])) {
-            $template = $this->containerTemplates['local'][$templateName];
-        } elseif (!empty($this->containerTemplates['global'][$templateName])) {
-            $template = $this->containerTemplates['global'][$templateName];
+        if (!empty($this->templates['inline'][$templateName])) {
+            $template = $this->templates['inline'][$templateName];
+        } elseif (!empty($this->templates['local'][$templateName])) {
+            $template = $this->templates['local'][$templateName];
+        } elseif (!empty($this->templates['global'][$templateName])) {
+            $template = $this->templates['global'][$templateName];
         }
 
         return $template;

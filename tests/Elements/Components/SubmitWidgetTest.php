@@ -2,7 +2,7 @@
 
 namespace Tests\Elements\Components;
 
-use LaraForm\Elements\Components\SubmitWidget;
+use LaraForm\Elements\Widgets\SubmitWidget;
 
 class SubmitWidgetTest extends \PHPUnit_Framework_TestCase
 {

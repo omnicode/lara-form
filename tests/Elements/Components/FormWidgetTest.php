@@ -2,7 +2,7 @@
 
 namespace Tests\Elements\Components;
 
-use LaraForm\Elements\Components\FormWidget;
+use LaraForm\Elements\Widgets\FormWidget;
 
 class FormWidgetTest extends \PHPUnit_Framework_TestCase
 {

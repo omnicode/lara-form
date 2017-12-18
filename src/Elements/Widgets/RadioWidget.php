@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 class RadioWidget extends BaseInputWidget
 {
@@ -10,8 +10,8 @@ class RadioWidget extends BaseInputWidget
     public function render()
     {
         $template = $this->config['templates']['radio'];
-        $this->inspectionAttributes($attr);
-        $this->containerTemplate = $this->getTemplate('radioContainer');
+        $this->checkAttributes($attr);
+        $this->currentTemplate = $this->getTemplate('radioContainer');
         $this->otherHtmlAttributes['type'] = 'radio';
         return $this->formatNestingLabel($template,$attr);
     }
@@ -19,9 +19,9 @@ class RadioWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
-        $attr['value'] = isset($attr['value']) ? $attr['value'] : $this->config['default_value']['radio'];
+        $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
         if (!empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
             if (!is_array($val)) {
@@ -37,9 +37,9 @@ class RadioWidget extends BaseInputWidget
         }
 
         $attr['type'] = 'radio';
-        $this->generateClass($attr, $this->config['css']['radioClass']);
+        $this->generateClass($attr, $this->config['css']['class']['radioClass']);
         $this->generateId($attr,true);
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 
 }

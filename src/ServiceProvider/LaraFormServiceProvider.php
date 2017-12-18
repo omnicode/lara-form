@@ -31,7 +31,7 @@ class LaraFormServiceProvider extends ServiceProvider
      */
     public function setCoreConfig()
     {
-        $baseConfig = require_once dirname (__DIR__) . '/Config/lara_form_core.php';
+        $baseConfig = require_once dirname(__DIR__) . '/Config/core.php';
         $this->app['config']->set('lara_form_core', $baseConfig);
     }
 
@@ -41,7 +41,7 @@ class LaraFormServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            dirname (__DIR__) .'/Config/lara_form_base.php' => config_path('lara_form.php'),
+            dirname(__DIR__) . '/Config/default.php' => config_path('lara_form.php'),
         ]);
     }
 
@@ -52,7 +52,7 @@ class LaraFormServiceProvider extends ServiceProvider
     protected function configMerge()
     {
         $this->replaceConfig(
-            dirname (__DIR__) . '/Config/lara_form_base.php', 'lara_form'
+            dirname(__DIR__) . '/Config/default.php', 'lara_form'
         );
     }
 

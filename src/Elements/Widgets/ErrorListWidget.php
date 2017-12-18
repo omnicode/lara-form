@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 
@@ -28,7 +28,7 @@ class ErrorListWidget extends Widget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
 
     }

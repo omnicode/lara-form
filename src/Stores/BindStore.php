@@ -4,7 +4,7 @@ namespace LaraForm\Stores;
 
 use LaraForm\Core\BaseStore;
 
-class BoundStore extends BaseStore
+class BindStore extends BaseStore
 {
     /**
      * @var

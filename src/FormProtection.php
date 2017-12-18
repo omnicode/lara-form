@@ -68,11 +68,11 @@ class FormProtection extends BaseFormProtection
      */
     public function __construct()
     {
-        $this->sessionPrePath = config('lara_form.session.pre_path', 'laraforms');
-        $this->pathForUnlock = config('lara_form.session.path_for.unlock', 'is_unlock');
-        $this->pathForCheck = config('lara_form.session.path_for.check', 'is_check');
-        $this->pathForTime = config('lara_form.session.path_for.time', 'created_time');
-        $this->pathForUrl = config('lara_form.session.path_for.action', '_action');
+        $this->sessionPrePath = config('lara_form.session.name', 'laraforms');
+        $this->pathForUnlock = config('lara_form.session.paths.unlock', 'is_unlock');
+        $this->pathForCheck = config('lara_form.session.paths.check', 'is_check');
+        $this->pathForTime = config('lara_form.session.paths.time', 'created_time');
+        $this->pathForUrl = config('lara_form.session.paths.action', '_action');
         $this->ajax = config('lara_form.ajax_request');
         $this->fields = [];
     }
@@ -120,7 +120,7 @@ class FormProtection extends BaseFormProtection
     public function validate(Request $request, $data)
     {
         $this->removeByTime();
-        $tokenName = config('lara_form.label.form_protection', 'laraform_token');
+        $tokenName = config('lara_form.token_name', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
 
         if (!$token) {
@@ -206,34 +206,32 @@ class FormProtection extends BaseFormProtection
      */
     public function removeByTime()
     {
-        $maxTime = config('lara_form.session.max_time', false);
+        $maxTime = config('lara_form.session.lifetime', false);
 
         if (!$maxTime) {
             return false;
         }
 
-        $formHistory = session(config('lara_form.session.pre_path'));
+        $formHistory = session(config('lara_form.session.name'));
 
         if (empty($formHistory)) {
             return false;
         }
+        if (starts_with($maxTime, '+') || starts_with($maxTime, '-')) {
+            $maxTime = substr($maxTime, 1);
+        }
 
-        $maxSeccounds = $maxTime * 60 * 60;
-        $timeName = config('lara_form.session.path_for.time');
-        $currentTime = time();
-        $betweenTime = $currentTime - $maxSeccounds;
-
-        $newHistory = array_filter($formHistory, function ($value) use ($timeName, $betweenTime) {
-
+        $maxSeccounds = strtotime( '-'.$maxTime);
+        $timeName = config('lara_form.session.paths.time');
+        $newHistory = array_filter($formHistory, function ($value) use ($timeName, $maxSeccounds) {
             if (isset($value[$timeName])) {
-
-                if ($value[$timeName] > $betweenTime) {
+                if ($value[$timeName] > $maxSeccounds) {
                     return $value;
                 }
             }
         });
 
-        session()->put(config('lara_form.session.pre_path'), $newHistory);
+        session()->put(config('lara_form.session.name'), $newHistory);
     }
 
     /**
@@ -247,11 +245,11 @@ class FormProtection extends BaseFormProtection
             return false;
         }
 
-        $formHistory = session(config('lara_form.session.pre_path'));
+        $formHistory = session(config('lara_form.session.name'));
 
         if (count($formHistory) > $maxCount) {
             $newHistory = array_slice($formHistory, -$maxCount);
-            session()->put(config('lara_form.session.pre_path'), $newHistory);
+            session()->put(config('lara_form.session.name'), $newHistory);
         }
     }
 
@@ -282,7 +280,7 @@ class FormProtection extends BaseFormProtection
     public function addField($field, &$options = [], $value = '')
     {
         if (!empty($options['disabled'])) {
-             return;
+            return;
         }
         if (!empty($options['_unlock'])) {
             unset($this->fields[$field]);

@@ -13,6 +13,6 @@ interface WidgetInterface
 {
     public function render();
 
-    public function inspectionAttributes(&$attr);
+    public function checkAttributes(&$attr);
 
 }

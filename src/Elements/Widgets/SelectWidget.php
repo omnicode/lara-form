@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 use function Symfony\Component\Debug\Tests\testHeader;
@@ -40,7 +40,7 @@ class SelectWidget extends Widget
      */
     public function render()
     {
-        $this->inspectionAttributes($this->attr);
+        $this->checkAttributes($this->attr);
         $optionsHtml = $this->renderOptions();
 
         $selectAttrs = [
@@ -50,7 +50,7 @@ class SelectWidget extends Widget
         ];
 
         $this->htmlAttributes['type'] = 'select';
-        $this->containerTemplate = $this->getTemplate('selectContainer');
+        $this->currentTemplate = $this->getTemplate('selectContainer');
         $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
         return $this->completeTemplate();
     }
@@ -58,11 +58,11 @@ class SelectWidget extends Widget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
         $this->generateId($attr);
         $this->generateLabel();
-        $this->generateClass($attr,$this->config['css']['selectClass']);
+        $this->generateClass($attr,$this->config['css']['class']['selectClass']);
 
         if (ends_with($this->name, '[]')) {
             $attr['multiple'] = true;
@@ -71,7 +71,7 @@ class SelectWidget extends Widget
 
         if (isset($attr['multiple'])) {
             $this->selectTemplate = $this->getTemplate('selectMultiple');
-            $this->hidden = $this->setHidden($this->name,$this->config['default_value']['hidden']);
+            $this->hidden = $this->setHidden($this->name,0);
             unset($attr['multiple']);
         } else {
             $this->selectTemplate = $this->getTemplate('select');
@@ -86,7 +86,7 @@ class SelectWidget extends Widget
             array_unshift($this->optionsArray, $attr['empty']);
             unset($attr['empty']);
         } else {
-            $emptyValue = $this->config['label']['select_empty'];
+            $emptyValue = $this->config['text']['select_empty'];
 
             if ($emptyValue) {
                 array_unshift($this->optionsArray, $emptyValue);
@@ -123,7 +123,7 @@ class SelectWidget extends Widget
             }
             unset($attr['groupDisabled']);
         }
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 
     /**

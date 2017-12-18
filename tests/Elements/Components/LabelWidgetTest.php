@@ -2,7 +2,7 @@
 
 namespace Label\Elements\Components;
 
-use LaraForm\Elements\Components\LabelWidget;
+use LaraForm\Elements\Widgets\LabelWidget;
 
 class LabelWidgetTest extends \PHPUnit_Framework_TestCase
 {

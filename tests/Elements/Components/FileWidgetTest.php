@@ -2,7 +2,7 @@
 
 namespace Tests\Elements\Components;
 
-use LaraForm\Elements\Components\FileWidget;
+use LaraForm\Elements\Widgets\FileWidget;
 
 class FileWidgetTest extends \PHPUnit_Framework_TestCase
 {

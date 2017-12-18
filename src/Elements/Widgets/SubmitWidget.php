@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraForm\Elements\Components;
+namespace LaraForm\Elements\Widgets;
 
 class SubmitWidget extends BaseInputWidget
 {
@@ -9,7 +9,7 @@ class SubmitWidget extends BaseInputWidget
      */
     public function render()
     {
-        $this->inspectionAttributes($this->attr);
+        $this->checkAttributes($this->attr);
         $template = $this->getTemplate('button');
 
         if ($this->name === false) {
@@ -17,7 +17,7 @@ class SubmitWidget extends BaseInputWidget
         } elseif (!empty($this->name)) {
             $name = $this->name;
         } else {
-            $name = $this->config['label']['submit_name'] ? $this->config['label']['submit_name'] : '';
+            $name = $this->config['text']['submit_name'] ? $this->config['text']['submit_name'] : '';
         }
         $btnAttr = [
             'attrs' => $this->formatAttributes($this->attr),
@@ -26,7 +26,7 @@ class SubmitWidget extends BaseInputWidget
 
 
         $this->html = $this->formatTemplate($template, $btnAttr);
-        $this->containerTemplate = $this->config['templates']['submitContainer'];
+        $this->currentTemplate = $this->config['templates']['submitContainer'];
         return $this->completeTemplate();
     }
 
@@ -34,10 +34,10 @@ class SubmitWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function inspectionAttributes(&$attr)
+    public function checkAttributes(&$attr)
     {
-        $btn = $this->config['css']['submitClass'];
-        $btnColor = $this->config['css']['submitColor'];
+        $btn = $this->config['css']['class']['submitClass'];
+        $btnColor = $this->config['css']['class']['submitColor'];
         $defaut = $btn . ' ' . $btnColor;
 
         if (isset($attr['btn'])) {
@@ -60,7 +60,7 @@ class SubmitWidget extends BaseInputWidget
         }
 
         $this->generateId($attr);
-        parent::inspectionAttributes($attr);
+        parent::checkAttributes($attr);
     }
 
 }
