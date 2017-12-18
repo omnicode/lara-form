@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use LaraForm\FormProtection;
 
+/**
+ * Class LaraFormMiddleware
+ * @package LaraForm\Middleware
+ */
 class LaraFormMiddleware
 {
     /**
@@ -24,6 +28,8 @@ class LaraFormMiddleware
     }
 
     /**
+     * if the check fails, it will throw an exception
+     *
      * @param Request $request
      * @param Closure $next
      * @return mixed
@@ -49,6 +55,8 @@ class LaraFormMiddleware
     }
 
     /**
+     * Checks for to specific exceptions in the configuration file
+     *
      * @param $request
      * @return bool
      */

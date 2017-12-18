@@ -20,19 +20,10 @@ class LaraFormServiceProvider extends ServiceProvider
         $this->registerFormProtection();
         $this->registerMiddleware(LaraFormMiddleware::class);
         $this->registerStores();
-        $this->registerFormBuilder();
-        $this->configMerge();
+        $this->replaceConfig();
         $this->setCoreConfig();
+        $this->registerFormBuilder();
 
-    }
-
-    /**
-     *
-     */
-    public function setCoreConfig()
-    {
-        $baseConfig = require_once dirname(__DIR__) . '/Config/core.php';
-        $this->app['config']->set('lara_form_core', $baseConfig);
     }
 
     /**
@@ -45,29 +36,24 @@ class LaraFormServiceProvider extends ServiceProvider
         ]);
     }
 
-
     /**
-     *
+     * Create a core configuration
      */
-    protected function configMerge()
+    public function setCoreConfig()
     {
-        $this->replaceConfig(
-            dirname(__DIR__) . '/Config/default.php', 'lara_form'
-        );
+        $baseConfig = require_once dirname(__DIR__) . '/Config/core.php';
+        $this->app['config']->set('lara_form_core', $baseConfig);
     }
 
     /**
      * Merge the given configuration with the existing configuration.
-     * @param  string $path
-     * @param  string $key
-     * @return void
      */
-    protected function replaceConfig($path, $key)
+    protected function replaceConfig()
     {
-        $config = $this->app['config']->get($key, []);
-        $baseConfig = require_once $path;
+        $config = $this->app['config']->get('lara_form', []);
+        $baseConfig = require_once dirname(__DIR__) . '/Config/default.php';
 
-        $this->app['config']->set($key, array_replace_recursive($baseConfig,$config));
+        $this->app['config']->set('lara_form', array_replace_recursive($baseConfig,$config));
     }
 
     /**
@@ -82,7 +68,7 @@ class LaraFormServiceProvider extends ServiceProvider
 
 
     /**
-     *
+     * Register the FormProtection
      */
     protected function registerFormProtection()
     {
@@ -93,7 +79,7 @@ class LaraFormServiceProvider extends ServiceProvider
 
 
     /**
-     *
+     * Register the ErroeStore, OldInputStore and OptionStore
      */
     protected function registerStores()
     {
@@ -110,7 +96,7 @@ class LaraFormServiceProvider extends ServiceProvider
     }
 
     /**
-     *
+     * Register the FormBuilder
      */
     protected function registerFormBuilder()
     {

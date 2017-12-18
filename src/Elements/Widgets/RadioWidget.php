@@ -2,10 +2,16 @@
 
 namespace LaraForm\Elements\Widgets;
 
+/**
+ * Processes and creates input tag for radio type
+ *
+ * Class RadioWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class RadioWidget extends BaseInputWidget
 {
     /**
-     * @return string
+     * @return mixed|string
      */
     public function render()
     {
@@ -18,6 +24,7 @@ class RadioWidget extends BaseInputWidget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {
@@ -38,6 +45,11 @@ class RadioWidget extends BaseInputWidget
 
         $attr['type'] = 'radio';
         $this->generateClass($attr, $this->config['css']['class']['radioClass']);
+
+        if (empty($attr['class'])) {
+            $attr['class'] = false;
+        }
+
         $this->generateId($attr,true);
         parent::checkAttributes($attr);
     }

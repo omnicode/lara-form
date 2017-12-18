@@ -1,18 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Admin
- * Date: 28-Nov-17
- * Time: 05:23 PM
- */
 
 namespace LaraForm\Elements;
 
-
+/**
+ * Interface WidgetInterface
+ * @package LaraForm\Elements
+ */
 interface WidgetInterface
 {
+    /**
+     * @return mixed
+     */
     public function render();
 
+    /**
+     * @param $attr
+     * @return mixed
+     */
     public function checkAttributes(&$attr);
 
 }

@@ -2,6 +2,12 @@
 
 namespace LaraForm\Elements\Widgets;
 
+/**
+ * Processes and creates input tag for number
+ *
+ * Class NumberWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class NumberWidget extends BaseInputWidget
 {
     /**

@@ -4,10 +4,18 @@ namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 
+/**
+ * Returns a list of validation errors
+ *
+ * Class ErrorListWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class ErrorListWidget extends Widget
 {
     /**
-     * @return string
+     * Returns a list of validation errors
+     *
+     * @return mixed|string|void
      */
     public function render()
     {

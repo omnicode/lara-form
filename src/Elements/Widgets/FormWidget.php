@@ -4,9 +4,18 @@ namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 
+/**
+ * Processes and creates form tag and hidden fields for
+ * method, csrf and lara_form validation
+ *
+ * Class FormWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class FormWidget extends Widget
 {
     /**
+     * Returns the finished html form opened or closed view
+     *
      * @return array|string|void
      */
     public function render()
@@ -22,6 +31,7 @@ class FormWidget extends Widget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {
@@ -45,8 +55,10 @@ class FormWidget extends Widget
     }
 
     /**
+     * Create a opening the form tag by processing and modifying the fields overeating its attributes
+     *
      * @param $options
-     * @return array
+     * @return mixed|string
      */
     private function start($options)
     {
@@ -77,7 +89,9 @@ class FormWidget extends Widget
     }
 
     /**
-     * @return string
+     * Create a closing the form tag
+     *
+     * @return mixed
      */
     private function end()
     {

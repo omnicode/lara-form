@@ -9,8 +9,24 @@ use LaraForm\Stores\BindStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 
+/**
+ * Class Widget
+ * @package LaraForm\Elements
+ */
 class Widget extends BaseWidget implements WidgetInterface
 {
+    /**
+     * Widget constructor.
+     * @param ErrorStore $errorStore
+     * @param OldInputStore $oldInputStore
+     */
+    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore)
+    {
+        $this->config = config('lara_form');
+        $this->errors = $errorStore;
+        $this->oldInputs = $oldInputStore;
+    }
+
     /**
      *
      */
@@ -20,6 +36,8 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * Checks and modifies the attributes that were passed in the field
+     *
      * @param $attr
      */
     public function checkAttributes(&$attr)
@@ -36,18 +54,8 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
-     * Widget constructor.
-     * @param ErrorStore $errorStore
-     * @param OldInputStore $oldInputStore
-     */
-    public function __construct(ErrorStore $errorStore, OldInputStore $oldInputStore)
-    {
-        $this->config = config('lara_form');
-        $this->errors = $errorStore;
-        $this->oldInputs = $oldInputStore;
-    }
-
-    /**
+     * Adds modifying data to templates and their parameters
+     *
      * @param $data
      */
     public function setParams($data)
@@ -58,6 +66,8 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * Adds and model in BindStore and creates the object
+     *
      * @param $data
      */
     public function setModel($data)
@@ -67,6 +77,8 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * Creates a field name and their options if they exist
+     *
      * @param $arguments
      */
     public function setArguments($arguments)
@@ -78,10 +90,12 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * Returns the content of the error message and its style if the error is eating
+     *
      * @param $name
      * @return array
      */
-    public function setError($name)
+    public function getErrorByFieldName($name)
     {
         $errorParams = [
             'help' => '',
@@ -100,6 +114,8 @@ class Widget extends BaseWidget implements WidgetInterface
 
 
     /**
+     * Returns the field value from the link to the model or the one that was before the validation
+     *
      * @param $name
      * @return array
      */
@@ -120,18 +136,21 @@ class Widget extends BaseWidget implements WidgetInterface
         return $data;
     }
 
-    /*
+    /**
+     * Creates view for html field label
      *
+     * @param $name
+     * @param $attr
+     * @return mixed
      */
-
-    protected function setLabel($name, $attr)
+    protected function renderLabel($name, $attr)
     {
         $template = $this->config['templates']['label'];
 
         if (!isset($attr['for'])) {
             $attr['for'] = $name;
         }
-        // dd($this->htmlClass);
+
         $rep = [
             'attrs' => $this->formatAttributes($attr),
             'text' => $name,
@@ -141,20 +160,24 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * Checks and creates attributes for the label field
+     *
      * @param $inputName
      * @param $option
      * @param bool $treatment
      * @return string
      */
-    protected function renderLabel($inputName, $option, $treatment = false)
+    protected function checkLabel($inputName, $option, $treatment = false)
     {
         $for = isset($option['id']) ? $option['id'] : $inputName;
         $labelName = $treatment ? $inputName : $this->getLabelName($inputName);
-        $this->label = $this->setLabel($labelName, ['for' => $for]);
+        $this->label = $this->renderLabel($labelName, ['for' => $for]);
         return $this->label;
     }
 
     /**
+     * Generates id by specified parameters
+     *
      * @param $attr
      * @param bool $multi
      */
@@ -177,19 +200,21 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
-     *
+     * Generates id by property attr
      */
     protected function generateLabel()
     {
         if (!empty($this->attr['label'])) {
-            $this->renderLabel($this->attr['label'], $this->attr, true);
+            $this->checkLabel($this->attr['label'], $this->attr, true);
             unset($this->attr['label']);
         } elseif (!isset($this->attr['label'])) {
-            $this->renderLabel($this->name, $this->attr);
+            $this->checkLabel($this->name, $this->attr);
         }
     }
 
     /**
+     * Returns a default value or a modification for concatenating classes,
+     *
      * @return mixed
      */
     protected function getHtmlClassControl()
@@ -209,6 +234,8 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * Generates class by specified parameters
+     *
      * @param $attr
      * @param bool $default
      * @param bool $format
@@ -219,14 +246,14 @@ class Widget extends BaseWidget implements WidgetInterface
             if ($attr['class'] === false) {
                 $this->htmlClass[] = false;
             } else {
-                $classies = $attr['class'];
-                if (!is_array($classies)) {
-                    $classies = [$classies];
+                $classes = $attr['class'];
+                if (!is_array($classes)) {
+                    $classes = [$classes];
                 }
                 if ($this->getHtmlClassControl()) {
-                    $this->htmlClass = array_merge([$default],$classies);
+                    $this->htmlClass = array_merge([$default],$classes);
                 } else {
-                    $this->htmlClass = $classies;
+                    $this->htmlClass = $classes;
                 }
                 unset($attr['class']);
             }
@@ -239,29 +266,23 @@ class Widget extends BaseWidget implements WidgetInterface
         }
     }
 
-    private function isConcated()
-    {
-
-    }
-
     /**
+     * Creates a hidden input field
+     *
      * @param $name
-     * @param bool $value
-     * @return string
+     * @param int $value
+     * @return mixed
      */
-    protected function setHidden($name, $value = false)
+    protected function setHidden($name, $value = 0)
     {
         $hiddenTemplate = $this->config['templates']['hiddenInput'];
-
-        if ($value === false) {
-            $value = 0;
-        }
-
         $attr = ['name' => $name, 'value' => $value,];
         return $this->formatTemplate($hiddenTemplate, $attr);
     }
 
     /**
+     * Removes all characters except letters and numbers and creates a name for the label field
+     *
      * @param $name
      * @return string
      */
@@ -271,6 +292,8 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * Removes all characters except letters and numbers and creates a id by camelcase style
+     *
      * @param $name
      * @return mixed
      */

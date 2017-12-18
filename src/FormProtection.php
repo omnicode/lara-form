@@ -108,7 +108,6 @@ class FormProtection extends BaseFormProtection
 
     /**
      * Validates the field names, and for hidden field the value also, from the request
-     * if the check fails, it will throw an exception
      *
      * @param Request $request
      * @param $data

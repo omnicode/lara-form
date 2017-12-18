@@ -8,27 +8,37 @@ use function Symfony\Component\Debug\Tests\testHeader;
 class SelectWidget extends Widget
 {
     /**
-     * @var
+     * Keeped here select template
+     *
+     * @var string
      */
     private $selectTemplate;
 
     /**
+     * Keeped here selected options
+     *
      * @var bool
      */
     private $selected = [];
 
     /**
+     * Keeped here disablied options
+     *
      * @var array
      */
     private $optionDisabled = [];
 
     /**
+     * Keeped here disablied group
+     *
      * @var array
      */
     private $groupDisabled = [];
 
     /**
-     * @var
+     * Keeped here options
+     *
+     * @var array
      */
     private $optionsArray;
 
@@ -56,6 +66,7 @@ class SelectWidget extends Widget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {
@@ -81,7 +92,7 @@ class SelectWidget extends Widget
             unset($attr['options']);
         }
 
-        if (isset($attr['empty']) && $attr['empty'] !== false) {
+        if (!empty($attr['empty'])) {
             array_unshift($this->optionsArray, $attr['empty']);
             unset($attr['empty']);
         } else {
@@ -164,7 +175,7 @@ class SelectWidget extends Widget
     /**
      * @param $groupName
      * @param $options
-     * @return string
+     * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -186,7 +197,7 @@ class SelectWidget extends Widget
 
     /**
      * @param $str
-     * @param array|bool $disabled
+     * @param array $disabled
      * @return array
      */
     private function isDisabled($str, array $disabled = [])

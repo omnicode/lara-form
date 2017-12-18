@@ -2,6 +2,12 @@
 
 namespace LaraForm\Elements\Widgets;
 
+/**
+ * Processes and creates input tag for hidden type
+ *
+ * Class HiddenWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class HiddenWidget extends BaseInputWidget
 {
 
@@ -15,6 +21,7 @@ class HiddenWidget extends BaseInputWidget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {

@@ -2,6 +2,10 @@
 
 namespace LaraForm\Elements\Widgets;
 
+/**
+ * Class InputWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class InputWidget extends BaseInputWidget
 {
     /**
@@ -14,6 +18,7 @@ class InputWidget extends BaseInputWidget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {

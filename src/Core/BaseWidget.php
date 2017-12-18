@@ -258,7 +258,7 @@ abstract class BaseWidget
                 return $class;
             }
 
-            $uniqueClass = $this->array_iunique($this->htmlClass);
+            $uniqueClass = $this->array_unique($this->htmlClass);
             $class = implode(' ', $uniqueClass);
         }
 
@@ -308,7 +308,7 @@ abstract class BaseWidget
             $container = strip_tags($container);
         }
 
-        $containerAttributes += $this->setError($this->name);
+        $containerAttributes += $this->getErrorByFieldName($this->name);
         $containerAttributes += $this->getContainerAllAttributes();
         $this->resetProperties();
         return $this->formatTemplate($container, $containerAttributes);

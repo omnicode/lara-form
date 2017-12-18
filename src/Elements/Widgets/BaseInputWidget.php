@@ -4,20 +4,17 @@ namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 
+/**
+ * Processes and creates input tags
+ *
+ * Class BaseInputWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class BaseInputWidget extends Widget
 {
     /**
-     * @var array
-     */
-    protected $types = [
-        'checkbox',
-        'radio',
-        'submit',
-        'textarea',
-        'file'
-    ];
-
-    /**
+     * Returns the finished html view
+     *
      * @return string
      */
     public function render()
@@ -28,6 +25,7 @@ class BaseInputWidget extends Widget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {
@@ -35,23 +33,19 @@ class BaseInputWidget extends Widget
     }
 
     /**
+     * Formats input fields according to a given template or by default
+     *
      * @param $name
      * @param $attr
      * @param bool $cTemplate
-     * @return string
+     * @return mixed|string
      */
     protected function formatInputField($name, $attr, $cTemplate = false)
     {
-        if (!$cTemplate) {
-
-            if (isset($attr['type']) && in_array($attr['type'], $this->types)) {
-                $template = $this->getTemplate($attr['type']);
-            } else {
-                $template = $this->getTemplate('input');
-            }
-
-        } else {
+        if ($cTemplate) {
             $template = $cTemplate;
+        } else {
+            $template = $this->getTemplate('input');
         }
 
         $this->generalcheckAttributes($attr, $cTemplate);
@@ -62,10 +56,12 @@ class BaseInputWidget extends Widget
     }
 
     /**
+     * Formats the fields inside the label field
+     *
      * @param $template
      * @param $attr
      * @param array $labelAttrs
-     * @return string
+     * @return mixed|string
      */
     protected function formatNestingLabel($template, $attr, $labelAttrs = [])
     {
@@ -89,6 +85,8 @@ class BaseInputWidget extends Widget
     }
 
     /**
+     * Checks and modifies the attributes that were passed in the field
+     *
      * @param $attr
      * @param $cTemplate
      */

@@ -2,15 +2,25 @@
 
 namespace LaraForm\Elements\Widgets;
 
+/**
+ * Processes and creates input tag for file type
+ *
+ * Class FileWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class FileWidget extends BaseInputWidget
 {
     /**
-     * @var
+     * Keeped here template for file input
+     *
+     * @var string
      */
     private $fileTemplate;
 
     /**
-     * @return string
+     * Returns the finished html file input view
+     *
+     * @return mixed|string
      */
     public function render()
     {
@@ -28,6 +38,7 @@ class FileWidget extends BaseInputWidget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {

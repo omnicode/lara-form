@@ -2,6 +2,12 @@
 
 namespace LaraForm\Elements\Widgets;
 
+/**
+ * Processes and creates checkbox
+ *
+ * Class CheckboxWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class CheckboxWidget extends BaseInputWidget
 {
     /**
@@ -10,7 +16,9 @@ class CheckboxWidget extends BaseInputWidget
     private $oldCheckboxNames = [];
 
     /**
-     * @return string
+     * Returns the finished html checkbox view
+     *
+     * @return mixed|string
      */
     public function render()
     {
@@ -22,6 +30,7 @@ class CheckboxWidget extends BaseInputWidget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {
@@ -71,7 +80,11 @@ class CheckboxWidget extends BaseInputWidget
             $this->oldCheckboxNames[] = $this->name;
         }
         $attr['type'] = 'checkbox';
+
         $this->generateClass($attr, $this->config['css']['class']['checkboxClass']);
+        if (empty($attr['class'])) {
+           $attr['class'] = false;
+        }
         $this->generateId($attr,true);
         parent::checkAttributes($attr);
     }

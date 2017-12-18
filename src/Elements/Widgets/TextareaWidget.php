@@ -4,10 +4,19 @@ namespace LaraForm\Elements\Widgets;
 
 use LaraForm\Elements\Widget;
 
+/**
+ * Processes and creates textarea tag
+ *
+ * Class TextareaWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class TextareaWidget extends Widget
 {
+
     /**
-     * @return string
+     * Returns the finished html textarea view
+     *
+     * @return mixed|string|void
      */
     public function render()
     {
@@ -24,6 +33,7 @@ class TextareaWidget extends Widget
 
     /**
      * @param $attr
+     * @return mixed|void
      */
     public function checkAttributes(&$attr)
     {

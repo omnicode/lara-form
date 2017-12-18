@@ -2,7 +2,12 @@
 
 namespace LaraForm\Elements\Widgets;
 
-
+/**
+ * Processes and creates input tag for password type
+ *
+ * Class PasswordWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class PasswordWidget extends BaseInputWidget
 {
     /**
