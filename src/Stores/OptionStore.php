@@ -6,7 +6,7 @@ use LaraForm\Core\BaseStore;
 use LaraForm\FormBuilder;
 
 /**
- * creates a system of chain-calling methods
+ * creates a system of Chain-calling methods
  *
  * Class OptionStore
  * @package LaraForm\Stores
@@ -14,14 +14,14 @@ use LaraForm\FormBuilder;
 class OptionStore extends BaseStore
 {
     /**
-     * save here object FormBuilder
+     * Keeped here object FormBuilder
      *
      * @var FormBuilder
      */
     private $builder;
 
     /**
-     *
+     * Keeped here all field attributes
      *
      * @var array
      */
@@ -29,6 +29,8 @@ class OptionStore extends BaseStore
 
 
     /**
+     * Chain calling this method passes an array of attributes
+     *
      * @param $options
      * @return $this
      */
@@ -48,6 +50,8 @@ class OptionStore extends BaseStore
 
 
     /**
+     * Chain calling this method passes an field id
+     *
      * @param $strId
      * @return $this
      */
@@ -58,6 +62,8 @@ class OptionStore extends BaseStore
     }
 
     /**
+     * Chain calling this method passes an array or arguments of field class
+     *
      * @param $var
      * @return $this
      */
@@ -76,6 +82,10 @@ class OptionStore extends BaseStore
     }
 
     /**
+     * Chain calling this method for data attibutes
+     * The first argument is the name
+     * The second argument is the value
+     *
      * @param $name
      * @param $value
      * @return $this
@@ -87,6 +97,8 @@ class OptionStore extends BaseStore
     }
 
     /**
+     * Gets the field attibutes
+     *
      * @return array
      */
     public function getOprions()
@@ -95,7 +107,7 @@ class OptionStore extends BaseStore
     }
 
     /**
-     *
+     * Remove field attibutes
      */
     public function resetOptions()
     {
@@ -103,6 +115,8 @@ class OptionStore extends BaseStore
     }
 
     /**
+     * Accepts an object and assigns the property
+     *
      * @param $model
      */
     public function setBuilder($model)
@@ -111,6 +125,9 @@ class OptionStore extends BaseStore
     }
 
     /**
+     * When there is a mapping then we call the method __toString() from bulider,
+     * because the rendering is done there
+     *
      * @return mixed
      */
     public function __toString()

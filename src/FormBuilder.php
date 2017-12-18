@@ -10,59 +10,75 @@ use LaraForm\Stores\OldInputStore;
 use LaraForm\Stores\OptionStore;
 use LaraForm\Traits\FormControl;
 
+/**
+ * Creates objects of fields and displays them
+ *
+ * Class FormBuilder
+ * @package LaraForm
+ */
 class FormBuilder extends BaseFormBuilder
 {
     use FormControl;
 
     /**
+     * Keeped here object FormProtection
+     *
      * @var FormProtection
      */
     protected $formProtection;
 
     /**
+     * Keeped here object ErrorStore
+     *
      * @var ErrorStore
      */
     protected $errorStore;
 
     /**
+     * Keeped here object OldInputStore
+     *
      * @var OldInputStore
      */
     protected $oldInputStore;
 
     /**
+     * Keeped here objects by  already created fields
+     *
      * @var array
      */
     protected $maked = [];
 
     /**
+     * Keeped here model that was passed in form
+     *
      * @var $model
      */
     protected $model;
 
     /**
+     * Designate the start and end of the form
+     *
      * @var bool
      */
     protected $isForm = false;
 
     /**
-     * @var array
+     * Keeped here object of the current field
+     *
+     * @var widget
      */
-    protected $localTemplates = [
-        'pattern' => [],
-        'div' => [],
-        'class_concat' => true
-    ];
+    protected $widget;
 
     /**
-     * @var array
+     * Keeped here object OptionStore
+     *
+     * @var OptionStore
      */
-    protected $globalTemplates = [
-        'pattern' => [],
-        'div' => [],
-        'class_concat' => true
-    ];
+    protected $optionStore;
 
     /**
+     * Keeped modifications for the view template of one element
+     *
      * @var array
      */
     protected $inlineTemplates = [
@@ -72,16 +88,30 @@ class FormBuilder extends BaseFormBuilder
     ];
 
     /**
-     * @var
+     * Keeped modifications for the view templates inside in form
+     *
+     * @var array
      */
-    protected $widget;
+    protected $localTemplates = [
+        'pattern' => [],
+        'div' => [],
+        'class_concat' => true
+    ];
 
     /**
-     * @var OptionStore
+     * Keeped modifications for the view templates inside in page
+     *
+     * @var array
      */
-    protected $optionStore;
+    protected $globalTemplates = [
+        'pattern' => [],
+        'div' => [],
+        'class_concat' => true
+    ];
 
     /**
+     * Accepts an objects and assigns the properties
+     *
      * FormBuilder constructor.
      * @param FormProtection $formProtection
      * @param ErrorStore $errorStore
@@ -101,6 +131,10 @@ class FormBuilder extends BaseFormBuilder
     }
 
     /**
+     * Opens the form, and begins to store data about the fields
+     * Warning!
+     * The attributes of the action and method must be passed in the second parameter or not transmitted at all!!!
+     *
      * @param null $model
      * @param array $options
      * @return mixed
@@ -140,6 +174,8 @@ class FormBuilder extends BaseFormBuilder
     }
 
     /**
+     * Closes the form
+     *
      * @return mixed
      */
     public function end()
@@ -151,6 +187,8 @@ class FormBuilder extends BaseFormBuilder
     }
 
     /**
+     * Accepts changes for presentation templates within a form or on a page
+     *
      * @param $templateName
      * @param bool $templateValue
      * @param bool $global
@@ -181,6 +219,19 @@ class FormBuilder extends BaseFormBuilder
     }
 
     /**
+     * @return mixed
+     */
+    public function __toString()
+    {
+        $data = $this->complateTemplatesAndParams();
+        $this->widget->setArguments($this->optionStore->getOprions());
+        $this->widget->setParams($data);
+        $this->optionStore->resetOptions();
+
+        return $this->widget->render();
+    }
+
+    /**
      * @param $method
      * @param $arrgs
      * @return mixed
@@ -190,7 +241,6 @@ class FormBuilder extends BaseFormBuilder
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
 
         if (isset($attr['type'])) {
-
             if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file', 'textarea', 'hidden'])) {
                 $method = $attr['type'];
             }
@@ -198,7 +248,6 @@ class FormBuilder extends BaseFormBuilder
 
         if (isset($arrgs[0])) {
             $value = '';
-
             if ($method == 'hidden') {
                 $value = isset($attr['value']) ? $attr['value'] : config('lara_form.default_value.hidden');
             }
@@ -212,17 +261,9 @@ class FormBuilder extends BaseFormBuilder
         return $this->make($method, $arrgs);
     }
 
-
     /**
-     * @param $data
-     * @return bool
-     */
-    protected function validate($data)
-    {
-        return $this->formProtection->validate($data);
-    }
-
-    /**
+     * Instantiates field objects and returns an object OptionStore to create a chain
+     *
      * @param $method
      * @param $arguments
      * @return mixed
@@ -247,22 +288,9 @@ class FormBuilder extends BaseFormBuilder
         return $this->optionStore;
     }
 
-
     /**
-     * @return mixed
-     */
-    public function __toString()
-    {
-        $data = $this->complateTemplatesAndParams();
-        $this->widget->setArguments($this->optionStore->getOprions());
-        $this->widget->setParams($data);
-        $this->optionStore->resetOptions();
-
-        return $this->widget->render();
-    }
-
-
-    /**
+     * Completing modifying templates and their parame
+     *
      * @return array
      */
     private function complateTemplatesAndParams()
@@ -283,26 +311,8 @@ class FormBuilder extends BaseFormBuilder
     }
 
     /**
-     * @param $options
-     * @return array|string
-     * @throws \Exception
-     */
-    private function getGeneralUnlockFieldsBy(&$options)
-    {
-        $unlockFields = [];
-
-        if (!empty($options['_unlockFields'])) {
-            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']);
-            unset($options['_unlockFields']);
-        }
-
-        $unlockFields[] = '_token';
-        $unlockFields[] = '_method';
-        $unlockFields[] = config('lara_form.token_name', 'laraform_token');
-        return $unlockFields;
-    }
-
-    /**
+     * Checks whether the template modification has been transferred from a separate field
+     *
      * @param $attr
      */
     private function hasTemplate(&$attr)
@@ -319,7 +329,7 @@ class FormBuilder extends BaseFormBuilder
     }
 
     /**
-     *
+     * Remove proprties
      */
     private function resetProperties()
     {
@@ -330,6 +340,8 @@ class FormBuilder extends BaseFormBuilder
     }
 
     /**
+     * locally or globally stores modifications and template parameters in properties
+     *
      * @param $data
      * @param $container
      * @param $options
@@ -348,5 +360,27 @@ class FormBuilder extends BaseFormBuilder
         foreach ($data as $key => $value) {
             $container['pattern'][$key] = $value;
         }
+    }
+
+    /**
+     * From the form parameters get a list of fields that should not be validated
+     *
+     * @param $options
+     * @return array|string
+     * @throws \Exception
+     */
+    private function getGeneralUnlockFieldsBy(&$options)
+    {
+        $unlockFields = [];
+
+        if (!empty($options['_unlockFields'])) {
+            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']);
+            unset($options['_unlockFields']);
+        }
+
+        $unlockFields[] = '_token';
+        $unlockFields[] = '_method';
+        $unlockFields[] = config('lara_form.token_name', 'laraform_token');
+        return $unlockFields;
     }
 }

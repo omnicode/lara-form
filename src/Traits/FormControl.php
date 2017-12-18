@@ -8,11 +8,15 @@ use Route;
 trait FormControl
 {
     /**
+     * Keepes here all routes
+     *
      * @var array
      */
     private $routes = [];
 
     /**
+     * From the form parameters evaluates the action and returns it
+     *
      * @param array $options
      * @return array|mixed|string
      */
@@ -40,6 +44,7 @@ trait FormControl
 
             if (!is_array($action)) {
                 //if action is url
+                // deprecated, will be removed in next version
                 if (filter_var($action, FILTER_VALIDATE_URL)) {
                     return $action;
                 }
@@ -70,6 +75,9 @@ trait FormControl
 
 
     /**
+     * Returns a query method, by default it is a post, but if you specify model is a put
+     * It is possible and in the manual to give a method
+     *
      * @param $options
      * @return null|string
      * @internal param $model
@@ -91,6 +99,9 @@ trait FormControl
     }
 
     /**
+     * Returns an array of routes where the keys are the
+     * names of the routes and the value is controller and method
+     *
      * @return array
      */
     private function getRoutes()
@@ -105,6 +116,8 @@ trait FormControl
     }
 
     /**
+     * Return current route
+     *
      * @return mixed
      */
     private function getCurrentRoute()

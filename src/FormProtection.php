@@ -6,60 +6,60 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Http\Request;
 use LaraForm\Core\BaseFormProtection;
 
+/**
+ * Working with form fields and validating requests for their compliance
+ *
+ * Class FormProtection
+ * @package LaraForm
+ */
 class FormProtection extends BaseFormProtection
 {
     /**
-     * @var
+     * Keeped here key for form fields
+     *
+     * @var string
      */
     protected $token;
 
     /**
-     * @var
+     * Keeped here fields which are not validated
+     *
+     * @var array
      */
     protected $unlockFields;
 
     /**
+     * Keeped here fields which are validated
+     *
      * @var array
      */
     public $fields;
 
     /**
-     * @var
+     * Keeped here configuration for session
+     *
+     * @var array
      */
-    protected $sessionPrePath;
+    protected $configSession = [];
 
     /**
-     * @var
-     */
-    protected $pathForCheck;
-
-    /**
-     * @var
-     */
-    protected $pathForTime;
-
-    /**
-     * @var
-     */
-    protected $pathForUnlock;
-
-    /**
-     * @var mixed
-     */
-    protected $pathForUrl;
-
-    /**
+     * Keeped here the form opening time
+     *
      * @var
      */
     protected $created_time;
 
     /**
+     * Keeped here form action url
+     *
      * @var
      */
     protected $url;
 
     /**
-     * @var
+     * Keeped here params for ajax requests
+     *
+     * @var array
      */
     protected $ajax;
 
@@ -68,11 +68,7 @@ class FormProtection extends BaseFormProtection
      */
     public function __construct()
     {
-        $this->sessionPrePath = config('lara_form.session.name', 'laraforms');
-        $this->pathForUnlock = config('lara_form.session.paths.unlock', 'is_unlock');
-        $this->pathForCheck = config('lara_form.session.paths.check', 'is_check');
-        $this->pathForTime = config('lara_form.session.paths.time', 'created_time');
-        $this->pathForUrl = config('lara_form.session.paths.action', '_action');
+        $this->configSession = config('lara_form.session');
         $this->ajax = config('lara_form.ajax_request');
         $this->fields = [];
     }
@@ -111,6 +107,9 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * Validates the field names, and for hidden field the value also, from the request
+     * if the check fails, it will throw an exception
+     *
      * @param Request $request
      * @param $data
      * @return bool
@@ -142,6 +141,7 @@ class FormProtection extends BaseFormProtection
         $data = $this->removeUnlockFields($data, $token);
 
         if ($request->ajax()) {
+            // for ajax request
             $isAjax = $this->verificationForAjax($request);
 
             if ($isAjax) {
@@ -175,6 +175,9 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * If the request is ajax, then the default token is removed
+     * from the session except those specified in the configuration file
+     *
      * @param $request
      * @return bool
      */
@@ -202,6 +205,8 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * Removes obsolete tokens from the session
+     *
      * @return bool
      */
     public function removeByTime()
@@ -235,6 +240,8 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * To monitor the number of tokens in the session and delete them to a specified count
+     *
      * @return bool
      */
     public function removeByCount()
@@ -273,6 +280,10 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * Adds fields for validation
+     * Warning!
+     * Those fields that have disabled or unlock attributes will not be added to the list of validation!!!
+     *
      * @param $field
      * @param array $options
      * @param string $value
@@ -299,6 +310,8 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * Transforms a multidimensional array into a string
+     *
      * @param $field
      */
     public function addArrayInputField($field)
@@ -321,15 +334,15 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
-     *
+     * Fields saves in session
      */
     public function confirm()
     {
         $data = [
-            $this->pathForCheck => $this->fields,
-            $this->pathForUnlock => $this->unlockFields,
-            $this->pathForTime => $this->created_time,
-            $this->pathForUrl => $this->url,
+            $this->configSession['paths']['check'] => $this->fields,
+            $this->configSession['paths']['unlock'] => $this->unlockFields,
+            $this->configSession['paths']['time'] => $this->created_time,
+            $this->configSession['paths']['action'] => $this->url,
         ];
 
         $this->fields = [];
@@ -344,7 +357,7 @@ class FormProtection extends BaseFormProtection
     private function sessionPath($path = '')
     {
         $path = empty($path) ? $this->token : $path;
-        return $this->sessionPrePath . '.' . $path;
+        return $this->configSession['name'] . '.' . $path;
     }
 
     /**
@@ -353,18 +366,20 @@ class FormProtection extends BaseFormProtection
      */
     private function getCheckedFieldsBy($token)
     {
-        $path = $token . '.' . $this->pathForCheck;
+        $path = $token . '.' . $this->configSession['paths']['check'];
         return session($this->sessionPath($path));
     }
 
     /**
+     * Verifies the current url corresponds to the one specified in the form
+     *
      * @param $token
      * @param $currentUrl
      * @return bool
      */
     public function isValidAction($token, $currentUrl)
     {
-        $path = $token . '.' . $this->pathForUnlock;
+        $path = $token . '.' . $this->configSession['paths']['unlock'];
         $unlockFields = session($this->sessionPath($path));
         if (in_array('action', $unlockFields)) {
             return true;
@@ -385,18 +400,20 @@ class FormProtection extends BaseFormProtection
      */
     protected function getAction($token)
     {
-        $path = $token . '.' . $this->pathForUrl;
+        $path = $token . '.' . $this->configSession['paths']['action'];
         return session($this->sessionPath($path));
     }
 
     /**
+     * Removes unverifiable fields from request
+     *
      * @param $data
      * @param $token
      * @return mixed
      */
     private function removeUnlockFields($data, $token)
     {
-        $path = $token . '.' . $this->pathForUnlock;
+        $path = $token . '.' . $this->configSession['paths']['unlock'];
         $unlockFields = session($this->sessionPath($path));
         $globalUnloc = config('lara_form.except.field');
 

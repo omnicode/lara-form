@@ -2,101 +2,138 @@
 
 namespace LaraForm\Core;
 
+/**
+ * Creates ready-made templates
+ *
+ * Class BaseWidget
+ * @package LaraForm\Core
+ */
 abstract class BaseWidget
 {
     /**
+     * Fields that are required in the template
+     *
      * @var array
      */
     private $htmlAttributes = [];
 
     /**
+     * Other fields that are not required for the template
+     *
      * @var array
      */
     private $otherHtmlAttributes = [];
 
     /**
+     * Contains classes for the field
+     *
      * @var array
      */
     protected $htmlClass = [];
 
     /**
+     * Contains the current ready html view
+     *
      * @var string
      */
     protected $html = '';
 
     /**
+     * Contains the current html label field
+     *
      * @var string
      */
     protected $label = '';
 
     /**
+     * Contains the current html icon field
+     *
      * @var string
      */
     protected $icon = '';
 
     /**
+     * Contains the current field name
+     *
      * @var
      */
     protected $name;
 
     /**
+     * Contains the current field attributes
+     *
      * @var array
      */
     protected $attr = [];
 
 
     /**
+     * Contains the configuration params
+     *
      * @var mixed
      */
     protected $config;
 
     /**
-     * @var
-     */
-    protected $attributes;
-
-    /**
+     * Contains the current selected template for field container
+     *
      * @var bool
      */
     protected $currentTemplate = false;
 
     /**
+     * Contains the params for field container
+     *
      * @var array
      */
     protected $containerParams = [];
 
     /**
+     * Contains the templates for field container
+     *
      * @var array
      */
     protected $templates = [];
 
     /**
+     * Contains the params for html class concatenation
+     *
      * @var array
      */
     protected $classConcat = [];
 
     /**
+     * Contains current hidden hollow if that's eating
+     *
      * @var string
      */
     protected $hidden = '';
 
     /**
+     * Contains the validation errors
+     *
      * @var array
      */
     protected $errors = [];
 
     /**
+     * Contains the data of the fields before the check is
+     *
      * @var array
      */
     protected $oldInputs = [];
 
     /**
+     * Contains the passed model
+     *
      * @var
      */
     protected $bind = null;
 
 
     /**
+     * Add templates, parameters, and parameters for concatenating classes to properties
+     *
      * @param $data
      * @param $permission
      */
@@ -112,6 +149,8 @@ abstract class BaseWidget
     }
 
     /**
+     * Formats the html template to the specified params
+     *
      * @param $template
      * @param $attributes
      * @return mixed
@@ -134,6 +173,8 @@ abstract class BaseWidget
     }
 
     /**
+     * Transforms the template into the required form
+     *
      * @param $template
      */
     private function transformTemplate(&$template)
@@ -151,6 +192,8 @@ abstract class BaseWidget
     }
 
     /**
+     * Formats the html attributes
+     *
      * @param $attributes
      * @return string
      */
@@ -191,6 +234,8 @@ abstract class BaseWidget
     }
 
     /**
+     * Filteres and format html class
+     *
      * @return string
      */
     protected function formatClass()
@@ -222,8 +267,11 @@ abstract class BaseWidget
     }
 
     /**
-     * @param $array
+     * case-insensitive array_unique
+     *
+     * @param array
      * @return array
+     * @link http://stackoverflow.com/a/2276400/932473
      */
     private function array_iunique($array)
     {
@@ -232,6 +280,8 @@ abstract class BaseWidget
     }
 
     /**
+     * Finally creates a view
+     *
      * @return mixed|string
      */
     protected function completeTemplate()
@@ -244,7 +294,6 @@ abstract class BaseWidget
             'icon' => $this->icon
         ];
 
-
         if ($this->currentTemplate) {
             $container = $this->currentTemplate;
         } elseif ($this->getHtmlAttributes('type') && $this->getHtmlAttributes('type') !== 'hidden') {
@@ -252,7 +301,6 @@ abstract class BaseWidget
         } else {
             return $this->html;
         }
-
 
         if (!is_array($this->containerParams['inline']) or
             !is_array($this->containerParams['local']) or
@@ -267,7 +315,7 @@ abstract class BaseWidget
     }
 
     /**
-     *
+     * Removes proprties
      */
     protected function resetProperties()
     {
@@ -279,6 +327,8 @@ abstract class BaseWidget
     }
 
     /**
+     * Returns a default template or a modified template
+     *
      * @param $templateName
      * @return mixed
      */
@@ -298,6 +348,8 @@ abstract class BaseWidget
     }
 
     /**
+     * Returns all parameters for the field container
+     *
      * @return array
      */
     private function getContainerAllAttributes()
@@ -317,6 +369,8 @@ abstract class BaseWidget
     }
 
     /**
+     * Returns parameters for the field container by permission
+     *
      * @param $data
      * @return array
      */
