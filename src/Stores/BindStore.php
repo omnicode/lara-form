@@ -4,6 +4,13 @@ namespace LaraForm\Stores;
 
 use LaraForm\Core\BaseStore;
 
+/**
+ * Binds the model to the form for default value
+ *
+ * Class BindStore
+ * @package LaraForm\Stores
+ * @link https://github.com/adamwathan/form/blob/master/src/AdamWathan/Form/Binding/BoundData.php
+ */
 class BindStore extends BaseStore
 {
     /**
@@ -46,7 +53,6 @@ class BindStore extends BaseStore
     protected function dotGet($dotKey, $default)
     {
         $keyParts = explode('.', $dotKey);
-
         return $this->dataGet($this->data, $keyParts, $default);
     }
 

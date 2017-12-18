@@ -146,7 +146,7 @@ class FormBuilder extends BaseFormBuilder
     {
         $this->formProtection->confirm();
         $end = $this->make('form', ['end']);
-        $this->resetOldData();
+        $this->resetProperties();
         return $end;
     }
 
@@ -321,7 +321,7 @@ class FormBuilder extends BaseFormBuilder
     /**
      *
      */
-    private function resetOldData()
+    private function resetProperties()
     {
         $this->isForm = false;
         $this->maked = [];

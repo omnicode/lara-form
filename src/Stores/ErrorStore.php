@@ -4,6 +4,13 @@ namespace LaraForm\Stores;
 
 use LaraForm\Core\BaseStore;
 
+/**
+ * binds validation errors to a form for displaying an error messages
+ *
+ * Class ErrorStore
+ * @package LaraForm\Stores
+ * @link https://github.com/adamwathan/form/blob/master/src/AdamWathan/Form/ErrorStore/IlluminateErrorStore.php
+ */
 class ErrorStore extends BaseStore
 {
     /**

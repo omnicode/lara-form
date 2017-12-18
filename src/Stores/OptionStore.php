@@ -3,15 +3,26 @@
 namespace LaraForm\Stores;
 
 use LaraForm\Core\BaseStore;
+use LaraForm\FormBuilder;
 
+/**
+ * creates a system of chain-calling methods
+ *
+ * Class OptionStore
+ * @package LaraForm\Stores
+ */
 class OptionStore extends BaseStore
 {
     /**
-     * @var
+     * save here object FormBuilder
+     *
+     * @var FormBuilder
      */
     private $builder;
 
     /**
+     *
+     *
      * @var array
      */
     private $attributes = [];
