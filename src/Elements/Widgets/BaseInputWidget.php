@@ -55,9 +55,9 @@ class BaseInputWidget extends Widget
         }
 
         $this->generalcheckAttributes($attr, $cTemplate);
-        $this->htmlAttributes['name'] = $name;
-        $this->htmlAttributes['attrs'] = $this->formatAttributes($attr);
-        $this->html = $this->formatTemplate($template, $this->htmlAttributes);
+        $this->setHtmlAttributes('name', $name);
+        $this->setHtmlAttributes('attrs', $this->formatAttributes($attr));
+        $this->html = $this->formatTemplate($template, $this->getHtmlAttributes());
         return $this->completeTemplate();
     }
 
@@ -73,7 +73,7 @@ class BaseInputWidget extends Widget
         $this->formatInputField($this->name, $attr, $template);
 
         if (!empty($attr['type'])) {
-            $this->otherHtmlAttributes['type'] = $attr['type'];
+            $this->setOtherHtmlAttributes('type', $attr['type']);
             unset($attr['type']);
         }
 
@@ -95,34 +95,34 @@ class BaseInputWidget extends Widget
     private function generalcheckAttributes(&$attr, $cTemplate)
     {
         if (isset($attr['type'])) {
-            $this->htmlAttributes['type'] = $attr['type'];
+            $this->setHtmlAttributes('type',$attr['type']);
             unset($attr['type']);
         } else {
-            $this->htmlAttributes['type'] = 'text';
+            $this->setHtmlAttributes('type','text');
         }
 
-        $this->htmlAttributes['value'] = '';
+        $this->setHtmlAttributes('value','');
         if (!empty($attr['value']) && $cTemplate) {
-            $this->htmlAttributes['value'] = $attr['value'];
+            $this->setHtmlAttributes('value',$attr['value']);
             unset($attr['value']);
         }
 
         $notId = ['hidden', 'submit', 'reset', 'button', 'radio', 'checkbox', 'label'];
 
-        if (!in_array($this->htmlAttributes['type'], $notId) && !$cTemplate) {
+        if (!in_array($this->getHtmlAttributes('type'), $notId) && !$cTemplate) {
             $attr += $this->getValue($this->name);
         }
 
         $this->generateId($attr);
-        if (!in_array($this->htmlAttributes['type'], ['hidden', 'submit', 'reset', 'button'])) {
+        if (!in_array($this->getHtmlAttributes('type'), ['hidden', 'submit', 'reset', 'button'])) {
             $this->generateLabel($attr);
         }
 
-        if ($this->htmlAttributes['type'] !== 'hidden') {
+        if ($this->getHtmlAttributes('type') !== 'hidden') {
             $this->generateClass($attr, $this->config['css']['class']['inputClass']);
         }
 
-        $this->otherHtmlAttributes = $attr;
+        $this->assignOtherhtmlAtrributes($attr);
         parent::checkAttributes($attr);
     }
 

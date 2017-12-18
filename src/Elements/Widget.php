@@ -31,7 +31,7 @@ class Widget extends BaseWidget implements WidgetInterface
         }
 
         if (!empty($attr['required'])) {
-            $this->otherHtmlAttributes['required'] = 'required';
+            $this->setOtherHtmlAttributes('required', 'required');
         }
     }
 
@@ -62,7 +62,7 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     public function setModel($data)
     {
-        $this->bind = app(BindStore::class,[$data]);
+        $this->bind = app(BindStore::class, [$data]);
 
     }
 
@@ -131,7 +131,7 @@ class Widget extends BaseWidget implements WidgetInterface
         if (!isset($attr['for'])) {
             $attr['for'] = $name;
         }
-       // dd($this->htmlClass);
+        // dd($this->htmlClass);
         $rep = [
             'attrs' => $this->formatAttributes($attr),
             'text' => $name,
@@ -194,7 +194,7 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     protected function getHtmlClassControl()
     {
-        $concat = $this->config['css']['class_control']['concat'];
+        $concat = $this->config['css']['class_control'];
 
         if (!$this->classConcat['inline']) {
             $concat = $this->classConcat['inline'];
@@ -210,27 +210,23 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * @param $attr
-     * @param $default
+     * @param bool $default
      * @param bool $format
      */
-    protected function generateClass(&$attr, $default, $format = true)
+    protected function generateClass(&$attr, $default = false, $format = true)
     {
         if (isset($attr['class'])) {
-
             if ($attr['class'] === false) {
                 $this->htmlClass[] = false;
             } else {
-                $symbol = $this->config['css']['class_control']['concat_symbol'];
-
-                if ($this->getHtmlClassControl() && starts_with($attr['class'],$symbol)) {
-                    $replacedClass = substr($attr['class'], strlen($symbol));
-                    $this->htmlClass[] = $default;
-
-                    if (strlen($replacedClass) > 0) {
-                        $this->htmlClass[] = $replacedClass;
-                    }
+                $classies = $attr['class'];
+                if (!is_array($classies)) {
+                    $classies = [$classies];
+                }
+                if ($this->getHtmlClassControl()) {
+                    $this->htmlClass = array_merge([$default],$classies);
                 } else {
-                    $this->htmlClass[] = $attr['class'];
+                    $this->htmlClass = $classies;
                 }
                 unset($attr['class']);
             }
@@ -241,6 +237,11 @@ class Widget extends BaseWidget implements WidgetInterface
         if ($format) {
             $attr['class'] = $this->formatClass();
         }
+    }
+
+    private function isConcated()
+    {
+
     }
 
     /**

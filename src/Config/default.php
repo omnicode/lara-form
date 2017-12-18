@@ -12,6 +12,7 @@ return [
 
     ],
     'css' => [
+        'class_control' => true,
         'class' => [
             'idPrefix' => false,
             'errorClass' => 'has-error',
@@ -23,10 +24,6 @@ return [
             'textareaClass' => 'form-control',
             'submitColor' => 'btn-default',
             'submitClass' => 'btn'
-        ],
-        'class_control' => [
-            'concat' => true,
-            'concat_symbol' => '+'
         ]
     ],
     'session' => [

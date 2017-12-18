@@ -19,7 +19,7 @@ class PasswordWidget extends BaseInputWidget
      */
     public function checkAttributes(&$attr)
     {
-        $this->otherHtmlAttributes['type'] = 'password';
+        $this->setOtherHtmlAttributes('type', 'password');
         $attr['type'] = 'password';
         parent::checkAttributes($attr);
     }

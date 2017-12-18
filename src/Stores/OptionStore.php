@@ -16,19 +16,6 @@ class OptionStore extends BaseStore
      */
     private $attributes = [];
 
-    /**
-     * @param $name
-     * @param $value
-     * @return $this
-     */
-    public function __call($name, $value)
-    {
-        $arrNames = preg_split('/(?=[A-Z])|(_)/',$name);
-        $attributeName = strtolower((implode('-',$arrNames)));
-        $value = array_shift($value);
-        $this->attributes[1][$attributeName] = $value;
-        return $this;
-    }
 
     /**
      * @param $options
@@ -42,9 +29,49 @@ class OptionStore extends BaseStore
 
         if (isset($this->attributes[1])) {
             $this->attributes[1] += $options;
-        }else{
+        } else {
             $this->attributes += $options;
         }
+        return $this;
+    }
+
+
+    /**
+     * @param $strId
+     * @return $this
+     */
+    public function id($strId)
+    {
+        $this->attributes[1]['id'] = $strId;
+        return $this;
+    }
+
+    /**
+     * @param $var
+     * @return $this
+     */
+    public function class($var)
+    {
+        $classies = [];
+        if (is_array($var)) {
+            $classies = $var;
+        } else {
+            foreach (func_get_args() as $index => $class) {
+                $classies[] = $class;
+            }
+        }
+        $this->attributes[1]['class'] = $classies;
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
+    public function data($name, $value)
+    {
+        $this->attributes[1]['data-' . $name] = $value;
         return $this;
     }
 

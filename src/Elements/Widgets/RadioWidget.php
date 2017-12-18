@@ -12,7 +12,7 @@ class RadioWidget extends BaseInputWidget
         $template = $this->config['templates']['radio'];
         $this->checkAttributes($attr);
         $this->currentTemplate = $this->getTemplate('radioContainer');
-        $this->otherHtmlAttributes['type'] = 'radio';
+        $this->setOtherHtmlAttributes('type', 'radio');
         return $this->formatNestingLabel($template,$attr);
     }
 

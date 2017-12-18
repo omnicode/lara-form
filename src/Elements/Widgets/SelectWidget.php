@@ -48,8 +48,7 @@ class SelectWidget extends Widget
             'name' => $this->name,
             'attrs' => $this->formatAttributes($this->attr)
         ];
-
-        $this->htmlAttributes['type'] = 'select';
+        $this->setHtmlAttributes('type','select');
         $this->currentTemplate = $this->getTemplate('selectContainer');
         $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
         return $this->completeTemplate();

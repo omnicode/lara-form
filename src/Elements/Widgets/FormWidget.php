@@ -29,15 +29,19 @@ class FormWidget extends Widget
             $attr['enctype'] = 'multipart/form-data';
             unset($attr['file']);
         }
+
         if (!empty($attr['_unlockFields'])) {
             unset($attr['_unlockFields']);
         }
+
         if (empty($attr['accept-charset'])) {
             $attr['accept-charset'] = $this->config['charset'];
         }
+
         unset($attr['_form_token']);
         unset($attr['_form_action']);
         unset($attr['_form_method']);
+        $this->generateClass($attr);
     }
 
     /**

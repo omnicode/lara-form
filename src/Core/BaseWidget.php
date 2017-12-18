@@ -7,17 +7,12 @@ abstract class BaseWidget
     /**
      * @var array
      */
-    protected $htmlAttributes = [];
+    private $htmlAttributes = [];
 
     /**
      * @var array
      */
-    protected $otherHtmlAttributes = [];
-
-    /**
-     * @var array
-     */
-    protected $unlokAttributes = [];
+    private $otherHtmlAttributes = [];
 
     /**
      * @var array
@@ -180,7 +175,7 @@ abstract class BaseWidget
             }
         });
 
-        $this->otherHtmlAttributes += $attributes;
+        $this->setOtherHtmlAttributes($attributes);
 
         foreach ($attributes as $index => $attribute) {
 
@@ -252,7 +247,7 @@ abstract class BaseWidget
 
         if ($this->currentTemplate) {
             $container = $this->currentTemplate;
-        } elseif (isset($this->htmlAttributes['type']) && $this->htmlAttributes['type'] !== 'hidden') {
+        } elseif ($this->getHtmlAttributes('type') && $this->getHtmlAttributes('type') !== 'hidden') {
             $container = $this->getTemplate('inputContainer');
         } else {
             return $this->html;
@@ -329,7 +324,7 @@ abstract class BaseWidget
     {
         $params = [];
 
-        if (!empty($this->otherHtmlAttributes['required'])) {
+        if ($this->getOtherHtmlAttributes('required')) {
 
             if (!empty($data['required'])) {
                 $params['required'] = $data['required'];
@@ -343,7 +338,7 @@ abstract class BaseWidget
             $params['type'] = $data['type'];
             unset($data['type']);
         } else {
-            $params['type'] = isset($this->otherHtmlAttributes['type']) ? $this->otherHtmlAttributes['type'] : $this->htmlAttributes['type'];
+            $params['type'] = $this->getOtherHtmlAttributes('type') ? $this->getOtherHtmlAttributes('type') : $this->getHtmlAttributes('type');
         }
 
         if (!empty($data['class'])) {
@@ -363,5 +358,62 @@ abstract class BaseWidget
         }
 
         return $params;
+    }
+
+    /**
+     * @param $key
+     * @param null $value
+     */
+    protected function setOtherHtmlAttributes($key, $value = null)
+    {
+        if (is_array($key) && empty($value)) {
+            $this->otherHtmlAttributes += $key;
+        } else {
+            $this->otherHtmlAttributes[$key] = $value;
+        }
+    }
+
+    /**
+     * @param $data
+     */
+    protected function assignOtherhtmlAtrributes($data)
+    {
+        $this->otherHtmlAttributes = $data;
+    }
+
+    /**
+     * @param null $key
+     * @return array|bool|mixed
+     */
+    protected function getOtherHtmlAttributes($key = null)
+    {
+        if (empty($key)) {
+            return $this->otherHtmlAttributes;
+        }
+
+        return !empty($this->otherHtmlAttributes[$key]) ? $this->otherHtmlAttributes[$key] : false;
+    }
+
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    protected function setHtmlAttributes($key, $value)
+    {
+        $this->htmlAttributes[$key] = $value;
+    }
+
+    /**
+     * @param null $key
+     * @return array|bool|mixed
+     */
+    protected function getHtmlAttributes($key = null)
+    {
+        if (empty($key)) {
+            return $this->htmlAttributes;
+        }
+
+        return isset($this->htmlAttributes[$key]) ? $this->htmlAttributes[$key] : false;
     }
 }

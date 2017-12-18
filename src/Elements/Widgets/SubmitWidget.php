@@ -53,9 +53,9 @@ class SubmitWidget extends BaseInputWidget
         $this->generateClass($attr, $defaut);
 
         if (!empty($attr['type']) && in_array($attr['type'], ['submit', 'button', 'reset'])) {
-            $this->otherHtmlAttributes['type'] = $attr['type'];
+            $this->setOtherHtmlAttributes('type',$attr['type']);
         } else {
-            $this->otherHtmlAttributes['type'] = 'submit';
+            $this->setOtherHtmlAttributes('type','submit');
             $attr['type'] = 'submit';
         }
 
