@@ -6,7 +6,6 @@ use LaraForm\Elements\Widget;
 
 /**
  * Processes and creates input tags
- *
  * Class BaseInputWidget
  * @package LaraForm\Elements\Widgets
  */
@@ -14,7 +13,6 @@ class BaseInputWidget extends Widget
 {
     /**
      * Returns the finished html view
-     *
      * @return string
      */
     public function render()
@@ -34,7 +32,6 @@ class BaseInputWidget extends Widget
 
     /**
      * Formats input fields according to a given template or by default
-     *
      * @param $name
      * @param $attr
      * @param bool $cTemplate
@@ -57,7 +54,6 @@ class BaseInputWidget extends Widget
 
     /**
      * Formats the fields inside the label field
-     *
      * @param $template
      * @param $attr
      * @param array $labelAttrs
@@ -65,43 +61,54 @@ class BaseInputWidget extends Widget
      */
     protected function formatNestingLabel($template, $attr, $labelAttrs = [])
     {
-        $labelTemplate = $this->getTemplate('nestingLabel');
+        $anonymous = true;
+        $text = '';
+
+        if (isset($attr['nameShow']) && $attr['nameShow'] === false) {
+            $anonymous = false;
+        }
+        $icon = $this->icon;
+        $this->icon = '';
         $this->formatInputField($this->name, $attr, $template);
 
         if (!empty($attr['type'])) {
             $this->setOtherHtmlAttributes('type', $attr['type']);
             unset($attr['type']);
         }
+        if ($anonymous) {
+            $text = !empty($attr['label']) ? $attr['label'] : $this->getLabelName($this->name);
+        }
 
         $templateAttr = [
             'hidden' => $this->hidden,
             'content' => $this->html,
-            'text' => !empty($attr['label']) ? $attr['label'] : $this->getLabelName($this->name),
+            'text' => $text,
+            'icon' => $icon,
             'attrs' => $this->formatAttributes($labelAttrs)
         ];
 
+        $labelTemplate = $this->getTemplate('nestingLabel');
         $this->html = $this->formatTemplate($labelTemplate, $templateAttr);
         return $this->completeTemplate();
     }
 
     /**
      * Checks and modifies the attributes that were passed in the field
-     *
      * @param $attr
      * @param $cTemplate
      */
     private function generalcheckAttributes(&$attr, $cTemplate)
     {
         if (!empty($attr['type'])) {
-            $this->setHtmlAttributes('type',$attr['type']);
+            $this->setHtmlAttributes('type', $attr['type']);
             unset($attr['type']);
         } else {
-            $this->setHtmlAttributes('type','text');
+            $this->setHtmlAttributes('type', 'text');
         }
 
-        $this->setHtmlAttributes('value','');
+        $this->setHtmlAttributes('value', '');
         if (!empty($attr['value']) && $cTemplate) {
-            $this->setHtmlAttributes('value',$attr['value']);
+            $this->setHtmlAttributes('value', $attr['value']);
             unset($attr['value']);
         }
 
@@ -116,7 +123,7 @@ class BaseInputWidget extends Widget
         if (!in_array($this->getHtmlAttributes('type'), ['hidden', 'submit', 'reset', 'button'])) {
             $this->generateLabel($attr);
         }
-         $type = $this->getHtmlAttributes('type');
+        $type = $this->getHtmlAttributes('type');
         if ($type !== 'hidden') {
             $defaultClass = isset($this->config['css']['class'][$type]) ? $this->config['css']['class'][$type] : false;
             $this->generateClass($attr, $defaultClass);

@@ -4,18 +4,23 @@ namespace LaraForm\Elements\Widgets;
 
 /**
  * Processes and creates checkbox
+ *
  * Class CheckboxWidget
  * @package LaraForm\Elements\Widgets
  */
 class CheckboxWidget extends BaseInputWidget
 {
     /**
+     * Remembers the names of the checkboxes to determine in the future it
+     * is worth inserting hidden or not
+     *
      * @var array
      */
     private $oldCheckboxNames = [];
 
     /**
      * Returns the finished html checkbox view
+     *
      * @return mixed|string
      */
     public function render()
@@ -50,6 +55,7 @@ class CheckboxWidget extends BaseInputWidget
             $attr['checked'] = 'checked';
         }
 
+        $multi = false;
         if (!empty($attr['multiple']) || strpos($this->name, '[]')) {
 
             if (!strpos($this->name, '[]')) {
@@ -59,6 +65,7 @@ class CheckboxWidget extends BaseInputWidget
             if (isset($attr['multiple'])) {
                 unset($attr['multiple']);
             }
+            $multi = true;
         }
 
         if (isset($attr['hidden']) && $attr['hidden'] == false) {
@@ -79,7 +86,7 @@ class CheckboxWidget extends BaseInputWidget
         }
 
         $attr['type'] = 'checkbox';
-        $this->generateId($attr, true);
+        $this->generateId($attr, $multi);
         parent::checkAttributes($attr);
     }
 }

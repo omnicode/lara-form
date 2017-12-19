@@ -99,7 +99,7 @@ return [
         // Label element when inputs are not nested inside the label.
         'label' => '<label {%attrs%}>{%icon%}{%text%}</label>',
         // Label element used for radio and multi-checkbox inputs.
-        'nestingLabel' => '{%hidden%}<label {%attrs%}>{%content%}{%text%}</label>',
+        'nestingLabel' => '{%hidden%}<label {%attrs%}>{%content%}{%icon%}{%text%}</label>',
         // Option element used in select pickers.
         'option' => '<option value="{%value%}" {%attrs%}>{%text%}</option>',
         // Option group element used in select pickers.

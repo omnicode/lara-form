@@ -4,7 +4,6 @@ namespace LaraForm\Elements\Widgets;
 
 /**
  * Processes and creates input tag for file type
- *
  * Class FileWidget
  * @package LaraForm\Elements\Widgets
  */
@@ -12,28 +11,24 @@ class FileWidget extends BaseInputWidget
 {
     /**
      * Keeped here template for file input
-     *
      * @var string
      */
     private $fileTemplate;
 
     /**
      * Returns the finished html file input view
-     *
      * @return mixed|string
      */
     public function render()
     {
         $this->checkAttributes($this->attr);
         $this->currentTemplate = $this->getTemplate('fileContainer');
-        if ($this->name === false) {
-            $name = '';
-        } elseif (!empty($this->name)) {
-            $name = $this->name;
-        } else {
-            $name = $this->config['text']['submit_name'] ? $this->config['text']['submit_name'] : '';
+
+        if (empty($this->name)) {
+            $this->name = $this->config['text']['submit_name'] ? $this->config['text']['submit_name'] : '';
         }
-        return $this->formatInputField($name, $this->attr, $this->fileTemplate);
+        $labelAttr = ['class' => $this->formatClass()];
+        return $this->formatNestingLabel($this->fileTemplate, $this->attr,$labelAttr);
     }
 
     /**
@@ -44,7 +39,7 @@ class FileWidget extends BaseInputWidget
     {
         $btn = $this->config['css']['class']['submit'];
         $btnColor = $this->config['css']['class']['submitColor'];
-        $default = $btn.' '.$btnColor;
+        $default = $btn . ' ' . $btnColor;
 
         if (isset($attr['btn'])) {
 
@@ -76,10 +71,12 @@ class FileWidget extends BaseInputWidget
                 $attr['accept'] = implode(', ', $attr['accept']);
             }
         }
+
         if (isset($attr['label']) && $attr['label'] === false) {
             unset($attr['label']);
         }
-        $this->generateClass($attr,$default,false);
+
+        $this->generateClass($attr, $default, false);
         parent::checkAttributes($attr);
     }
 }
