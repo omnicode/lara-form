@@ -36,7 +36,7 @@ class SubmitWidget extends BaseInputWidget
      */
     public function checkAttributes(&$attr)
     {
-        $btn = $this->config['css']['class']['submitClass'];
+        $btn = $this->config['css']['class']['submit'];
         $btnColor = $this->config['css']['class']['submitColor'];
         $defaut = $btn . ' ' . $btnColor;
 

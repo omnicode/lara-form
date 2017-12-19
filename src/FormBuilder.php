@@ -326,6 +326,10 @@ class FormBuilder extends BaseFormBuilder
             $this->inlineTemplates['div'] = $attr[1]['div'];
             unset($attr[1]['div']);
         }
+        if (isset($attr[1]['class_concat'])) {
+            $this->inlineTemplates['class_concat'] = $attr[1]['class_concat'];
+            unset($attr[1]['class_concat']);
+        }
     }
 
     /**

@@ -42,9 +42,9 @@ class TextareaWidget extends Widget
         }
         $this->currentTemplate = $this->getTemplate('inputContainer');
         $this->setOtherHtmlAttributes('type', 'textarea');
-        $this->generateClass($attr, $this->config['css']['class']['textareaClass']);
+        $this->generateClass($attr, $this->config['css']['class']['textarea']);
         $this->generateId($attr);
-        $this->generateLabel();
+        $this->generateLabel($attr);
         parent::checkAttributes($attr);
     }
 }

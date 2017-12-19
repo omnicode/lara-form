@@ -44,12 +44,6 @@ class RadioWidget extends BaseInputWidget
         }
 
         $attr['type'] = 'radio';
-        $this->generateClass($attr, $this->config['css']['class']['radioClass']);
-
-        if (empty($attr['class'])) {
-            $attr['class'] = false;
-        }
-
         $this->generateId($attr,true);
         parent::checkAttributes($attr);
     }

@@ -258,7 +258,7 @@ abstract class BaseWidget
                 return $class;
             }
 
-            $uniqueClass = $this->array_unique($this->htmlClass);
+            $uniqueClass = $this->array_iunique($this->htmlClass);
             $class = implode(' ', $uniqueClass);
         }
 

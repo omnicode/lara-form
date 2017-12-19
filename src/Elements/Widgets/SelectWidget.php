@@ -71,8 +71,8 @@ class SelectWidget extends Widget
     public function checkAttributes(&$attr)
     {
         $this->generateId($attr);
-        $this->generateLabel();
-        $this->generateClass($attr,$this->config['css']['class']['selectClass']);
+        $this->generateLabel($attr);
+        $this->generateClass($attr,$this->config['css']['class']['select']);
 
         if (ends_with($this->name, '[]')) {
             $attr['multiple'] = true;

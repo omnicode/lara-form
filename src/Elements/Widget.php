@@ -106,7 +106,7 @@ class Widget extends BaseWidget implements WidgetInterface
             $helpBlockTemplate = $this->config['templates']['helpBlock'];
             $errorAttr['text'] = $this->errors->getError($name);
             $errorParams['help'] = $this->formatTemplate($helpBlockTemplate, $errorAttr);
-            $errorParams['error'] = $this->config['css']['class']['errorClass'];
+            $errorParams['error'] = $this->config['css']['class']['error'];
         }
 
         return $errorParams;
@@ -200,15 +200,17 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
-     * Generates id by property attr
+     * Generates label by property attr
+     *
+     * @param $attr
      */
-    protected function generateLabel()
+    protected function generateLabel(&$attr)
     {
-        if (!empty($this->attr['label'])) {
-            $this->checkLabel($this->attr['label'], $this->attr, true);
-            unset($this->attr['label']);
-        } elseif (!isset($this->attr['label'])) {
-            $this->checkLabel($this->name, $this->attr);
+        if (!empty($attr['label'])) {
+            $this->checkLabel($attr['label'], $attr, true);
+            unset($attr['label']);
+        } elseif (!isset($attr['label'])) {
+            $this->checkLabel($this->name, $attr);
         }
     }
 
@@ -243,10 +245,11 @@ class Widget extends BaseWidget implements WidgetInterface
     protected function generateClass(&$attr, $default = false, $format = true)
     {
         if (isset($attr['class'])) {
-            if ($attr['class'] === false) {
-                $this->htmlClass[] = false;
+            $classes = $attr['class'];
+
+            if ($classes === false) {
+                $this->htmlClass = [];
             } else {
-                $classes = $attr['class'];
                 if (!is_array($classes)) {
                     $classes = [$classes];
                 }
@@ -255,6 +258,7 @@ class Widget extends BaseWidget implements WidgetInterface
                 } else {
                     $this->htmlClass = $classes;
                 }
+
                 unset($attr['class']);
             }
         } else {

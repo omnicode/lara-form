@@ -15,15 +15,18 @@ return [
         'class_control' => true,
         'class' => [
             'idPrefix' => false,
-            'errorClass' => 'has-error',
-            'inputClass' => 'form-control',
-            'selectClass' => 'form-control',
-            'checkboxClass' => false,
-            'radioClass' => false,
-            'fileClass' => false,
-            'textareaClass' => 'form-control',
+            'error' => 'has-error',
+            'text' => 'form-control',
+            'password' => 'form-control',
+            'email' => 'form-control',
+            'number' => 'form-control',
+            'select' => 'form-control',
+            'checkbox' => false,
+            'radio' => false,
+            'file' => false,
+            'textarea' => 'form-control',
+            'submit' => 'btn',
             'submitColor' => 'btn-default',
-            'submitClass' => 'btn'
         ]
     ],
     'session' => [

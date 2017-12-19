@@ -122,17 +122,14 @@ class FormProtection extends BaseFormProtection
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
 
         if (!$token) {
-
             return false;
         }
 
         if (!session()->has($this->sessionPath($token))) {
-
             return false;
         }
 
         if (!$this->isValidAction($token, $request->url())) {
-
             return false;
         }
 

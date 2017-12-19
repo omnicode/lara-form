@@ -42,7 +42,7 @@ class FileWidget extends BaseInputWidget
      */
     public function checkAttributes(&$attr)
     {
-        $btn = $this->config['css']['class']['submitClass'];
+        $btn = $this->config['css']['class']['submit'];
         $btnColor = $this->config['css']['class']['submitColor'];
         $default = $btn.' '.$btnColor;
 
@@ -75,6 +75,9 @@ class FileWidget extends BaseInputWidget
             if (is_array($attr['accept'])) {
                 $attr['accept'] = implode(', ', $attr['accept']);
             }
+        }
+        if (isset($attr['label']) && $attr['label'] === false) {
+            unset($attr['label']);
         }
         $this->generateClass($attr,$default,false);
         parent::checkAttributes($attr);

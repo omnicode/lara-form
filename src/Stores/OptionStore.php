@@ -30,14 +30,18 @@ class OptionStore extends BaseStore
 
     /**
      * Chain calling this method passes an array of attributes
-     *
      * @param $options
+     * @param array $values
      * @return $this
      */
-    public function attr($options)
+    public function attr($options, $values = [])
     {
         if (!is_array($options)) {
-            $options = [$options];
+            if (!empty($values)) {
+                $options = [$options => $values];
+            }else{
+                $options = [$options];
+            }
         }
 
         if (isset($this->attributes[1])) {

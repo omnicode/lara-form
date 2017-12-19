@@ -42,6 +42,7 @@ class LaraFormMiddleware
             foreach ($request->query() as $index => $key) {
                 unset($data[$index]);
             }
+
             $validate = $this->formProtection->validate($request, $data);
 
             if ($validate === false) {
