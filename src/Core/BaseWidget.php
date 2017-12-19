@@ -323,7 +323,6 @@ abstract class BaseWidget
         $this->htmlClass = [];
         $this->label = '';
         $this->attr = [];
-
     }
 
     /**

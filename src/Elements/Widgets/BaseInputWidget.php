@@ -94,6 +94,7 @@ class BaseInputWidget extends Widget
 
     /**
      * Checks and modifies the attributes that were passed in the field
+     *
      * @param $attr
      * @param $cTemplate
      */

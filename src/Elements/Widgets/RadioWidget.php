@@ -16,10 +16,10 @@ class RadioWidget extends BaseInputWidget
     public function render()
     {
         $template = $this->config['templates']['radio'];
-        $this->checkAttributes($attr);
+        $this->checkAttributes($this->attr);
         $this->currentTemplate = $this->getTemplate('radioContainer');
         $this->setOtherHtmlAttributes('type', 'radio');
-        return $this->formatNestingLabel($template,$attr);
+        return $this->formatNestingLabel($template,$this->attr);
     }
 
     /**

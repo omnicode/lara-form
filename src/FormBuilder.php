@@ -341,6 +341,7 @@ class FormBuilder extends BaseFormBuilder
         $this->maked = [];
         $this->localTemplates['pattern'] = [];
         $this->localTemplates['div'] = [];
+        $this->localTemplates['class_concat'] = true;
     }
 
     /**

@@ -60,6 +60,10 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     public function setParams($data)
     {
+        $this->containerParams = [];
+        $this->templates = [];
+        $this->classConcat = [];
+
         foreach ($data as $index => $item) {
             $this->addTemplateAndAttributes($item, $index);
         }
@@ -156,6 +160,7 @@ class Widget extends BaseWidget implements WidgetInterface
             'text' => $name,
             'icon' => $this->icon
         ];
+
         return $this->formatTemplate($template, $rep);
     }
 
