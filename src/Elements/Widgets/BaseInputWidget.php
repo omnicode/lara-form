@@ -64,7 +64,7 @@ class BaseInputWidget extends Widget
         $anonymous = true;
         $text = '';
 
-        if (isset($attr['nameShow']) && $attr['nameShow'] === false) {
+        if (isset($attr['label_text']) && $attr['label_text'] === false) {
             $anonymous = false;
         }
         $icon = $this->icon;

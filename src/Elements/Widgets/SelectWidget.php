@@ -5,6 +5,12 @@ namespace LaraForm\Elements\Widgets;
 use LaraForm\Elements\Widget;
 use function Symfony\Component\Debug\Tests\testHeader;
 
+/**
+ * Processes and creates select tag
+ *
+ * Class SelectWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class SelectWidget extends Widget
 {
     /**
@@ -44,6 +50,8 @@ class SelectWidget extends Widget
 
 
     /**
+     * Returns the finished select tag html view
+     *
      * @return mixed|string|void
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -95,7 +103,7 @@ class SelectWidget extends Widget
         if (!empty($attr['empty'])) {
             array_unshift($this->optionsArray, $attr['empty']);
             unset($attr['empty']);
-        } else {
+        } elseif(!isset($attr['empty']) || (isset($attr['empty']) && $attr['empty'] !== false)) {
             $emptyValue = $this->config['text']['select_empty'];
 
             if ($emptyValue) {
@@ -112,31 +120,33 @@ class SelectWidget extends Widget
             unset($attr['selected']);
         }
 
-        if (isset($attr['disabled']) && $attr['disabled'] != false) {
+        if (isset($attr['disabled']) && $attr['disabled'] !== false) {
             $attr['disabled'] = 'disabled';
         }
 
-        if (isset($attr['optionDisabled']) && $attr['optionDisabled'] !== false) {
-            $this->optionDisabled = $attr['optionDisabled'];
+        if (isset($attr['option_disabled']) && $attr['option_disabled'] !== false) {
+            $this->optionDisabled = $attr['option_disabled'];
 
             if (!is_array($this->optionDisabled)) {
                 $this->optionDisabled = [$this->optionDisabled];
             }
-            unset($attr['optionDisabled']);
+            unset($attr['option_disabled']);
         }
 
-        if (isset($attr['groupDisabled']) && $attr['groupDisabled'] !== false) {
-            $this->groupDisabled = $attr['groupDisabled'];
+        if (isset($attr['group_disabled']) && $attr['group_disabled'] !== false) {
+            $this->groupDisabled = $attr['group_disabled'];
 
             if (!is_array($this->groupDisabled)) {
                 $this->groupDisabled = [$this->groupDisabled];
             }
-            unset($attr['groupDisabled']);
+            unset($attr['group_disabled']);
         }
         parent::checkAttributes($attr);
     }
 
     /**
+     * Creates html option tags for select
+     *
      * @param bool $gropup
      * @return bool|string
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -173,6 +183,8 @@ class SelectWidget extends Widget
     }
 
     /**
+     * Creates html group option tags for select
+     *
      * @param $groupName
      * @param $options
      * @return mixed

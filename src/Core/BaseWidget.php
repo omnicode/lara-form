@@ -355,6 +355,7 @@ abstract class BaseWidget
     {
         $params = [
             'required' => '',
+            'disabled' => '',
             'type' => '',
             'containerAttrs' => '',
             'class' => '',
@@ -384,6 +385,16 @@ abstract class BaseWidget
                 unset($data['required']);
             } else {
                 $params['required'] = 'required';
+            }
+        }
+
+        if ($this->getOtherHtmlAttributes('disabled')) {
+
+            if (!empty($data['disabled'])) {
+                $params['disabled'] = $data['disabled'];
+                unset($data['disabled']);
+            } else {
+                $params['disabled'] = 'disabled';
             }
         }
 

@@ -51,6 +51,10 @@ class Widget extends BaseWidget implements WidgetInterface
         if (!empty($attr['required'])) {
             $this->setOtherHtmlAttributes('required', 'required');
         }
+
+        if (!empty($attr['disabled'])) {
+            $this->setOtherHtmlAttributes('disabled', 'disabled');
+        }
     }
 
     /**
@@ -192,11 +196,11 @@ class Widget extends BaseWidget implements WidgetInterface
             unset($attr['id']);
         } else {
             $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
-            if ($this->config['css']['class']['idPrefix'] && !isset($attr['idPrefix'])) {
-                $attr['id'] = $this->config['css']['class']['idPrefix'] . $attr['id'];
-            } elseif (isset($attr['idPrefix']) && $attr['id'] !== false) {
-                $attr['id'] = $attr['idPrefix'] . $attr['id'];
-                unset($attr['idPrefix']);
+            if ($this->config['css']['id_prefix'] && !isset($attr['id_prefix'])) {
+                $attr['id'] = $this->config['css']['id_prefix'] . $attr['id'];
+            } elseif (isset($attr['id_prefix']) && $attr['id'] !== false) {
+                $attr['id'] = $attr['id_prefix'] . $attr['id'];
+                unset($attr['id_prefix']);
             }
             if ($multi && isset($attr['value'])) {
                 $attr['id'] .= '-' . $attr['value'];
