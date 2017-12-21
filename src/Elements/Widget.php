@@ -229,12 +229,14 @@ class Widget extends BaseWidget implements WidgetInterface
             $this->checkLabel($attr['label'], $attr, true);
             unset($attr['label']);
         } elseif (!empty($attributes)) {
+            $trant = false;
             if (!empty($attributes['text'])) {
                 $labelName = $attributes['text'];
+                $trant = true;
                 unset($attributes['text']);
             }
 
-            $this->checkLabel($labelName, $attr, true, $attributes);
+            $this->checkLabel($labelName, $attr, $trant, $attributes);
         } elseif (!isset($attr['label']) && $this->config['text']['label']) {
             $this->checkLabel($labelName, $attr);
         }
@@ -255,42 +257,6 @@ class Widget extends BaseWidget implements WidgetInterface
         }
     }
 
-    /**
-     * @return bool/array
-     */
-    protected function getLabelAttributes()
-    {
-        $attr = false;
-
-        if (!empty($this->labelAttr['inline'])) {
-            $attr = $this->labelAttr['inline'];
-        } elseif (!empty($this->labelAttr['local'])) {
-            $attr = $this->labelAttr['local'];
-        } elseif (!empty($this->labelAttr['global'])) {
-            $attr = $this->labelAttr['global'];
-        }
-
-        return $attr;
-    }
-
-    /**
-     * Returns a default value or a modification for concatenating classes,
-     * @return mixed
-     */
-    protected function getHtmlClassControl()
-    {
-        $concat = $this->config['css']['class_control'];
-
-        if (!$this->classConcat['inline']) {
-            $concat = $this->classConcat['inline'];
-        } elseif (!$this->classConcat['local']) {
-            $concat = $this->classConcat['local'];
-        } elseif (!$this->classConcat['global']) {
-            $concat = $this->classConcat['global'];
-        }
-
-        return $concat;
-    }
 
     /**
      * Generates class by specified parameters

@@ -20,7 +20,7 @@ trait FormControl
      * @param array $options
      * @return array|mixed|string
      */
-    private function getAction(&$options = [])
+    protected function getAction(&$options = [])
     {
         if (!empty($options['route'])) {
             $route = $options['route'];
@@ -35,7 +35,7 @@ trait FormControl
 
         if (!empty($options['url'])) {
             $url = $options['url'];
-            unset($options['route']);
+            unset($options['url']);
             return $url;
         }
 
@@ -83,7 +83,7 @@ trait FormControl
      * @internal param $model
      * @internal param bool $unSet
      */
-    private function getMethod(&$options)
+    protected function getMethod(&$options)
     {
         $method = 'post';
         if (isset($options['method'])) {

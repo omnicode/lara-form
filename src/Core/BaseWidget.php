@@ -333,6 +333,17 @@ abstract class BaseWidget
         $this->attr = [];
     }
 
+    protected function getModifiedData($data, $default = false)
+    {   $datum = $default;
+        if (!empty($data['inline'])) {
+            $datum = $data['inline'];
+        } elseif (!empty($data['local'])) {
+            $datum = $data['local'];
+        } elseif (!empty($data['global'])) {
+            $datum = $data['global'];
+        }
+        return $datum;
+    }
     /**
      * Returns a default template or a modified template
      *
@@ -342,7 +353,6 @@ abstract class BaseWidget
     protected function getTemplate($templateName)
     {
         $template = $this->config['templates'][$templateName];
-
         if (!empty($this->templates['inline'][$templateName])) {
             $template = $this->templates['inline'][$templateName];
         } elseif (!empty($this->templates['local'][$templateName])) {
@@ -352,6 +362,23 @@ abstract class BaseWidget
         }
 
         return $template;
+    }
+
+    /**
+     * @return bool/array
+     */
+    protected function getLabelAttributes()
+    {
+        return $this->getModifiedData($this->labelAttr);
+    }
+
+    /**
+     * Returns a default value or a modification for concatenating classes,
+     * @return mixed
+     */
+    protected function getHtmlClassControl()
+    {
+        return $this->getModifiedData($this->classConcat,$this->config['css']['class_control']);
     }
 
     /**
