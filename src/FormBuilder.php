@@ -12,7 +12,6 @@ use LaraForm\Traits\FormControl;
 
 /**
  * Creates objects of fields and displays them
- *
  * Class FormBuilder
  * @package LaraForm
  */
@@ -22,96 +21,87 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Keeped here object FormProtection
-     *
      * @var FormProtection
      */
     protected $formProtection;
 
     /**
      * Keeped here object ErrorStore
-     *
      * @var ErrorStore
      */
     protected $errorStore;
 
     /**
      * Keeped here object OldInputStore
-     *
      * @var OldInputStore
      */
     protected $oldInputStore;
 
     /**
      * Keeped here objects by  already created fields
-     *
      * @var array
      */
     protected $maked = [];
 
     /**
      * Keeped here model that was passed in form
-     *
      * @var $model
      */
     protected $model;
 
     /**
      * Designate the start and end of the form
-     *
      * @var bool
      */
     protected $isForm = false;
 
     /**
      * Keeped here object of the current field
-     *
      * @var widget
      */
     protected $widget;
 
     /**
      * Keeped here object OptionStore
-     *
      * @var OptionStore
      */
     protected $optionStore;
 
     /**
      * Keeped modifications for the view template of one element
-     *
      * @var array
      */
     protected $inlineTemplates = [
         'pattern' => [],
         'div' => [],
+        'label' => [],
         'class_concat' => true
     ];
 
     /**
      * Keeped modifications for the view templates inside in form
-     *
      * @var array
      */
     protected $localTemplates = [
         'pattern' => [],
         'div' => [],
+        'label' => [],
         'class_concat' => true
     ];
 
     /**
      * Keeped modifications for the view templates inside in page
-     *
      * @var array
      */
     protected $globalTemplates = [
         'pattern' => [],
         'div' => [],
+        'label' => [],
         'class_concat' => true
     ];
 
     /**
      * Accepts an objects and assigns the properties
-     *
      * FormBuilder constructor.
      * @param FormProtection $formProtection
      * @param ErrorStore $errorStore
@@ -134,7 +124,6 @@ class FormBuilder extends BaseFormBuilder
      * Opens the form, and begins to store data about the fields
      * Warning!
      * The attributes of the action and method must be passed in the second parameter or not transmitted at all!!!
-     *
      * @param null $model
      * @param array $options
      * @return mixed
@@ -175,7 +164,6 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Closes the form
-     *
      * @return mixed
      */
     public function end()
@@ -188,7 +176,6 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Accepts changes for presentation templates within a form or on a page
-     *
      * @param $templateName
      * @param bool $templateValue
      * @param bool $global
@@ -241,7 +228,10 @@ class FormBuilder extends BaseFormBuilder
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
 
         if (isset($attr['type'])) {
-            if (in_array($attr['type'], ['checkbox', 'radio', 'submit', 'file', 'textarea', 'hidden'])) {
+            if (in_array($attr['type'], ['submit', 'reset', 'button'])) {
+                $method = 'submit';
+            }
+            if (in_array($attr['type'], ['checkbox', 'radio', 'file', 'textarea', 'hidden'])) {
                 $method = $attr['type'];
             }
         }
@@ -263,7 +253,6 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Instantiates field objects and returns an object OptionStore to create a chain
-     *
      * @param $method
      * @param $arguments
      * @return mixed
@@ -290,7 +279,6 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Completing modifying templates and their parame
-     *
      * @return array
      */
     private function complateTemplatesAndParams()
@@ -306,13 +294,13 @@ class FormBuilder extends BaseFormBuilder
 
         $this->inlineTemplates['pattern'] = [];
         $this->inlineTemplates['div'] = [];
+        $this->inlineTemplates['label'] = [];
         $this->inlineTemplates['class_concat'] = true;
         return $data;
     }
 
     /**
      * Checks whether the template modification has been transferred from a separate field
-     *
      * @param $attr
      */
     private function hasTemplate(&$attr)
@@ -330,6 +318,10 @@ class FormBuilder extends BaseFormBuilder
             $this->inlineTemplates['class_concat'] = $attr[1]['class_concat'];
             unset($attr[1]['class_concat']);
         }
+        if (!empty($attr[1]['label']) && is_array($attr[1]['label'])) {
+            $this->inlineTemplates['label'] = $attr[1]['label'];
+            unset($attr[1]['label']);
+        }
     }
 
     /**
@@ -341,12 +333,12 @@ class FormBuilder extends BaseFormBuilder
         $this->maked = [];
         $this->localTemplates['pattern'] = [];
         $this->localTemplates['div'] = [];
+        $this->localTemplates['label'] = [];
         $this->localTemplates['class_concat'] = true;
     }
 
     /**
      * locally or globally stores modifications and template parameters in properties
-     *
      * @param $data
      * @param $container
      * @param $options
@@ -360,6 +352,12 @@ class FormBuilder extends BaseFormBuilder
             if (isset($options['class_concat'])) {
                 $container['class_concat'] = $options['class_concat'];
             }
+            if (!empty($options['label']) && is_array($options['label'])) {
+                if (isset($options['label']['text'])) {
+                    unset($options['label']['text']);
+                }
+                $container['label'] = $options['label'];
+            }
         }
 
         foreach ($data as $key => $value) {
@@ -369,7 +367,6 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * From the form parameters get a list of fields that should not be validated
-     *
      * @param $options
      * @return array|string
      * @throws \Exception

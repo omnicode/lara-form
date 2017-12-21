@@ -37,7 +37,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Checks and modifies the attributes that were passed in the field
-     *
      * @param $attr
      */
     public function checkAttributes(&$attr)
@@ -59,7 +58,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Adds modifying data to templates and their parameters
-     *
      * @param $data
      */
     public function setParams($data)
@@ -67,6 +65,7 @@ class Widget extends BaseWidget implements WidgetInterface
         $this->containerParams = [];
         $this->templates = [];
         $this->classConcat = [];
+        $this->labelAttr = [];
 
         foreach ($data as $index => $item) {
             $this->addTemplateAndAttributes($item, $index);
@@ -75,7 +74,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Adds and model in BindStore and creates the object
-     *
      * @param $data
      */
     public function setModel($data)
@@ -86,7 +84,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Creates a field name and their options if they exist
-     *
      * @param $arguments
      */
     public function setArguments($arguments)
@@ -99,7 +96,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Returns the content of the error message and its style if the error is eating
-     *
      * @param $name
      * @return array
      */
@@ -111,7 +107,7 @@ class Widget extends BaseWidget implements WidgetInterface
         ];
 
         if (!empty($this->errors->hasError($name))) {
-            $helpBlockTemplate = $this->config['templates']['helpBlock'];
+            $helpBlockTemplate = $this->getTemplate('helpBlock');
             $errorAttr['text'] = $this->errors->getError($name);
             $errorParams['help'] = $this->formatTemplate($helpBlockTemplate, $errorAttr);
             $errorParams['error'] = $this->config['css']['class']['error'];
@@ -123,7 +119,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Returns the field value from the link to the model or the one that was before the validation
-     *
      * @param $name
      * @return array
      */
@@ -146,19 +141,20 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Creates view for html field label
-     *
      * @param $name
      * @param $attr
      * @return mixed
      */
     protected function renderLabel($name, $attr)
     {
-        $template = $this->config['templates']['label'];
+        $template = $this->getTemplate('label');
 
         if (!isset($attr['for'])) {
             $attr['for'] = $name;
         }
-
+        if (!empty($attr['class'])) {
+            $attr['class'] = $this->formatClass($attr['class']);
+        }
         $rep = [
             'attrs' => $this->formatAttributes($attr),
             'text' => $name,
@@ -170,23 +166,23 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Checks and creates attributes for the label field
-     *
      * @param $inputName
      * @param $option
      * @param bool $treatment
+     * @param array $labelAttr
      * @return string
      */
-    protected function checkLabel($inputName, $option, $treatment = false)
+    protected function checkLabel($inputName, $option, $treatment = false, $labelAttr = [])
     {
         $for = isset($option['id']) ? $option['id'] : $inputName;
         $labelName = $treatment ? $inputName : $this->getLabelName($inputName);
-        $this->label = $this->renderLabel($labelName, ['for' => $for]);
+        $labelAttr = array_merge($labelAttr, ['for' => $for]);
+        $this->label = $this->renderLabel($labelName, $labelAttr);
         return $this->label;
     }
 
     /**
      * Generates id by specified parameters
-     *
      * @param $attr
      * @param bool $multi
      */
@@ -210,22 +206,47 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Generates label by property attr
-     *
      * @param $attr
      */
     protected function generateLabel(&$attr)
     {
-        if (!empty($attr['label'])) {
+        $labelName = $this->name;
+        $attributes = $this->getLabelAttributes();
+        if (!empty($attr['label']) && is_string($attr['label'])) {
             $this->checkLabel($attr['label'], $attr, true);
             unset($attr['label']);
+        } elseif (!empty($attributes)) {
+            if (!empty($attributes['text'])) {
+                  $labelName = $attributes['text'];
+                  unset($attributes['text']);
+            }
+
+            $this->checkLabel($labelName, $attr, true,$attributes);
         } elseif (!isset($attr['label'])) {
-            $this->checkLabel($this->name, $attr);
+            $this->checkLabel($labelName, $attr);
         }
     }
 
     /**
+     * @return bool/array
+     */
+    protected function getLabelAttributes()
+    {
+        $attr = false;
+
+        if (!empty($this->labelAttr['inline'])) {
+            $attr = $this->labelAttr['inline'];
+        } elseif (!empty($this->labelAttr['local'])) {
+            $attr = $this->labelAttr['local'];
+        } elseif (!empty($this->labelAttr['global'])) {
+            $attr = $this->labelAttr['global'];
+        }
+
+        return $attr;
+    }
+
+    /**
      * Returns a default value or a modification for concatenating classes,
-     *
      * @return mixed
      */
     protected function getHtmlClassControl()
@@ -241,12 +262,10 @@ class Widget extends BaseWidget implements WidgetInterface
         }
 
         return $concat;
-
     }
 
     /**
      * Generates class by specified parameters
-     *
      * @param $attr
      * @param bool $default
      * @param bool $format
@@ -263,7 +282,7 @@ class Widget extends BaseWidget implements WidgetInterface
                     $classes = [$classes];
                 }
                 if ($this->getHtmlClassControl()) {
-                    $this->htmlClass = array_merge([$default],$classes);
+                    $this->htmlClass = array_merge([$default], $classes);
                 } else {
                     $this->htmlClass = $classes;
                 }
@@ -281,21 +300,19 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Creates a hidden input field
-     *
      * @param $name
      * @param int $value
      * @return mixed
      */
     protected function setHidden($name, $value = 0)
     {
-        $hiddenTemplate = $this->config['templates']['hiddenInput'];
+        $hiddenTemplate = $this->getTemplate('hiddenInput');
         $attr = ['name' => $name, 'value' => $value,];
         return $this->formatTemplate($hiddenTemplate, $attr);
     }
 
     /**
      * Removes all characters except letters and numbers and creates a name for the label field
-     *
      * @param $name
      * @return string
      */
@@ -306,7 +323,6 @@ class Widget extends BaseWidget implements WidgetInterface
 
     /**
      * Removes all characters except letters and numbers and creates a id by camelcase style
-     *
      * @param $name
      * @return mixed
      */

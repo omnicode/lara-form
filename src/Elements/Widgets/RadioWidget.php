@@ -15,7 +15,7 @@ class RadioWidget extends BaseInputWidget
      */
     public function render()
     {
-        $template = $this->config['templates']['radio'];
+        $template = $this->getTemplate('radio');
         $this->checkAttributes($this->attr);
         $this->currentTemplate = $this->getTemplate('radioContainer');
         $this->setOtherHtmlAttributes('type', 'radio');

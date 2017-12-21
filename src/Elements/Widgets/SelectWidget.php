@@ -66,7 +66,7 @@ class SelectWidget extends Widget
             'name' => $this->name,
             'attrs' => $this->formatAttributes($this->attr)
         ];
-        $this->setHtmlAttributes('type','select');
+        $this->setHtmlAttributes('type', 'select');
         $this->currentTemplate = $this->getTemplate('selectContainer');
         $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
         return $this->completeTemplate();
@@ -80,16 +80,18 @@ class SelectWidget extends Widget
     {
         $this->generateId($attr);
         $this->generateLabel($attr);
-        $this->generateClass($attr,$this->config['css']['class']['select']);
+        $this->generateClass($attr, $this->config['css']['class']['select']);
 
         if (ends_with($this->name, '[]')) {
             $attr['multiple'] = true;
-            $this->name = substr($this->name,0,-2);
+            $this->name = substr($this->name, 0, -2);
         }
 
         if (isset($attr['multiple'])) {
             $this->selectTemplate = $this->getTemplate('selectMultiple');
-            $this->hidden = $this->setHidden($this->name,0);
+            if (empty($attr['disabled'])) {
+                $this->hidden = $this->setHidden($this->name, 0);
+            }
             unset($attr['multiple']);
         } else {
             $this->selectTemplate = $this->getTemplate('select');
@@ -103,7 +105,7 @@ class SelectWidget extends Widget
         if (!empty($attr['empty'])) {
             array_unshift($this->optionsArray, $attr['empty']);
             unset($attr['empty']);
-        } elseif(!isset($attr['empty']) || (isset($attr['empty']) && $attr['empty'] !== false)) {
+        } elseif (!isset($attr['empty']) || (isset($attr['empty']) && $attr['empty'] !== false)) {
             $emptyValue = $this->config['text']['select_empty'];
 
             if ($emptyValue) {
@@ -200,7 +202,7 @@ class SelectWidget extends Widget
             $groupAttrs = $this->isDisabled($groupName, $this->groupDisabled);
         }
         $rep = [
-            'label' => $groupName,
+            'label' => $this->getLabelName($groupName),
             'content' => $childOptionsHtml,
             'attrs' => $this->formatAttributes($groupAttrs)
         ];

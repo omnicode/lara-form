@@ -122,14 +122,16 @@ class FormProtection extends BaseFormProtection
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
 
         if (!$token) {
+            dd(1);
             return false;
         }
 
         if (!session()->has($this->sessionPath($token))) {
+            dd(2);
             return false;
         }
 
-        if (!$this->isValidAction($token, $request->url())) {
+        if (!$this->isValidAction( $request, $token)) {
             return false;
         }
 
@@ -368,22 +370,21 @@ class FormProtection extends BaseFormProtection
 
     /**
      * Verifies the current url corresponds to the one specified in the form
-     *
      * @param $token
-     * @param $currentUrl
+     * @param $request
      * @return bool
      */
-    public function isValidAction($token, $currentUrl)
+    public function isValidAction(Request $request, $token )
     {
         $path = $token . '.' . $this->configSession['paths']['unlock'];
         $unlockFields = session($this->sessionPath($path));
-        if (in_array('action', $unlockFields)) {
+        if (in_array(['action', 'url', 'route'], $unlockFields)) {
             return true;
         }
 
         $action = $this->getAction($token);
 
-        if ($action == $currentUrl) {
+        if ($action === $request->url() || $action === $request->getRequestUri()) {
             return true;
         }
 

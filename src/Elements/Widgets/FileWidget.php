@@ -60,10 +60,10 @@ class FileWidget extends BaseInputWidget
         }
 
         if (isset($attr['multiple'])) {
-            $this->fileTemplate = $this->config['templates']['fileMultiple'];
+            $this->fileTemplate = $this->gettemplate('fileMultiple');
             unset($attr['multiple']);
         } else {
-            $this->fileTemplate = $this->config['templates']['file'];
+            $this->fileTemplate = $this->getTemplate('file');
         }
 
         if (isset($attr['accept'])) {

@@ -23,8 +23,8 @@ class ErrorListWidget extends Widget
             return $this->html;
         }
 
-        $ul = $this->config['templates']['errorList'];
-        $li = $this->config['templates']['errorItem'];
+        $ul = $this->getTemplate('errorList');
+        $li = $this->getTemplate('errorItem');
         $errors = $this->errors->getErrors()->all();
         $list = '';
         foreach ($errors as $name => $error) {

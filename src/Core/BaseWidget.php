@@ -103,6 +103,11 @@ abstract class BaseWidget
     protected $classConcat = [];
 
     /**
+     * @var array
+     */
+    protected $labelAttr = [];
+
+    /**
      * Contains current hidden hollow if that's eating
      *
      * @var string
@@ -141,6 +146,7 @@ abstract class BaseWidget
     {
         $this->containerParams[$permission] = $data['div'];
         $this->classConcat[$permission] = $data['class_concat'];
+        $this->labelAttr[$permission] = $data['label'];
         foreach ($data['pattern'] as $key => $value) {
             if (isset($this->config['templates'][$key])) {
                 $this->templates[$permission][$key] = $value;
@@ -235,34 +241,36 @@ abstract class BaseWidget
 
     /**
      * Filteres and format html class
-     *
+     * @param array $classes
      * @return string
      */
-    protected function formatClass()
+    protected function formatClass($classes = [])
     {
         $class = '';
-
-        if (!empty($this->htmlClass)) {
-            if (is_string($this->htmlClass)) {
-                $this->htmlClass = explode(' ', $this->htmlClass);
+        if (empty($classes)) {
+          $classes = $this->htmlClass;
+          $this->htmlClass = [];
+        }
+        if (!empty($classes)) {
+            if (is_string($classes)) {
+                $classes = explode(' ', $classes);
             }
 
-            $this->htmlClass = array_filter($this->htmlClass, function ($val) {
+            $classes = array_filter($classes, function ($val) {
                 $val = trim($val);
                 if (!empty($val) && $val !== '' && $val !== false) {
                     return $val;
                 }
             });
 
-            if (empty($this->htmlClass)) {
+            if (empty($classes)) {
                 return $class;
             }
 
-            $uniqueClass = $this->array_iunique($this->htmlClass);
+            $uniqueClass = $this->array_iunique($classes);
             $class = implode(' ', $uniqueClass);
         }
 
-        $this->htmlClass = [];
         return $class;
     }
 
@@ -379,23 +387,25 @@ abstract class BaseWidget
         $params = [];
 
         if ($this->getOtherHtmlAttributes('required')) {
-
             if (!empty($data['required'])) {
                 $params['required'] = $data['required'];
                 unset($data['required']);
             } else {
                 $params['required'] = 'required';
             }
+        }elseif (!empty($data['required'])){
+            unset($data['required']);
         }
 
         if ($this->getOtherHtmlAttributes('disabled')) {
-
             if (!empty($data['disabled'])) {
                 $params['disabled'] = $data['disabled'];
                 unset($data['disabled']);
             } else {
                 $params['disabled'] = 'disabled';
             }
+        }elseif (!empty($data['disabled'])){
+            unset($data['disabled']);
         }
 
         if (!empty($data['type'])) {

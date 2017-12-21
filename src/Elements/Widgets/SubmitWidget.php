@@ -26,7 +26,7 @@ class SubmitWidget extends BaseInputWidget
 
 
         $this->html = $this->formatTemplate($template, $btnAttr);
-        $this->currentTemplate = $this->config['templates']['submitContainer'];
+        $this->currentTemplate = $this->getTemplate('submitContainer');
         return $this->completeTemplate();
     }
 
