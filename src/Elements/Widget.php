@@ -46,13 +46,26 @@ class Widget extends BaseWidget implements WidgetInterface
             $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
             unset($attr['icon']);
         }
-
         if (!empty($attr['required'])) {
             $this->setOtherHtmlAttributes('required', 'required');
+            $attr['required'] = 'required';
         }
-
         if (!empty($attr['disabled'])) {
             $this->setOtherHtmlAttributes('disabled', 'disabled');
+            $attr['disabled'] = 'disabled';
+        }
+        if (!empty($attr['readonly'])) {
+            $attr['readonly'] = 'readonly';
+        }
+        if (!empty($attr['readonly'])) {
+            $attr['readonly'] = 'readonly';
+        }
+        if (isset($attr['autocomplete'])) {
+            if ($attr['autocomplete'] || $attr['autocomplete'] === 'on') {
+                $attr['autocomplete'] = 'on';
+            } else {
+                $attr['autocomplete'] = 'off';
+            }
         }
     }
 
@@ -217,13 +230,28 @@ class Widget extends BaseWidget implements WidgetInterface
             unset($attr['label']);
         } elseif (!empty($attributes)) {
             if (!empty($attributes['text'])) {
-                  $labelName = $attributes['text'];
-                  unset($attributes['text']);
+                $labelName = $attributes['text'];
+                unset($attributes['text']);
             }
 
-            $this->checkLabel($labelName, $attr, true,$attributes);
-        } elseif (!isset($attr['label'])) {
+            $this->checkLabel($labelName, $attr, true, $attributes);
+        } elseif (!isset($attr['label']) && $this->config['text']['label']) {
             $this->checkLabel($labelName, $attr);
+        }
+    }
+
+    /**
+     * Generates placeholder by property attr
+     * @param $attr
+     */
+    protected function generatePlaceholder(&$attr)
+    {
+        if (isset($attr['placeholder'])) {
+            if (is_bool($attr['placeholder']) && $attr['placeholder'] !== false) {
+                $attr['placeholder'] = $this->getLabelName($this->name);
+            }
+        } elseif ($this->config['text']['placeholder']) {
+            $attr['placeholder'] = $this->getLabelName($this->name);
         }
     }
 

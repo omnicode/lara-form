@@ -45,7 +45,7 @@ class BaseInputWidget extends Widget
             $template = $this->getTemplate('input');
         }
 
-        $this->generalcheckAttributes($attr, $cTemplate);
+        $this->generalCheckAttributes($attr, $cTemplate);
         $this->setHtmlAttributes('name', $name);
         $this->setHtmlAttributes('attrs', $this->formatAttributes($attr));
         $this->html = $this->formatTemplate($template, $this->getHtmlAttributes());
@@ -98,7 +98,7 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param $cTemplate
      */
-    private function generalcheckAttributes(&$attr, $cTemplate)
+    private function generalCheckAttributes(&$attr, $cTemplate)
     {
         if (!empty($attr['type'])) {
             $this->setHtmlAttributes('type', $attr['type']);
@@ -123,13 +123,13 @@ class BaseInputWidget extends Widget
 
         if (!in_array($this->getHtmlAttributes('type'), ['hidden', 'submit', 'reset', 'button'])) {
             $this->generateLabel($attr);
+            $this->generatePlaceholder($attr);
         }
         $type = $this->getHtmlAttributes('type');
         if ($type !== 'hidden') {
             $defaultClass = isset($this->config['css']['class'][$type]) ? $this->config['css']['class'][$type] : false;
             $this->generateClass($attr, $defaultClass);
         }
-
         $this->assignOtherhtmlAtrributes($attr);
         parent::checkAttributes($attr);
     }

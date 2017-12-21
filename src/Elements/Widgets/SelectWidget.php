@@ -28,14 +28,14 @@ class SelectWidget extends Widget
     private $selected = [];
 
     /**
-     * Keeped here disablied options
+     * Keeped here disabled options
      *
      * @var array
      */
     private $optionDisabled = [];
 
     /**
-     * Keeped here disablied group
+     * Keeped here disabled group
      *
      * @var array
      */

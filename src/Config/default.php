@@ -9,7 +9,8 @@ return [
     'text' => [
         'select_empty' => '--Select--',
         'submit_name' => 'Save',
-
+        'placeholder' => true,
+        'label' => true,
     ],
     'css' => [
         'class_control' => true,
