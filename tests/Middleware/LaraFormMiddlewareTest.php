@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Middleware;
+namespace LaraForm\Tests\Middleware;
 
 use LaraForm\Middleware\LaraFormMiddleware;
 

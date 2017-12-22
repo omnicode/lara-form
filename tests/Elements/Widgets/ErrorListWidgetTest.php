@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Elements\Components;
+namespace LaraForm\Tests\Elements\Widgets;
 
 use LaraForm\Elements\Widgets\ErrorListWidget;
 

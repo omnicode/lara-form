@@ -1,6 +1,6 @@
 <?php
 
-namespace Label\Elements\Components;
+namespace Label\Elements\Widgets;
 
 use LaraForm\Elements\Widgets\LabelWidget;
 

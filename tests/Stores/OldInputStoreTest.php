@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Stores;
+namespace LaraForm\Tests\Stores;
 
 use LaraForm\Stores\OldInputStore;
 

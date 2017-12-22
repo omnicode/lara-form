@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace LaraForm\Tests;
 
 use LaraForm\Facades\LaraForm;
 use LaraForm\FormBuilder;
@@ -8,7 +8,7 @@ use LaraForm\FormProtection;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 
-class FormBuilderTest extends PHPUnit_Framework_TestCase
+class FormBuilderTest extends BaseTestCase
 {
     /**
      * @var FormProtection
@@ -25,12 +25,15 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase
      */
     protected $oldInputStore;
 
+    protected $optionStore;
 
     /**
      *
      */
     public function setUp()
-    {   parent::setUp();
+    {
+        parent::setUp();
+        dd(7);
         $this->formProtection = app(FormProtection::class);
         $this->errorStore = app(ErrorStore::class);
         $this->oldInputStore = app(OldInputStore::class);
@@ -42,14 +45,14 @@ class FormBuilderTest extends PHPUnit_Framework_TestCase
     public function testCreateWhenIsFormFalse()
     {
         dd(5);
-        $token = md5(str_random(80));
-        $options['form_token'] = $token;
-       // $formData = $this->make('form', ['start', $options]);
-       // $formHtml = $formData['html'];
+        // $token = md5(str_random(80));
+        // $options['form_token'] = $token;
+        // $formData = $this->make('form', ['start', $options]);
+        // $formHtml = $formData['html'];
 
-       /* if ($formData['method'] === 'get') {
-            return $formHtml;
-       } */
+        /* if ($formData['method'] === 'get') {
+             return $formHtml;
+        } */
 
         /* $this->formProtection->setToken($token);
          $this->formProtection->setTime();

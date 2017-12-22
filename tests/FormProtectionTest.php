@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace LaraForm\Tests;
 
 use LaraForm\FormProtection;
 

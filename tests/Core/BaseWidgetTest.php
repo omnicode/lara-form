@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Core;
+namespace LaraForm\Tests\Core;
 
 use LaraForm\Core\BaseWidget;
 
