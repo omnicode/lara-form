@@ -18,7 +18,9 @@ trait FormControl
      * From the form parameters evaluates the action and returns it
      *
      * @param array $options
-     * @return array|mixed|string
+     * @return mixed|string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function getAction(&$options = [])
     {
@@ -33,7 +35,7 @@ trait FormControl
             return route(...$route);
         }
 
-        if (!empty($options['url'])) {
+        if (!empty($options['url']) && is_string($options['url'])) {
             $url = $options['url'];
             unset($options['url']);
             return $url;

@@ -137,7 +137,7 @@ class FormBuilder extends BaseFormBuilder
 
         $this->model = $model;
         $this->isForm = true;
-        $token = md5(str_random(80));
+        $token = $this->generateToken();
         $action = $this->getAction($options);
         $method = $this->getMethod($options);
         $options['_form_token'] = $token;
@@ -145,7 +145,6 @@ class FormBuilder extends BaseFormBuilder
         $options['_form_method'] = $method;
 
         $form = $this->make('form', ['start', $options]);
-
 
         if ($method === 'get') {
             return $form;
@@ -164,7 +163,9 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Closes the form
-     * @return mixed
+     * @return OptionStore
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
      */
     public function end()
     {
@@ -220,18 +221,22 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * @param $method
-     * @param $arrgs
-     * @return mixed
+     * @param array $arrgs
+     * @return OptionStore
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
      */
     public function __call($method, $arrgs = [])
     {
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
 
         if (isset($attr['type'])) {
+            // button types
             if (in_array($attr['type'], ['submit', 'reset', 'button'])) {
                 $method = 'submit';
             }
-            if (in_array($attr['type'], ['checkbox', 'radio', 'file', 'textarea', 'hidden'])) {
+            // other field types
+            if (in_array($attr['type'], ['checkbox', 'radio', 'file', 'textarea', 'hidden', 'label'])) {
                 $method = $attr['type'];
             }
         }
@@ -239,8 +244,9 @@ class FormBuilder extends BaseFormBuilder
         if (isset($arrgs[0])) {
             $value = '';
             if ($method == 'hidden') {
-                $value = isset($attr['value']) ? $attr['value'] : config('lara_form.default_value.hidden');
+                $value = isset($attr['value']) ? $attr['value'] : 0;
             }
+
 
             if (!in_array($method, ['submit', 'button', 'reset', 'label']) && $this->isForm) {
                 $this->formProtection->addField($arrgs[0], $attr, $value);
@@ -253,9 +259,12 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Instantiates field objects and returns an object OptionStore to create a chain
+     *
      * @param $method
      * @param $arguments
-     * @return mixed
+     * @return OptionStore
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
      */
     private function make($method, $arguments)
     {
@@ -371,7 +380,7 @@ class FormBuilder extends BaseFormBuilder
      * @return array|string
      * @throws \Exception
      */
-    private function getGeneralUnlockFieldsBy(&$options)
+    protected function getGeneralUnlockFieldsBy(&$options)
     {
         $unlockFields = [];
 
@@ -384,5 +393,14 @@ class FormBuilder extends BaseFormBuilder
         $unlockFields[] = '_method';
         $unlockFields[] = config('lara_form.token_name', 'laraform_token');
         return $unlockFields;
+    }
+
+    /**
+     * @return string
+     * @throws \RuntimeException
+     */
+    protected function generateToken()
+    {
+        return md5(str_random(80));
     }
 }

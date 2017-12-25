@@ -52,7 +52,6 @@ class LaraFormServiceProvider extends ServiceProvider
     {
         $config = $this->app['config']->get('lara_form', []);
         $baseConfig = require_once dirname(__DIR__) . '/Config/default.php';
-
         $this->app['config']->set('lara_form', array_replace_recursive($baseConfig,$config));
     }
 
