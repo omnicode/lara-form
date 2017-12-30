@@ -62,17 +62,22 @@ trait FormControl
 
         if (!strpos('@', $methodName)) {
             $currentRoute = $this->getCurrentRoute();
-            $currentController = class_basename(get_class($currentRoute->getController()));
+            $currentController = get_class($currentRoute->getController());
             $methodName = $currentController . '@' . $methodName;
         }
 
-        $routeName = array_search($methodName, $allRoutes);
+        foreach ($allRoutes as $routeName => $method) {
+             if (ends_with($methodName,$method)) {
+                 $route = $routeName;
+                 break;
+             }
+        }
 
-        if (empty($routeName)) {
+        if (empty($route)) {
             abort(405, '[' . $methodName . '] method not allowed!');
         }
 
-        return route($routeName, $action);
+        return route($route, $action);
     }
 
 
@@ -110,7 +115,7 @@ trait FormControl
     {
         if (empty($this->routes)) {
             collect(Route::getRoutes())->map(function ($route) {
-                $this->routes[$route->getName()] = class_basename($route->getActionName());
+                $this->routes[$route->getName()] = $route->getActionName();
             });
         }
 

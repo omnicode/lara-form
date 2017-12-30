@@ -45,6 +45,7 @@ class TextareaWidget extends Widget
         $this->generateClass($attr, $this->config['css']['class']['textarea']);
         $this->generateId($attr);
         $this->generateLabel($attr);
+        $this->generatePlaceholder($attr);
         parent::checkAttributes($attr);
     }
 }

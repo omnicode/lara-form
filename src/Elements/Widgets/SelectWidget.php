@@ -46,7 +46,7 @@ class SelectWidget extends Widget
      *
      * @var array
      */
-    private $optionsArray;
+    private $optionsArray = [];
 
 
     /**
@@ -120,6 +120,11 @@ class SelectWidget extends Widget
                 $this->selected = [$this->selected];
             }
             unset($attr['selected']);
+        }else{
+            $val = $this->getValue($this->name)['value'];
+            if (empty($val)) {
+              $this->selected = [$val];
+            }
         }
 
         if (isset($attr['disabled']) && $attr['disabled'] !== false) {

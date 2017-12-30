@@ -162,13 +162,16 @@ class FormBuilder extends BaseFormBuilder
     }
 
     /**
-     * Closes the form
-     * @return OptionStore
+     * @return OptionStore|string
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
      */
     public function end()
     {
+        if (!$this->isForm) {
+            return '';
+        }
+
         $this->formProtection->confirm();
         $end = $this->make('form', ['end']);
         $this->resetProperties();
@@ -259,14 +262,13 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Instantiates field objects and returns an object OptionStore to create a chain
-     *
      * @param $method
      * @param $arguments
      * @return OptionStore
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
      */
-    private function make($method, $arguments)
+    protected function make($method, $arguments)
     {
         $modelName = ucfirst($method);
         $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');
@@ -290,7 +292,7 @@ class FormBuilder extends BaseFormBuilder
      * Completing modifying templates and their parame
      * @return array
      */
-    private function complateTemplatesAndParams()
+    protected function complateTemplatesAndParams()
     {
         $data = [
             // for once filed
@@ -312,7 +314,7 @@ class FormBuilder extends BaseFormBuilder
      * Checks whether the template modification has been transferred from a separate field
      * @param $attr
      */
-    private function hasTemplate(&$attr)
+    protected function hasTemplate(&$attr)
     {
         if (!empty($attr[1]['template'])) {
             $this->inlineTemplates['pattern'] = $attr[1]['template'];
@@ -336,7 +338,7 @@ class FormBuilder extends BaseFormBuilder
     /**
      * Remove proprties
      */
-    private function resetProperties()
+    protected function resetProperties()
     {
         $this->isForm = false;
         $this->maked = [];
@@ -352,7 +354,7 @@ class FormBuilder extends BaseFormBuilder
      * @param $container
      * @param $options
      */
-    private function addTemplatesAndParams($data, &$container, $options)
+    protected function addTemplatesAndParams($data, &$container, $options)
     {
         if (!empty($options)) {
             if (isset($options['div'])) {

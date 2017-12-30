@@ -5,7 +5,9 @@ namespace LaraForm\Elements\Widgets;
 class SubmitWidget extends BaseInputWidget
 {
     /**
-     * @return string
+     * @return mixed|string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function render()
     {
