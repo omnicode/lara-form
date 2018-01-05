@@ -89,9 +89,9 @@ class Widget extends BaseWidget implements WidgetInterface
      * Adds and model in BindStore and creates the object
      * @param $data
      */
-    public function setModel($data)
+    public function binding($data)
     {
-        $this->bind = app(BindStore::class, [$data]);
+        $this->bind = $data;
 
     }
 

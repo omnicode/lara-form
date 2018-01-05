@@ -6,7 +6,6 @@ use LaraForm\Core\BaseStore;
 
 /**
  * Binds the model to the form for default value
- *
  * Class BindStore
  * @package LaraForm\Stores
  * @link https://github.com/adamwathan/form/blob/master/src/AdamWathan/Form/Binding/BoundData.php
@@ -19,10 +18,9 @@ class BindStore extends BaseStore
     protected $data;
 
     /**
-     * BoundStore constructor.
      * @param $data
      */
-    public function __construct($data)
+    public function setModel($data)
     {
         $this->data = $data;
     }
@@ -89,7 +87,7 @@ class BindStore extends BaseStore
     {
         $key = array_shift($keyParts);
 
-        if (! isset($target[$key])) {
+        if (!isset($target[$key])) {
             return $default;
         }
 
@@ -106,7 +104,7 @@ class BindStore extends BaseStore
     {
         $key = array_shift($keyParts);
 
-        if (! (property_exists($target, $key) || method_exists($target, '__get'))) {
+        if (!(property_exists($target, $key) || method_exists($target, '__get'))) {
             return $default;
         }
 

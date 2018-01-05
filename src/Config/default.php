@@ -82,7 +82,7 @@ return [
         // File input used by file().
         'file' => '<input type="file" name="{%name%}" style="display: none" {%attrs%}/>',
         // File input used by file().
-        'fileMultiple' => '<input type="file" name="{%name%}"  multiple="multiple" style="display: none" {%attrs%}/>',
+        'fileMultiple' => '<input type="file" name="{%name%}[]"  multiple="multiple" style="display: none" {%attrs%}/>',
         // Open tag used by create().
         'formStart' => '<form {%attrs%}>',
         // Close tag used by end().

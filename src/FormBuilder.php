@@ -37,6 +37,19 @@ class FormBuilder extends BaseFormBuilder
      */
     protected $oldInputStore;
 
+
+    /**
+     * Keeped here object OptionStore
+     * @var OptionStore
+     */
+    protected $optionStore;
+
+    /**
+     * Keeped here object BindStore
+     * @var BindStore
+     */
+    protected $bindStore;
+
     /**
      * Keeped here objects by  already created fields
      * @var array
@@ -54,18 +67,11 @@ class FormBuilder extends BaseFormBuilder
      * @var bool
      */
     protected $isForm = false;
-
     /**
      * Keeped here object of the current field
      * @var widget
      */
     protected $widget;
-
-    /**
-     * Keeped here object OptionStore
-     * @var OptionStore
-     */
-    protected $optionStore;
 
     /**
      * Keeped modifications for the view template of one element
@@ -107,17 +113,20 @@ class FormBuilder extends BaseFormBuilder
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
      * @param OptionStore $optionStore
+     * @param BindStore $bindStore
      */
     public function __construct(
         FormProtection $formProtection,
         ErrorStore $errorStore,
         OldInputStore $oldInputStore,
-        OptionStore $optionStore
+        OptionStore $optionStore,
+        BindStore $bindStore
     ) {
         $this->formProtection = $formProtection;
         $this->errorStore = $errorStore;
         $this->oldInputStore = $oldInputStore;
         $this->optionStore = $optionStore;
+        $this->bindStore = $bindStore;
     }
 
     /**
@@ -280,7 +289,8 @@ class FormBuilder extends BaseFormBuilder
         $this->widget = $this->maked[$modelName];
 
         if (!empty($this->model)) {
-            $this->widget->setModel($this->model);
+            $this->bindStore->setModel($this->model);
+            $this->widget->binding($this->bindStore);
         }
 
         $this->optionStore->attr($arguments);

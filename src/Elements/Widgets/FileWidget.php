@@ -59,6 +59,11 @@ class FileWidget extends BaseInputWidget
             unset($attr['value']);
         }
 
+        if (ends_with($this->name, '[]')) {
+            $attr['multiple'] = true;
+            $this->name = substr($this->name, 0, -2);
+        }
+
         if (isset($attr['multiple'])) {
             $this->fileTemplate = $this->gettemplate('fileMultiple');
             unset($attr['multiple']);
