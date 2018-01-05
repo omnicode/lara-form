@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
 use LaraForm\Middleware\LaraFormMiddleware;
+use LaraForm\Stores\BindStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use LaraForm\Stores\OptionStore;
@@ -91,7 +92,9 @@ class LaraFormServiceProvider extends ServiceProvider
         $this->app->singleton('laraform.options', function ($app) {
             return new OptionStore();
         });
-
+        $this->app->singleton('laraform.bind', function ($app) {
+            return new BindStore();
+        });
     }
 
     /**
@@ -105,7 +108,8 @@ class LaraFormServiceProvider extends ServiceProvider
                 $app['laraform.protection'],
                 $app['laraform.error'],
                 $app['laraform.oldInput'],
-                $app['laraform.options']
+                $app['laraform.options'],
+                $app['laraform.bind']
             );
         });
     }
