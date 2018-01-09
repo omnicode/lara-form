@@ -38,6 +38,8 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      * Checks and modifies the attributes that were passed in the field
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function checkAttributes(&$attr)
     {
@@ -61,7 +63,7 @@ class Widget extends BaseWidget implements WidgetInterface
             $attr['readonly'] = 'readonly';
         }
         if (isset($attr['autocomplete'])) {
-            if ($attr['autocomplete'] || $attr['autocomplete'] === 'on') {
+            if ($attr['autocomplete'] === true || $attr['autocomplete'] === 'on') {
                 $attr['autocomplete'] = 'on';
             } else {
                 $attr['autocomplete'] = 'off';
@@ -108,9 +110,10 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
-     * Returns the content of the error message and its style if the error is eating
      * @param $name
      * @return array
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function getErrorByFieldName($name)
     {
@@ -157,6 +160,8 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @param $attr
      * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function renderLabel($name, $attr)
     {
@@ -184,11 +189,13 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param bool $treatment
      * @param array $labelAttr
      * @return string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function checkLabel($inputName, $option, $treatment = false, $labelAttr = [])
     {
         $for = isset($option['id']) ? $option['id'] : $inputName;
-        $labelName = $treatment ? $inputName : $this->getLabelName($inputName);
+        $labelName = $treatment ? $inputName : $this->translate($this->getLabelName($inputName));
         $labelAttr = array_merge($labelAttr, ['for' => $for]);
         $this->label = $this->renderLabel($labelName, $labelAttr);
         return $this->label;
@@ -220,6 +227,8 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      * Generates label by property attr
      * @param $attr
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function generateLabel(&$attr)
     {
@@ -286,7 +295,9 @@ class Widget extends BaseWidget implements WidgetInterface
         } else {
             $this->htmlClass[] = $default;
         }
-
+        if ($this->errors->getError($this->name)) {
+            $this->htmlClass[] = $this->config['css']['class']['error'];
+        }
         if ($format) {
             $attr['class'] = $this->formatClass();
         }
@@ -297,6 +308,8 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @param int $value
      * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function setHidden($name, $value = 0)
     {
@@ -323,5 +336,20 @@ class Widget extends BaseWidget implements WidgetInterface
     private function getId($name)
     {
         return lcfirst(str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name))));
+    }
+
+    /**
+     * @param $str
+     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     */
+    protected function translate($str)
+    {
+        if (function_exists('__')) {
+            return __($str);
+        }
+        if (function_exists('trans')) {
+            return trans($str);
+        }
+        return $str;
     }
 }

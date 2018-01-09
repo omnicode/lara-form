@@ -290,7 +290,7 @@ class FormProtection extends BaseFormProtection
             return;
         }
         if (!empty($options['_unlock'])) {
-            unset($this->fields[$field]);
+            unset($options[$field]);
             $this->unlockFields[] = $field; // TODO allows unlock array input
         } else {
 
@@ -382,7 +382,9 @@ class FormProtection extends BaseFormProtection
 
         $action = $this->getAction($token);
 
-        if ($action === $request->url() || $action === $request->getRequestUri()) {
+        if ($action === $request->url() ||
+            $action === $request->getRequestUri() ||
+            $action === $request->fullUrl()) {
             return true;
         }
 
