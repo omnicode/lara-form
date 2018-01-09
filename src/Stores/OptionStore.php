@@ -7,7 +7,6 @@ use LaraForm\FormBuilder;
 
 /**
  * creates a system of Chain-calling methods
- *
  * Class OptionStore
  * @package LaraForm\Stores
  */
@@ -15,31 +14,36 @@ class OptionStore extends BaseStore
 {
     /**
      * Keeped here object FormBuilder
-     *
      * @var FormBuilder
      */
     private $builder;
 
     /**
      * Keeped here all field attributes
-     *
      * @var array
      */
     private $attributes = [];
 
+    /**
+     * @param $attrs
+     */
+    public function setAttributes($attrs)
+    {
+        $this->attributes = $attrs;
+    }
 
     /**
      * Chain calling this method passes an array of attributes
      * @param $options
-     * @param array $values
+     * @param $values
      * @return $this
      */
-    public function attr($options, $values = [])
+    public function attr($options, $values = null)
     {
         if (!is_array($options)) {
-            if (!empty($values)) {
+            if (isset($values)) {
                 $options = [$options => $values];
-            }else{
+            } else {
                 $options = [$options];
             }
         }
@@ -47,7 +51,7 @@ class OptionStore extends BaseStore
         if (isset($this->attributes[1])) {
             $this->attributes[1] += $options;
         } else {
-            $this->attributes += $options;
+            $this->attributes[] = $options;
         }
         return $this;
     }
@@ -55,7 +59,6 @@ class OptionStore extends BaseStore
 
     /**
      * Chain calling this method passes an field id
-     *
      * @param $strId
      * @return $this
      */
@@ -67,7 +70,6 @@ class OptionStore extends BaseStore
 
     /**
      * Chain calling this method passes an array or arguments of field class
-     *
      * @param $var
      * @return $this
      */
@@ -89,7 +91,6 @@ class OptionStore extends BaseStore
      * Chain calling this method for data attibutes
      * The first argument is the name
      * The second argument is the value
-     *
      * @param $name
      * @param $value
      * @return $this
@@ -102,7 +103,6 @@ class OptionStore extends BaseStore
 
     /**
      * Gets the field attibutes
-     *
      * @return array
      */
     public function getOprions()
@@ -120,7 +120,6 @@ class OptionStore extends BaseStore
 
     /**
      * Accepts an object and assigns the property
-     *
      * @param $model
      */
     public function setBuilder($model)
@@ -131,7 +130,6 @@ class OptionStore extends BaseStore
     /**
      * When there is a mapping then we call the method __toString() from bulider,
      * because the rendering is done there
-     *
      * @return mixed
      */
     public function __toString()

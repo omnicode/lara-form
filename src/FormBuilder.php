@@ -67,6 +67,7 @@ class FormBuilder extends BaseFormBuilder
      * @var bool
      */
     protected $isForm = false;
+
     /**
      * Keeped here object of the current field
      * @var widget
