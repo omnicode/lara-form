@@ -51,7 +51,7 @@ class OptionStore extends BaseStore
         if (isset($this->attributes[1])) {
             $this->attributes[1] += $options;
         } else {
-            $this->attributes[] = $options;
+            $this->attributes += $options;
         }
         return $this;
     }
