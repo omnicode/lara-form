@@ -294,7 +294,7 @@ class FormBuilder extends BaseFormBuilder
             $this->widget->binding($this->bindStore);
         }
 
-        $this->optionStore->attr($arguments);
+        $this->optionStore->setAttributes($arguments);
         $this->optionStore->setBuilder($this);
         return $this->optionStore;
     }
