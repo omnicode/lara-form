@@ -224,8 +224,10 @@ class FormBuilder extends BaseFormBuilder
      */
     public function __toString()
     {
+        $params = $this->optionStore->getOprions();
+        $this->hasTemplate($params);
         $data = $this->complateTemplatesAndParams();
-        $this->widget->setArguments($this->optionStore->getOprions());
+        $this->widget->setArguments($params);
         $this->widget->setParams($data);
         $this->optionStore->resetOptions();
 
