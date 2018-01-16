@@ -262,6 +262,11 @@ class FormBuilder extends BaseFormBuilder
                 $value = isset($attr['value']) ? $attr['value'] : 0;
             }
 
+            if (!empty($attr['readonly'])) {
+                $val = $this->bindStore->get($arrgs[0]);
+                $value = !empty($val) ? $val : '';
+                $value = isset($attr['value']) ? $attr['value'] : $value;
+            }
 
             if (!in_array($method, ['submit', 'button', 'reset', 'label']) && $this->isForm) {
                 $this->formProtection->addField($arrgs[0], $attr, $value);
