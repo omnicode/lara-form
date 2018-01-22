@@ -156,10 +156,11 @@ abstract class BaseWidget
 
     /**
      * Formats the html template to the specified params
-     *
      * @param $template
      * @param $attributes
      * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function formatTemplate($template, $attributes)
     {
@@ -180,8 +181,9 @@ abstract class BaseWidget
 
     /**
      * Transforms the template into the required form
-     *
      * @param $template
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     private function transformTemplate(&$template)
     {
@@ -291,6 +293,8 @@ abstract class BaseWidget
      * Finally creates a view
      *
      * @return mixed|string
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function completeTemplate()
     {
@@ -333,6 +337,11 @@ abstract class BaseWidget
         $this->attr = [];
     }
 
+    /**
+     * @param $data
+     * @param bool $default
+     * @return bool
+     */
     protected function getModifiedData($data, $default = false)
     {   $datum = $default;
         if (!empty($data['inline'])) {
@@ -374,6 +383,7 @@ abstract class BaseWidget
 
     /**
      * Returns a default value or a modification for concatenating classes,
+     *
      * @return mixed
      */
     protected function getHtmlClassControl()
