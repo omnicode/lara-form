@@ -82,7 +82,8 @@ class FormBuilder extends BaseFormBuilder
         'pattern' => [],
         'div' => [],
         'label' => [],
-        'class_concat' => true
+        'class_concat' => true,
+        'escept' => false
     ];
 
     /**
@@ -93,7 +94,8 @@ class FormBuilder extends BaseFormBuilder
         'pattern' => [],
         'div' => [],
         'label' => [],
-        'class_concat' => true
+        'class_concat' => true,
+        'escept' => false
     ];
 
     /**
@@ -104,7 +106,8 @@ class FormBuilder extends BaseFormBuilder
         'pattern' => [],
         'div' => [],
         'label' => [],
-        'class_concat' => true
+        'class_concat' => true,
+        'escept' => false,
     ];
 
     /**
@@ -224,10 +227,10 @@ class FormBuilder extends BaseFormBuilder
      */
     public function __toString()
     {
-        $params = $this->optionStore->getOprions();
-        $this->hasTemplate($params);
+        $args = $this->optionStore->getOprions();
+        $this->hasTemplate($args);
         $data = $this->complateTemplatesAndParams();
-        $this->widget->setArguments($params);
+        $this->widget->setArguments($args);
         $this->widget->setParams($data);
         $this->optionStore->resetOptions();
 
@@ -325,6 +328,7 @@ class FormBuilder extends BaseFormBuilder
         $this->inlineTemplates['div'] = [];
         $this->inlineTemplates['label'] = [];
         $this->inlineTemplates['class_concat'] = true;
+        $this->inlineTemplates['escept'] = false;
         return $data;
     }
 
@@ -338,7 +342,6 @@ class FormBuilder extends BaseFormBuilder
             $this->inlineTemplates['pattern'] = $attr[1]['template'];
             unset($attr[1]['template']);
         }
-
         if (isset($attr[1]['div'])) {
             $this->inlineTemplates['div'] = $attr[1]['div'];
             unset($attr[1]['div']);
@@ -350,6 +353,10 @@ class FormBuilder extends BaseFormBuilder
         if (!empty($attr[1]['label']) && is_array($attr[1]['label'])) {
             $this->inlineTemplates['label'] = $attr[1]['label'];
             unset($attr[1]['label']);
+        }
+        if (isset($attr[1]['escept'])) {
+            $this->inlineTemplates['escept'] = $attr[1]['escept'];
+            unset($attr[1]['escept']);
         }
     }
 
@@ -364,6 +371,7 @@ class FormBuilder extends BaseFormBuilder
         $this->localTemplates['div'] = [];
         $this->localTemplates['label'] = [];
         $this->localTemplates['class_concat'] = true;
+        $this->localTemplates['escept'] = false;
     }
 
     /**
@@ -380,6 +388,9 @@ class FormBuilder extends BaseFormBuilder
             }
             if (isset($options['class_concat'])) {
                 $container['class_concat'] = $options['class_concat'];
+            }
+            if (isset($options['escept'])) {
+                $container['escept'] = $options['escept'];
             }
             if (!empty($options['label']) && is_array($options['label'])) {
                 if (isset($options['label']['text'])) {

@@ -75,16 +75,16 @@ class OptionStore extends BaseStore
      */
     private function _class($var)
     {
-    $classies = [];
-    if (is_array($var)) {
-        $classies = $var;
-    } else {
-        foreach (func_get_args() as $index => $class) {
-            $classies[] = $class;
+        $classies = [];
+        if (is_array($var)) {
+            $classies = $var;
+        } else {
+            foreach (func_get_args() as $index => $class) {
+                $classies[] = $class;
+            }
         }
-    }
-    $this->attributes[1]['class'] = $classies;
-    return $this;
+        $this->attributes[1]['class'] = $classies;
+        return $this;
     }
 
     /**
@@ -137,6 +137,11 @@ class OptionStore extends BaseStore
         return $this->builder->__toString();
     }
 
+    /**
+     * @param $method
+     * @param $attr
+     * @return $this
+     */
     public function __call($method, $attr)
     {
         if ($method === 'class') {

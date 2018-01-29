@@ -103,6 +103,13 @@ abstract class BaseWidget
     protected $classConcat = [];
 
     /**
+     * Contains the params for escept
+     *
+     * @var array
+     */
+    protected $escept = [];
+
+    /**
      * @var array
      */
     protected $labelAttr = [];
@@ -147,6 +154,7 @@ abstract class BaseWidget
         $this->containerParams[$permission] = $data['div'];
         $this->classConcat[$permission] = $data['class_concat'];
         $this->labelAttr[$permission] = $data['label'];
+        $this->escept[$permission] = $data['escept'];
         foreach ($data['pattern'] as $key => $value) {
             if (isset($this->config['templates'][$key])) {
                 $this->templates[$permission][$key] = $value;
@@ -353,6 +361,7 @@ abstract class BaseWidget
         }
         return $datum;
     }
+
     /**
      * Returns a default template or a modified template
      *
@@ -389,6 +398,15 @@ abstract class BaseWidget
     protected function getHtmlClassControl()
     {
         return $this->getModifiedData($this->classConcat,$this->config['css']['class_control']);
+    }
+
+    /**
+     * Returns a default value or a modification for escept html tags,
+     * @return bool
+     */
+    protected function getIsEscept()
+    {
+        return $this->getModifiedData($this->escept,$this->config['escept']);
     }
 
     /**

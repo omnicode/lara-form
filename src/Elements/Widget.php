@@ -183,6 +183,18 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
+     * @param $text
+     * @return string
+     */
+    protected function escept($text)
+    {
+        if (!$this->getIsEscept()) {
+            return htmlspecialchars($text);
+        }
+        return $text;
+    }
+
+    /**
      * Checks and creates attributes for the label field
      * @param $inputName
      * @param $option
@@ -195,7 +207,7 @@ class Widget extends BaseWidget implements WidgetInterface
     protected function checkLabel($inputName, $option, $treatment = false, $labelAttr = [])
     {
         $for = isset($option['id']) ? $option['id'] : $inputName;
-        $labelName = $treatment ? $inputName : $this->translate($this->getLabelName($inputName));
+        $labelName = $treatment ? $this->escept($inputName) : $this->translate($this->getLabelName($inputName));
         $labelAttr = array_merge($labelAttr, ['for' => $for]);
         $this->label = $this->renderLabel($labelName, $labelAttr);
         return $this->label;
@@ -259,7 +271,7 @@ class Widget extends BaseWidget implements WidgetInterface
     {
         if (isset($attr['placeholder'])) {
             if (is_bool($attr['placeholder']) && $attr['placeholder'] !== false) {
-                $attr['placeholder'] = $this->getLabelName($this->name);
+                $attr['placeholder'] = $this->translate($this->getLabelName($this->name));
             }
         } elseif ($this->config['text']['placeholder']) {
             $attr['placeholder'] = $this->getLabelName($this->name);

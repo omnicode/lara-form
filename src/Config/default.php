@@ -2,6 +2,7 @@
 return [
     'charset' => 'utf-8',
     'token_name' => 'laraform_token',
+    'escept' => false,
     'separator' => [
         'start' => '{%', // [..., {..., (...
         'end' => '%}',   // ...], ...}, ...)
