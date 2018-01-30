@@ -247,7 +247,20 @@ class FormBuilder extends BaseFormBuilder
     public function __call($method, $arrgs = [])
     {
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
+        $method = $this->getFieldType($attr, $method);
+        $this->fixField($arrgs,$attr, $method);
+        $this->hasTemplate($arrgs);
+        return $this->make($method, $arrgs);
+    }
 
+    /**
+     * @param $attr
+     * @param $default
+     * @return string
+     */
+    protected function getFieldType($attr, $default)
+    {
+        $method = $default;
         if (isset($attr['type'])) {
             // button types
             if (in_array($attr['type'], ['submit', 'reset', 'button'])) {
@@ -258,7 +271,16 @@ class FormBuilder extends BaseFormBuilder
                 $method = $attr['type'];
             }
         }
+        return $method;
+    }
 
+    /**
+     * @param $arrgs
+     * @param $attr
+     * @param $method
+     */
+    protected function fixField($arrgs, $attr, $method)
+    {
         if (isset($arrgs[0])) {
             $value = '';
             if ($method == 'hidden') {
@@ -275,9 +297,6 @@ class FormBuilder extends BaseFormBuilder
                 $this->formProtection->addField($arrgs[0], $attr, $value);
             }
         }
-
-        $this->hasTemplate($arrgs);
-        return $this->make($method, $arrgs);
     }
 
     /**

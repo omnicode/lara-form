@@ -242,7 +242,7 @@ class FormProtection extends BaseFormProtection
      */
     public function removeByCount()
     {
-        $maxCount = \config('lara_form.session.max_count', false);
+        $maxCount = config('lara_form.session.max_count', false);
 
         if (!$maxCount) {
             return false;
