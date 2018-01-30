@@ -144,12 +144,9 @@ class FormBuilder extends BaseFormBuilder
      */
     public function create($model = null, $options = [])
     {
-        if ($this->isForm) {
-            abort(300, 'Your action is not correct, have is open and not closed tag form!');
-        }
 
         $this->model = $model;
-        $this->isForm = true;
+        $this->setIsForm(true);
         $token = $this->generateToken();
         $action = $this->getAction($options);
         $method = $this->getMethod($options);
@@ -248,7 +245,7 @@ class FormBuilder extends BaseFormBuilder
     {
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
         $method = $this->getFieldType($attr, $method);
-        $this->fixField($arrgs,$attr, $method);
+        $this->fixField($arrgs, $attr, $method);
         $this->hasTemplate($arrgs);
         return $this->make($method, $arrgs);
     }
@@ -281,21 +278,23 @@ class FormBuilder extends BaseFormBuilder
      */
     protected function fixField($arrgs, $attr, $method)
     {
-        if (isset($arrgs[0])) {
-            $value = '';
-            if ($method == 'hidden') {
-                $value = isset($attr['value']) ? $attr['value'] : 0;
-            }
+        if (!isset($arrgs[0])) {
+            return;
+        }
 
-            if (!empty($attr['readonly'])) {
-                $val = $this->bindStore->get($arrgs[0]);
-                $value = !empty($val) ? $val : '';
-                $value = isset($attr['value']) ? $attr['value'] : $value;
-            }
+        $value = '';
+        if ($method == 'hidden') {
+            $value = isset($attr['value']) ? $attr['value'] : 0;
+        }
 
-            if (!in_array($method, ['submit', 'button', 'reset', 'label']) && $this->isForm) {
-                $this->formProtection->addField($arrgs[0], $attr, $value);
-            }
+        if (!empty($attr['readonly'])) {
+            $val = $this->bindStore->get($arrgs[0]);
+            $value = !empty($val) ? $val : '';
+            $value = isset($attr['value']) ? $attr['value'] : $value;
+        }
+
+        if (!in_array($method, ['submit', 'button', 'reset', 'label']) && $this->getIsForm()) {
+            $this->formProtection->addField($arrgs[0], $attr, $value);
         }
     }
 
@@ -384,7 +383,7 @@ class FormBuilder extends BaseFormBuilder
      */
     protected function resetProperties()
     {
-        $this->isForm = false;
+        $this->setIsForm(false);
         $this->maked = [];
         $this->localTemplates['pattern'] = [];
         $this->localTemplates['div'] = [];
@@ -452,5 +451,27 @@ class FormBuilder extends BaseFormBuilder
     protected function generateToken()
     {
         return md5(str_random(80));
+    }
+
+    /**
+     * @param $val
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    protected function setIsForm($val)
+    {
+        if ($this->isForm && $val) {
+            abort(500, 'Your action is not correct, have is open and not closed tag form!');
+        }
+
+        $this->isForm = $val;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function getIsForm()
+    {
+        return $this->isForm;
     }
 }
