@@ -112,6 +112,7 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Accepts an objects and assigns the properties
+     *
      * FormBuilder constructor.
      * @param FormProtection $formProtection
      * @param ErrorStore $errorStore
@@ -161,7 +162,7 @@ class FormBuilder extends BaseFormBuilder
         }
 
         $this->formProtection->setToken($token);
-        $this->formProtection->setTime();
+        $this->formProtection->setTime(time());
         $this->formProtection->setUrl($action);
         $this->formProtection->removeByTime();
         $this->formProtection->removeByCount();
@@ -175,6 +176,8 @@ class FormBuilder extends BaseFormBuilder
      * @return OptionStore|string
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function end()
     {
@@ -204,10 +207,10 @@ class FormBuilder extends BaseFormBuilder
                 unset($templateName['_options']);
             }
 
-            if (!empty($options['global'])) {
-                $this->addTemplatesAndParams($templateName, $this->globalTemplates, $options);
-            } else {
+            if (empty($options['global'])) {
                 $this->addTemplatesAndParams($templateName, $this->localTemplates, $options);
+            } else {
+                $this->addTemplatesAndParams($templateName, $this->globalTemplates, $options);
             }
         } elseif ($templateValue) {
 

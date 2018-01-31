@@ -33,16 +33,17 @@ class LaraFormServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            dirname(__DIR__) . '/Config/default.php' => config_path('lara_form.php'),
+            dirname(__DIR__) . DIRECTORY_SEPARATOR .'Config'.DIRECTORY_SEPARATOR.'lara_form.php' => config_path('lara_form.php'),
         ]);
     }
+
 
     /**
      * Create a core configuration
      */
     public function setCoreConfig()
     {
-        $baseConfig = require_once dirname(__DIR__) . '/Config/core.php';
+        $baseConfig = require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'lara_form_core.php';
         $this->app['config']->set('lara_form_core', $baseConfig);
     }
 
@@ -52,8 +53,8 @@ class LaraFormServiceProvider extends ServiceProvider
     protected function replaceConfig()
     {
         $config = $this->app['config']->get('lara_form', []);
-        $baseConfig = require_once dirname(__DIR__) . '/Config/default.php';
-        $this->app['config']->set('lara_form', array_replace_recursive($baseConfig,$config));
+        $baseConfig = require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'lara_form.php';
+        $this->app['config']->set('lara_form', array_replace_recursive($baseConfig, $config));
     }
 
     /**

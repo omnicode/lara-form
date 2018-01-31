@@ -8,7 +8,6 @@ use LaraForm\Core\BaseFormProtection;
 
 /**
  * Working with form fields and validating requests for their compliance
- *
  * Class FormProtection
  * @package LaraForm
  */
@@ -16,49 +15,42 @@ class FormProtection extends BaseFormProtection
 {
     /**
      * Keeped here key for form fields
-     *
      * @var string
      */
     protected $token;
 
     /**
      * Keeped here fields which are not validated
-     *
      * @var array
      */
     protected $unlockFields;
 
     /**
      * Keeped here fields which are validated
-     *
      * @var array
      */
     public $fields;
 
     /**
      * Keeped here configuration for session
-     *
      * @var array
      */
     protected $configSession = [];
 
     /**
      * Keeped here the form opening time
-     *
      * @var
      */
     protected $created_time;
 
     /**
      * Keeped here form action url
-     *
      * @var
      */
     protected $url;
 
     /**
      * Keeped here params for ajax requests
-     *
      * @var array
      */
     protected $ajax;
@@ -82,11 +74,11 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
-     *
+     * @param $time
      */
-    public function setTime()
+    public function setTime($time)
     {
-        $this->created_time = time();
+        $this->created_time = $time;
     }
 
     /**
@@ -108,15 +100,15 @@ class FormProtection extends BaseFormProtection
 
     /**
      * Validates the field names, and for hidden field the value also, from the request
-     *
      * @param Request $request
      * @param $data
      * @return bool
-     * @internal param bool $isAjax
-     * @internal param bool $currentUrl
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function validate(Request $request, $data)
     {
+        dd($request);
         $this->removeByTime();
         $tokenName = config('lara_form.token_name', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
@@ -129,7 +121,7 @@ class FormProtection extends BaseFormProtection
             return false;
         }
 
-        if (!$this->isValidAction( $request, $token)) {
+        if (!$this->isValidAction($request, $token)) {
             return false;
         }
 
@@ -173,7 +165,6 @@ class FormProtection extends BaseFormProtection
     /**
      * If the request is ajax, then the default token is removed
      * from the session except those specified in the configuration file
-     *
      * @param $request
      * @return bool
      */
@@ -202,8 +193,9 @@ class FormProtection extends BaseFormProtection
 
     /**
      * Removes obsolete tokens from the session
-     *
      * @return bool
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function removeByTime()
     {
@@ -219,10 +211,10 @@ class FormProtection extends BaseFormProtection
             return false;
         }
         if (starts_with($maxTime, '+') || starts_with($maxTime, '-')) {
-            $maxTime = substr($maxTime, 1);
+            abort(500, 'Time must not begin with a + character or with a character -');
         }
 
-        $maxSeccounds = strtotime( '-'.$maxTime);
+        $maxSeccounds = strtotime('-' . $maxTime);
         $timeName = config('lara_form.session.paths.time');
         $newHistory = array_filter($formHistory, function ($value) use ($timeName, $maxSeccounds) {
             if (isset($value[$timeName])) {
@@ -237,7 +229,6 @@ class FormProtection extends BaseFormProtection
 
     /**
      * To monitor the number of tokens in the session and delete them to a specified count
-     *
      * @return bool
      */
     public function removeByCount()
@@ -279,21 +270,21 @@ class FormProtection extends BaseFormProtection
      * Adds fields for validation
      * Warning!
      * Those fields that have disabled or unlock attributes will not be added to the list of validation!!!
-     *
      * @param $field
      * @param array $options
      * @param string $value
+     * @return bool
      */
     public function addField($field, &$options = [], $value = '')
     {
         if (!empty($options['disabled'])) {
-            return;
+            return false;
         }
+
         if (!empty($options['_unlock'])) {
-            unset($options[$field]);
+            unset($options['_unlock']);
             $this->unlockFields[] = $field; // TODO allows unlock array input
         } else {
-
             if (!starts_with($field, $this->unlockFields)) {
 
                 if (str_contains($field, '[') && str_contains($field, ']')) {
@@ -307,7 +298,6 @@ class FormProtection extends BaseFormProtection
 
     /**
      * Transforms a multidimensional array into a string
-     *
      * @param $field
      */
     public function addArrayInputField($field)
@@ -322,8 +312,6 @@ class FormProtection extends BaseFormProtection
 
         if (ends_with($field, '.')) {
             array_set($this->fields, substr($field, 0, -1), []);
-        } elseif (str_contains('..', $field)) {
-            dd('as');
         } else {
             array_set($this->fields, $field, '');
         }
@@ -347,32 +335,12 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
-     * @param string $path
-     * @return string
-     */
-    private function sessionPath($path = '')
-    {
-        $path = empty($path) ? $this->token : $path;
-        return $this->configSession['name'] . '.' . $path;
-    }
-
-    /**
-     * @param $token
-     * @return bool|mixed
-     */
-    private function getCheckedFieldsBy($token)
-    {
-        $path = $token . '.' . $this->configSession['paths']['check'];
-        return session($this->sessionPath($path));
-    }
-
-    /**
      * Verifies the current url corresponds to the one specified in the form
      * @param $token
      * @param $request
      * @return bool
      */
-    public function isValidAction(Request $request, $token )
+    public function isValidAction(Request $request, $token)
     {
         $path = $token . '.' . $this->configSession['paths']['unlock'];
         $unlockFields = session($this->sessionPath($path));
@@ -381,10 +349,12 @@ class FormProtection extends BaseFormProtection
         }
 
         $action = $this->getAction($token);
-
-        if ($action === $request->url() ||
-            $action === $request->getRequestUri() ||
-            $action === $request->fullUrl()) {
+        $urls = [
+            $request->url(),
+            $request->getRequestUri(),
+            $request->fullUrl(),
+        ];
+        if (in_array($action,$urls)) {
             return true;
         }
 
@@ -402,21 +372,40 @@ class FormProtection extends BaseFormProtection
     }
 
     /**
+     * @param string $path
+     * @return string
+     */
+    protected function sessionPath($path = '')
+    {
+        $path = empty($path) ? $this->token : $path;
+        return $this->configSession['name'] . '.' . $path;
+    }
+
+    /**
+     * @param $token
+     * @return bool|mixed
+     */
+    protected function getCheckedFieldsBy($token)
+    {
+        $path = $token . '.' . $this->configSession['paths']['check'];
+        return session($this->sessionPath($path));
+    }
+
+    /**
      * Removes unverifiable fields from request
-     *
      * @param $data
      * @param $token
      * @return mixed
      */
-    private function removeUnlockFields($data, $token)
+    protected function removeUnlockFields($data, $token)
     {
         $path = $token . '.' . $this->configSession['paths']['unlock'];
         $unlockFields = session($this->sessionPath($path));
         $globalUnloc = config('lara_form.except.field');
-
         if (!empty($globalUnloc)) {
             $unlockFields = array_merge($globalUnloc, $unlockFields);
         }
+
 
         foreach ($data as $key => $value) {
             if (ends_with($key, '[]')) {
@@ -426,6 +415,7 @@ class FormProtection extends BaseFormProtection
                 unset($data[$key]);
             }
         }
+
         return $data;
     }
 }

@@ -16,6 +16,6 @@ abstract  class BaseStore
      */
     protected function transformKey($key)
     {
-        return str_replace(['[]', '[', ']'], ['', '.', ''], $key);
+        return str_ireplace(['[]', '[', ']'], ['', '.', ''], $key);
     }
 }
