@@ -356,9 +356,11 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     protected function translate($str)
     {
-        $path = $this->config['translateDirective'];
+        $path = $this->config['translate_directive'];
         if (!empty($path) && !ends_with('.', $path)) {
             $path = $path . '.';
+        } else {
+            $path = '';
         }
         if (function_exists('__')) {
             return __($path . $str);
