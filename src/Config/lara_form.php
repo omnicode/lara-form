@@ -3,6 +3,7 @@ return [
     'charset' => 'utf-8',
     'token_name' => 'laraform_token',
     'escept' => false,
+    'translateDirective' => '',
     'separator' => [
         'start' => '{%', // [..., {..., (...
         'end' => '%}',   // ...], ...}, ...)

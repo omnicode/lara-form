@@ -108,7 +108,6 @@ class FormProtection extends BaseFormProtection
      */
     public function validate(Request $request, $data)
     {
-        dd($request);
         $this->removeByTime();
         $tokenName = config('lara_form.token_name', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
@@ -120,6 +119,7 @@ class FormProtection extends BaseFormProtection
         if (!session()->has($this->sessionPath($token))) {
             return false;
         }
+
 
         if (!$this->isValidAction($request, $token)) {
             return false;
@@ -168,7 +168,7 @@ class FormProtection extends BaseFormProtection
      * @param $request
      * @return bool
      */
-    private function verificationForAjax($request)
+    protected function verificationForAjax($request)
     {
         if (!empty($this->ajax['url']) && in_array($request->url(), $this->ajax['url'])) {
             return false;
