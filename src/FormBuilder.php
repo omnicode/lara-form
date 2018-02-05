@@ -451,7 +451,7 @@ class FormBuilder extends BaseFormBuilder
     protected function setIsForm($val)
     {
         if ($this->isForm && $val) {
-            abort(500, 'Your action is not correct, have is open and not closed tag form!');
+            throw new \Exception('Your action is not correct, have is open and not closed tag form!');
         }
 
         $this->isForm = $val;
