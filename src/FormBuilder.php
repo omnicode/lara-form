@@ -74,6 +74,9 @@ class FormBuilder extends BaseFormBuilder
      */
     protected $widget;
 
+    /**
+     * @var array
+     */
     protected $templateDefaultParams = [
         'pattern' => [],
         'div' => [],
