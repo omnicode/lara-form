@@ -74,41 +74,31 @@ class FormBuilder extends BaseFormBuilder
      */
     protected $widget;
 
+    protected $templateDefaultParams = [
+        'pattern' => [],
+        'div' => [],
+        'label' => [],
+        'class_concat' => true,
+        'escept' => false
+    ];
+    
     /**
      * Keeped modifications for the view template of one element
      * @var array
      */
-    protected $inlineTemplates = [
-        'pattern' => [],
-        'div' => [],
-        'label' => [],
-        'class_concat' => true,
-        'escept' => false
-    ];
-
+    protected $inlineTemplates = [];
+    
     /**
      * Keeped modifications for the view templates inside in form
      * @var array
      */
-    protected $localTemplates = [
-        'pattern' => [],
-        'div' => [],
-        'label' => [],
-        'class_concat' => true,
-        'escept' => false
-    ];
+    protected $localTemplates = [];
 
     /**
      * Keeped modifications for the view templates inside in page
      * @var array
      */
-    protected $globalTemplates = [
-        'pattern' => [],
-        'div' => [],
-        'label' => [],
-        'class_concat' => true,
-        'escept' => false,
-    ];
+    protected $globalTemplates = [];
 
     /**
      * Accepts an objects and assigns the properties
@@ -132,6 +122,9 @@ class FormBuilder extends BaseFormBuilder
         $this->oldInputStore = $oldInputStore;
         $this->optionStore = $optionStore;
         $this->bindStore = $bindStore;
+        $this->localTemplates = $this->templateDefaultParams;
+        $this->globalTemplates = $this->templateDefaultParams;
+        $this->inlineTemplates = $this->templateDefaultParams;
     }
 
     /**
@@ -344,11 +337,7 @@ class FormBuilder extends BaseFormBuilder
             'global' => $this->globalTemplates,
         ];
 
-        $this->inlineTemplates['pattern'] = [];
-        $this->inlineTemplates['div'] = [];
-        $this->inlineTemplates['label'] = [];
-        $this->inlineTemplates['class_concat'] = true;
-        $this->inlineTemplates['escept'] = false;
+        $this->inlineTemplates = $this->templateDefaultParams;
         return $data;
     }
 
@@ -387,11 +376,7 @@ class FormBuilder extends BaseFormBuilder
     {
         $this->setIsForm(false);
         $this->maked = [];
-        $this->localTemplates['pattern'] = [];
-        $this->localTemplates['div'] = [];
-        $this->localTemplates['label'] = [];
-        $this->localTemplates['class_concat'] = true;
-        $this->localTemplates['escept'] = false;
+        $this->localTemplates = $this->templateDefaultParams;
     }
 
     /**
