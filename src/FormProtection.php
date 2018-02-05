@@ -111,7 +111,6 @@ class FormProtection extends BaseFormProtection
         $this->removeByTime();
         $tokenName = config('lara_form.token_name', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
-
         if (!$token) {
             return false;
         }
@@ -138,7 +137,6 @@ class FormProtection extends BaseFormProtection
         } else {
             session()->forget($this->sessionPath($token));
         }
-
         if (array_keys($data) != array_keys($checkedFields)) {
             return false;
         }
@@ -146,7 +144,7 @@ class FormProtection extends BaseFormProtection
         foreach ($checkedFields as $field => $value) {
             if (!empty($value)) {
                 if (is_array($value)) {
-                    // for array input
+                    // for array input;
                     if (array_keys(array_dot($value)) != array_keys(array_dot($data[$field]))) {
                         return false;
                     }
@@ -344,17 +342,15 @@ class FormProtection extends BaseFormProtection
     {
         $path = $token . '.' . $this->configSession['paths']['unlock'];
         $unlockFields = session($this->sessionPath($path));
-        if (in_array(['action', 'url', 'route'], $unlockFields)) {
+
+        if (is_array($unlockFields) && !empty(array_intersect(['action', 'url', 'route'], $unlockFields))) {
             return true;
         }
 
         $action = $this->getAction($token);
-        $urls = [
-            $request->url(),
-            $request->getRequestUri(),
-            $request->fullUrl(),
-        ];
-        if (in_array($action,$urls)) {
+        $urls = [$request->url(), $request->getRequestUri(), $request->fullUrl()];
+
+        if (in_array($action, $urls)) {
             return true;
         }
 
@@ -405,12 +401,11 @@ class FormProtection extends BaseFormProtection
         if (!empty($globalUnloc)) {
             $unlockFields = array_merge($globalUnloc, $unlockFields);
         }
-
-
         foreach ($data as $key => $value) {
             if (ends_with($key, '[]')) {
                 $key = substr($key, 0, -2);
             }
+
             if (starts_with($key, $unlockFields)) {
                 unset($data[$key]);
             }

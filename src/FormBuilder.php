@@ -145,7 +145,6 @@ class FormBuilder extends BaseFormBuilder
      */
     public function create($model = null, $options = [])
     {
-
         $this->model = $model;
         $this->setIsForm(true);
         $token = $this->generateToken();
