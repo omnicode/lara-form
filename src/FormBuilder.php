@@ -220,9 +220,9 @@ class FormBuilder extends BaseFormBuilder
     /**
      * @return mixed
      */
-    public function __toString()
+    public function output()
     {
-        $args = $this->optionStore->getOprions();
+        $args = $this->optionStore->getOptions();
         $this->hasTemplate($args);
         $data = $this->complateTemplatesAndParams();
         $this->widget->setArguments($args);

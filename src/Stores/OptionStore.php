@@ -16,13 +16,13 @@ class OptionStore extends BaseStore
      * Keeped here object FormBuilder
      * @var FormBuilder
      */
-    private $builder;
+    protected $builder;
 
     /**
      * Keeped here all field attributes
      * @var array
      */
-    private $attributes = [];
+    protected $attributes = [];
 
     /**
      * @param $attrs
@@ -73,7 +73,7 @@ class OptionStore extends BaseStore
      * @param $var
      * @return $this
      */
-    private function _class($var)
+    protected function _class($var)
     {
         $classies = [];
         if (is_array($var)) {
@@ -105,7 +105,7 @@ class OptionStore extends BaseStore
      * Gets the field attibutes
      * @return array
      */
-    public function getOprions()
+    public function getOptions()
     {
         return $this->attributes;
     }
@@ -122,7 +122,7 @@ class OptionStore extends BaseStore
      * Accepts an object and assigns the property
      * @param $model
      */
-    public function setBuilder($model)
+    public function setBuilder(FormBuilder $model)
     {
         $this->builder = $model;
     }
@@ -134,7 +134,7 @@ class OptionStore extends BaseStore
      */
     public function __toString()
     {
-        return $this->builder->__toString();
+        return $this->builder->output();
     }
 
     /**
@@ -148,6 +148,5 @@ class OptionStore extends BaseStore
             $this->_class(...$attr);
             return $this;
         }
-
     }
 }
