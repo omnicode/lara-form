@@ -63,11 +63,11 @@ class LaraFormMiddleware
      * @param $request
      * @return bool
      */
-    private function isGlobalException($request)
+    protected function isGlobalException($request)
     {
         $isExcept = false;
-        $exceptUrls = config('lara_form.except.url', []);;
-        $exceptRoutes = config('lara_form.except.route', []);;
+        $exceptUrls = config('lara_form.except.url');;
+        $exceptRoutes = config('lara_form.except.route');;
 
         if (!empty($exceptUrls)) {
             $uri = $request->getUri();
@@ -88,7 +88,7 @@ class LaraFormMiddleware
             }
         }
 
-        if (!empty($exceptRoutes)) {
+        if (!empty($exceptRoutes) && !$isExcept) {
             $routeName = $request->route()->getName();
             if (in_array($routeName, $exceptRoutes)) {
                 $isExcept = true;

@@ -6,6 +6,7 @@ use LaraForm\Core\BaseStore;
 
 /**
  * Binds the model to the form for default value
+ *
  * Class BindStore
  * @package LaraForm\Stores
  * @link https://github.com/adamwathan/form/blob/master/src/AdamWathan/Form/Binding/BoundData.php

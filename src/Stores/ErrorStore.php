@@ -5,7 +5,7 @@ namespace LaraForm\Stores;
 use LaraForm\Core\BaseStore;
 
 /**
- * binds validation errors to a form for displaying an error messages
+ * Binds validation errors to a form for displaying an error messages
  *
  * Class ErrorStore
  * @package LaraForm\Stores
@@ -16,7 +16,7 @@ class ErrorStore extends BaseStore
     /**
      * @var mixed
      */
-    private $session;
+    protected $session;
 
     /**
      * ErrorStore constructor.
@@ -32,12 +32,11 @@ class ErrorStore extends BaseStore
      */
     public function hasError($key)
     {
-        if (! $this->hasErrors()) {
+        if (!$this->hasErrors()) {
             return false;
         }
 
         $key = $this->transformKey($key);
-
         return $this->getErrors()->has($key);
     }
 
@@ -47,7 +46,7 @@ class ErrorStore extends BaseStore
      */
     public function getError($key)
     {
-        if (! $this->hasError($key)) {
+        if (!$this->hasError($key)) {
             return null;
         }
 

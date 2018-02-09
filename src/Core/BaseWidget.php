@@ -4,7 +4,6 @@ namespace LaraForm\Core;
 
 /**
  * Creates ready-made templates
- *
  * Class BaseWidget
  * @package LaraForm\Core
  */
@@ -12,56 +11,48 @@ abstract class BaseWidget
 {
     /**
      * Fields that are required in the template
-     *
      * @var array
      */
-    private $htmlAttributes = [];
+    protected $htmlAttributes = [];
 
     /**
      * Other fields that are not required for the template
-     *
      * @var array
      */
-    private $otherHtmlAttributes = [];
+    protected $otherHtmlAttributes = [];
 
     /**
      * Contains classes for the field
-     *
      * @var array
      */
     protected $htmlClass = [];
 
     /**
      * Contains the current ready html view
-     *
      * @var string
      */
     protected $html = '';
 
     /**
      * Contains the current html label field
-     *
      * @var string
      */
     protected $label = '';
 
     /**
      * Contains the current html icon field
-     *
      * @var string
      */
     protected $icon = '';
 
     /**
      * Contains the current field name
-     *
      * @var
      */
     protected $name;
 
     /**
      * Contains the current field attributes
-     *
      * @var array
      */
     protected $attr = [];
@@ -69,42 +60,36 @@ abstract class BaseWidget
 
     /**
      * Contains the configuration params
-     *
      * @var mixed
      */
     protected $config;
 
     /**
      * Contains the current selected template for field container
-     *
      * @var bool
      */
     protected $currentTemplate = false;
 
     /**
      * Contains the params for field container
-     *
      * @var array
      */
     protected $containerParams = [];
 
     /**
      * Contains the templates for field container
-     *
      * @var array
      */
     protected $templates = [];
 
     /**
      * Contains the params for html class concatenation
-     *
      * @var array
      */
     protected $classConcat = [];
 
     /**
      * Contains the params for escept
-     *
      * @var array
      */
     protected $escept = [];
@@ -116,28 +101,24 @@ abstract class BaseWidget
 
     /**
      * Contains current hidden hollow if that's eating
-     *
      * @var string
      */
     protected $hidden = '';
 
     /**
      * Contains the validation errors
-     *
      * @var array
      */
     protected $errors = [];
 
     /**
      * Contains the data of the fields before the check is
-     *
      * @var array
      */
     protected $oldInputs = [];
 
     /**
      * Contains the passed model
-     *
      * @var
      */
     protected $bind = null;
@@ -145,7 +126,6 @@ abstract class BaseWidget
 
     /**
      * Add templates, parameters, and parameters for concatenating classes to properties
-     *
      * @param $data
      * @param $permission
      */
@@ -193,7 +173,7 @@ abstract class BaseWidget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    private function transformTemplate(&$template)
+    protected function transformTemplate(&$template)
     {
         $start = $this->config['separator']['start'];
         $end = $this->config['separator']['end'];
@@ -201,15 +181,17 @@ abstract class BaseWidget
         $seperatorsEnd = [']', '}', ')'];
 
         if (!starts_with($start, $seperatorsStart) && !ends_with($end, $seperatorsEnd)) {
-            abort(300, 'Sintax error, allowed symbols for start ' . implode(',', $seperatorsStart) . ' and for end ' . implode(',', $seperatorsEnd));
+            $_msg = 'Sintax error, allowed symbols for start '
+                . implode(',', $seperatorsStart)
+                . ' and for end '
+                . implode(',', $seperatorsEnd);
+            throw new \Exception($_msg);
         }
-
         $template = str_ireplace([$start, $end], ['{%', '%}'], $template);
     }
 
     /**
      * Formats the html attributes
-     *
      * @param $attributes
      * @return string
      */
@@ -233,6 +215,7 @@ abstract class BaseWidget
                 return $value;
             }
         });
+        $attributes = $this->array_iunique($attributes);
 
         $this->setOtherHtmlAttributes($attributes);
 
@@ -241,7 +224,7 @@ abstract class BaseWidget
             if (is_string($index)) {
                 $attr .= $index . '="' . $attribute . '" ';
             } else {
-                $attr .= $attribute;
+                $attr .= $attribute . ' ';
             }
 
         }
@@ -258,12 +241,18 @@ abstract class BaseWidget
     {
         $class = '';
         if (empty($classes)) {
-          $classes = $this->htmlClass;
-          $this->htmlClass = [];
+            $classes = $this->htmlClass;
+            $this->htmlClass = [];
         }
         if (!empty($classes)) {
             if (is_string($classes)) {
                 $classes = explode(' ', $classes);
+            } else {
+                $exClasses = [];
+                foreach ($classes as $index => $class) {
+                    $exClasses = array_merge($exClasses, explode(' ', $class));
+                }
+                $classes = $exClasses;
             }
 
             $classes = array_filter($classes, function ($val) {
@@ -286,7 +275,6 @@ abstract class BaseWidget
 
     /**
      * case-insensitive array_unique
-     *
      * @param array
      * @return array
      * @link http://stackoverflow.com/a/2276400/932473
@@ -299,7 +287,6 @@ abstract class BaseWidget
 
     /**
      * Finally creates a view
-     *
      * @return mixed|string
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -319,6 +306,7 @@ abstract class BaseWidget
         } elseif ($this->getHtmlAttributes('type') && $this->getHtmlAttributes('type') !== 'hidden') {
             $container = $this->getTemplate('inputContainer');
         } else {
+
             return $this->html;
         }
 
@@ -340,8 +328,8 @@ abstract class BaseWidget
     protected function resetProperties()
     {
         $this->icon = '';
-        $this->htmlClass = [];
         $this->label = '';
+        $this->htmlClass = [];
         $this->attr = [];
     }
 
@@ -351,7 +339,8 @@ abstract class BaseWidget
      * @return bool
      */
     protected function getModifiedData($data, $default = false)
-    {   $datum = $default;
+    {
+        $datum = $default;
         if (!empty($data['inline'])) {
             $datum = $data['inline'];
         } elseif (!empty($data['local'])) {
@@ -364,12 +353,12 @@ abstract class BaseWidget
 
     /**
      * Returns a default template or a modified template
-     *
      * @param $templateName
      * @return mixed
      */
     protected function getTemplate($templateName)
     {
+
         $template = $this->config['templates'][$templateName];
         if (!empty($this->templates['inline'][$templateName])) {
             $template = $this->templates['inline'][$templateName];
@@ -392,12 +381,11 @@ abstract class BaseWidget
 
     /**
      * Returns a default value or a modification for concatenating classes,
-     *
      * @return mixed
      */
     protected function getHtmlClassControl()
     {
-        return $this->getModifiedData($this->classConcat,$this->config['css']['class_control']);
+        return $this->getModifiedData($this->classConcat, $this->config['css']['class_control']);
     }
 
     /**
@@ -406,15 +394,14 @@ abstract class BaseWidget
      */
     protected function getIsEscept()
     {
-        return $this->getModifiedData($this->escept,$this->config['escept']);
+        return $this->getModifiedData($this->escept, $this->config['escept']);
     }
 
     /**
      * Returns all parameters for the field container
-     *
      * @return array
      */
-    private function getContainerAllAttributes()
+    protected function getContainerAllAttributes()
     {
         $params = [
             'required' => '',
@@ -433,43 +420,68 @@ abstract class BaseWidget
 
     /**
      * Returns parameters for the field container by permission
-     *
      * @param $data
      * @return array
      */
     protected function getContainerAttributes($data)
     {
+        $attributes = [];
+
+        $attributes += $this->containerAttributeRequiredAndDisabled($data,'required');
+        $attributes += $this->containerAttributeRequiredAndDisabled($data,'disabled');
+        $attributes += $this->containerAttributeType($data);
+        $attributes += $this->containerAttributeClass($data);
+
+        if (!empty($data)) {
+            $attributes['containerAttrs'] = $this->formatAttributes($data);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    protected function containerAttributeRequiredAndDisabled(&$data,$key)
+    {
         $params = [];
-
-        if ($this->getOtherHtmlAttributes('required')) {
-            if (!empty($data['required'])) {
-                $params['required'] = $data['required'];
-                unset($data['required']);
+        if ($this->getOtherHtmlAttributes($key)) {
+            if (empty($data[$key])) {
+                $params[$key] = $key;
             } else {
-                $params['required'] = 'required';
+                $params[$key] = $data[$key];
+                unset($data[$key]);
             }
-        }elseif (!empty($data['required'])){
-            unset($data['required']);
+        } elseif (!empty($data[$key])) {
+            unset($data[$key]);
         }
+        return $params;
+    }
 
-        if ($this->getOtherHtmlAttributes('disabled')) {
-            if (!empty($data['disabled'])) {
-                $params['disabled'] = $data['disabled'];
-                unset($data['disabled']);
-            } else {
-                $params['disabled'] = 'disabled';
-            }
-        }elseif (!empty($data['disabled'])){
-            unset($data['disabled']);
-        }
-
-        if (!empty($data['type'])) {
+    /**
+     * @param $data
+     * @return array
+     */
+    protected function containerAttributeType(&$data)
+    {
+        $params = [];
+        if (empty($data['type'])) {
+            $params['type'] = $this->getOtherHtmlAttributes('type') ? $this->getOtherHtmlAttributes('type') : $this->getHtmlAttributes('type');
+        } else {
             $params['type'] = $data['type'];
             unset($data['type']);
-        } else {
-            $params['type'] = $this->getOtherHtmlAttributes('type') ? $this->getOtherHtmlAttributes('type') : $this->getHtmlAttributes('type');
         }
+        return $params;
+    }
 
+    /**
+     * @param $data
+     * @return array
+     */
+    protected function containerAttributeClass(&$data)
+    {
+        $params = [];
         if (!empty($data['class'])) {
             $class = $data['class'];
 
@@ -481,11 +493,6 @@ abstract class BaseWidget
             $params['class'] = $this->formatClass();
             unset($data['class']);
         }
-
-        if (!empty($data)) {
-            $params['containerAttrs'] = $this->formatAttributes($data);
-        }
-
         return $params;
     }
 

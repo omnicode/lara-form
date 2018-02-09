@@ -6,7 +6,8 @@ use LaraForm\Core\BaseStore;
 use LaraForm\FormBuilder;
 
 /**
- * creates a system of Chain-calling methods
+ * Creates a system of Chain-calling methods
+ *
  * Class OptionStore
  * @package LaraForm\Stores
  */

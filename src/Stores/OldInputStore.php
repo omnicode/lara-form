@@ -18,7 +18,7 @@ class OldInputStore extends BaseStore
     /**
      * @var mixed
      */
-    private $session;
+    protected $session;
 
     /**
      * OldInputStore constructor.
