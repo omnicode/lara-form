@@ -48,17 +48,9 @@ class Widget extends BaseWidget implements WidgetInterface
             $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
             unset($attr['icon']);
         }
-        if (!empty($attr['required'])) {
-            $this->setOtherHtmlAttributes('required', 'required');
-            $attr['required'] = 'required';
-        }
-        if (!empty($attr['disabled'])) {
-            $this->setOtherHtmlAttributes('disabled', 'disabled');
-            $attr['disabled'] = 'disabled';
-        }
-        if (!empty($attr['readonly'])) {
-            $attr['readonly'] = 'readonly';
-        }
+        $this->setOtherHtmlAttributesBy($attr,'required');
+        $this->setOtherHtmlAttributesBy($attr,'disabled');
+
         if (!empty($attr['readonly'])) {
             $attr['readonly'] = 'readonly';
         }
@@ -94,7 +86,6 @@ class Widget extends BaseWidget implements WidgetInterface
     public function binding($data)
     {
         $this->bind = $data;
-
     }
 
     /**
@@ -132,7 +123,6 @@ class Widget extends BaseWidget implements WidgetInterface
         return $errorParams;
     }
 
-
     /**
      * Returns the field value from the link to the model or the one that was before the validation
      * @param $name
@@ -154,6 +144,7 @@ class Widget extends BaseWidget implements WidgetInterface
         $data['value'] = $value;
         return $data;
     }
+
 
     /**
      * Creates view for html field label
@@ -251,6 +242,7 @@ class Widget extends BaseWidget implements WidgetInterface
             unset($attr['label']);
         } elseif (!empty($attributes)) {
             $trant = false;
+
             if (!empty($attributes['text'])) {
                 $labelName = $attributes['text'];
                 $trant = true;
@@ -277,7 +269,6 @@ class Widget extends BaseWidget implements WidgetInterface
             $attr['placeholder'] = $this->getLabelName($this->name);
         }
     }
-
 
     /**
      * Generates class by specified parameters
@@ -315,6 +306,19 @@ class Widget extends BaseWidget implements WidgetInterface
         }
     }
 
+
+    /**
+     * @param $attr
+     * @param $key
+     */
+    protected function setOtherHtmlAttributesBy(&$attr,$key)
+    {
+        if (!empty($attr[$key])) {
+            $this->setOtherHtmlAttributes($key,$key);
+            $attr[$key] = $key;
+        }
+    }
+
     /**
      * Creates a hidden input field
      * @param $name
@@ -345,7 +349,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @return mixed
      */
-    private function getId($name)
+    protected function getId($name)
     {
         return lcfirst(str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name))));
     }

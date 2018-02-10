@@ -98,7 +98,7 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param $cTemplate
      */
-    private function generalCheckAttributes(&$attr, $cTemplate)
+    protected function generalCheckAttributes(&$attr, $cTemplate)
     {
         if (!empty($attr['type'])) {
             $this->setHtmlAttributes('type', $attr['type']);
@@ -125,6 +125,7 @@ class BaseInputWidget extends Widget
             $this->generateLabel($attr);
             $this->generatePlaceholder($attr);
         }
+
         $type = $this->getHtmlAttributes('type');
         if ($type !== 'hidden') {
             $defaultClass = isset($this->config['css']['class'][$type]) ? $this->config['css']['class'][$type] : false;
