@@ -82,6 +82,6 @@ class FileWidget extends BaseInputWidget
         }
 
         $this->generateClass($attr, $default, false);
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
 }

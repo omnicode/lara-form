@@ -27,6 +27,6 @@ class HiddenWidget extends BaseInputWidget
     {
         $attr['type'] = 'hidden';
         $this->setHtmlAttributes('type', 'hidden');
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
 }

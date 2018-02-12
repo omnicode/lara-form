@@ -132,7 +132,7 @@ class BaseInputWidget extends Widget
             $this->generateClass($attr, $defaultClass);
         }
         $this->assignOtherhtmlAtrributes($attr);
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
 
 }

@@ -22,6 +22,6 @@ class InputWidget extends BaseInputWidget
      */
     public function checkAttributes(&$attr)
     {
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
 }

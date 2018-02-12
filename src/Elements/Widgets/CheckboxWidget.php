@@ -87,6 +87,6 @@ class CheckboxWidget extends BaseInputWidget
 
         $attr['type'] = 'checkbox';
         $this->generateId($attr, $multi);
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
 }

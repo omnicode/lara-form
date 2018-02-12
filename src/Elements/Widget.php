@@ -48,8 +48,8 @@ class Widget extends BaseWidget implements WidgetInterface
             $this->icon = $this->formatTemplate($iconTemplate, ['name' => $attr['icon']]);
             unset($attr['icon']);
         }
-        $this->setOtherHtmlAttributesBy($attr,'required');
-        $this->setOtherHtmlAttributesBy($attr,'disabled');
+        $this->setOtherHtmlAttributesBy($attr, 'required');
+        $this->setOtherHtmlAttributesBy($attr, 'disabled');
 
         if (!empty($attr['readonly'])) {
             $attr['readonly'] = 'readonly';
@@ -61,6 +61,14 @@ class Widget extends BaseWidget implements WidgetInterface
                 $attr['autocomplete'] = 'off';
             }
         }
+    }
+
+    /**
+     * @param $attr
+     */
+    protected function parentCheckAttributes(&$attr)
+    {
+        self::checkAttributes($attr);
     }
 
     /**
@@ -311,10 +319,10 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $attr
      * @param $key
      */
-    protected function setOtherHtmlAttributesBy(&$attr,$key)
+    protected function setOtherHtmlAttributesBy(&$attr, $key)
     {
         if (!empty($attr[$key])) {
-            $this->setOtherHtmlAttributes($key,$key);
+            $this->setOtherHtmlAttributes($key, $key);
             $attr[$key] = $key;
         }
     }
@@ -358,6 +366,7 @@ class Widget extends BaseWidget implements WidgetInterface
             return kebab_case($camel);
         }
         if ($case === 'snake') {
+
             return snake_case($camel);
         }
         return $camel;

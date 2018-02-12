@@ -26,6 +26,6 @@ class NumberWidget extends BaseInputWidget
     {
         $this->setOtherHtmlAttributes('type', 'number');
         $attr['type'] = 'number';
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
 }

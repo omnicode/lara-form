@@ -52,7 +52,7 @@ class FormWidget extends Widget
         unset($attr['_form_action']);
         unset($attr['_form_method']);
         $this->generateClass($attr);
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
 
     /**

@@ -148,7 +148,7 @@ class SelectWidget extends Widget
             }
             unset($attr['group_disabled']);
         }
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
 
     /**

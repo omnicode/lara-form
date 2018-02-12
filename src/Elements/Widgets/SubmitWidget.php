@@ -62,7 +62,6 @@ class SubmitWidget extends BaseInputWidget
         }
 
         $this->generateId($attr);
-        parent::checkAttributes($attr);
+        $this->parentCheckAttributes($attr);
     }
-
 }
