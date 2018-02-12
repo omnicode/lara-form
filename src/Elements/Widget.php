@@ -351,7 +351,16 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     protected function getId($name)
     {
-        return lcfirst(str_ireplace(' ', '', ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name))));
+        $str = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name);
+        $case = $this->config['css']['id_case'];
+        $camel = camel_case($str);
+        if ($case === 'kebab') {
+            return kebab_case($camel);
+        }
+        if ($case === 'snake') {
+            return snake_case($camel);
+        }
+        return $camel;
     }
 
     /**

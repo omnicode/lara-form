@@ -17,6 +17,7 @@ return [
     'css' => [
         'class_control' => true,
         'id_prefix' => false,
+        'id_case' => 'camel', // camel, kebab, snake
         'class' => [
             'error' => 'has-error',
             'text' => 'form-control',
