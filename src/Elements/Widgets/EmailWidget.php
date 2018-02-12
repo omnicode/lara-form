@@ -15,7 +15,7 @@ class EmailWidget extends BaseInputWidget
      */
     public function render()
     {
-        return parent::render();
+        return $this->parentRender();
     }
 
 

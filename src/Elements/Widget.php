@@ -366,7 +366,6 @@ class Widget extends BaseWidget implements WidgetInterface
             return kebab_case($camel);
         }
         if ($case === 'snake') {
-
             return snake_case($camel);
         }
         return $camel;

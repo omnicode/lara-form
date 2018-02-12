@@ -31,6 +31,14 @@ class BaseInputWidget extends Widget
     }
 
     /**
+     * @return string
+     */
+    protected function parentRender()
+    {
+        return self::render();
+    }
+
+    /**
      * Formats input fields according to a given template or by default
      * @param $name
      * @param $attr

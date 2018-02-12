@@ -16,7 +16,7 @@ class HiddenWidget extends BaseInputWidget
      */
     public function render()
     {
-        return parent::render();
+        return $this->parentRender();
     }
 
     /**
