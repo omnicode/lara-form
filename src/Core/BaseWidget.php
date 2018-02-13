@@ -484,11 +484,7 @@ abstract class BaseWidget
         $params = [];
         if (!empty($data['class'])) {
             $class = $data['class'];
-
-            if (!is_array($class)) {
-                $class = [$class];
-            }
-
+            $class = $this->strToArray($class);
             $this->htmlClass += $class;
             $params['class'] = $this->formatClass();
             unset($data['class']);
@@ -551,5 +547,17 @@ abstract class BaseWidget
         }
 
         return isset($this->htmlAttributes[$key]) ? $this->htmlAttributes[$key] : false;
+    }
+
+    /**
+     * @param $param
+     * @return array
+     */
+    protected function strToArray($param)
+    {
+        if (!is_array($param)) {
+            $param = [$param];
+        }
+        return $param;
     }
 }

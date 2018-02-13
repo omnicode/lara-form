@@ -292,9 +292,7 @@ class Widget extends BaseWidget implements WidgetInterface
             if ($classes === false) {
                 $this->htmlClass = [];
             } else {
-                if (!is_array($classes)) {
-                    $classes = [$classes];
-                }
+                $classes = $this->strToArray($classes);
                 if ($this->getHtmlClassControl()) {
                     $this->htmlClass = array_merge([$default], $classes);
                 } else {
@@ -390,5 +388,33 @@ class Widget extends BaseWidget implements WidgetInterface
             return trans($path . $str);
         }
         return $str;
+    }
+
+    /**
+     * @param $attr
+     * @param $btnColor
+     */
+    protected function btn(&$attr,$btn, $btnColor)
+    {
+        if (isset($attr['btn'])) {
+
+            if ($attr['btn'] === true) {
+                $attr['btn'] = $btnColor;
+            }
+
+            $this->htmlClass[] = $btn . '-' . $attr['btn'];
+            unset($attr['btn']);
+        }
+    }
+
+    /**
+     * @param $attr
+     */
+    protected function multipleByBrackets(&$attr)
+    {
+        if (ends_with($this->name, '[]')) {
+            $this->name = substr($this->name, 0, -2);
+            $attr['multiple'] = true;
+        }
     }
 }

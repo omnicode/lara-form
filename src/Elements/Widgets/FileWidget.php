@@ -13,7 +13,7 @@ class FileWidget extends BaseInputWidget
      * Keeped here template for file input
      * @var string
      */
-    private $fileTemplate;
+    protected $fileTemplate;
 
     /**
      * Returns the finished html file input view
@@ -28,7 +28,7 @@ class FileWidget extends BaseInputWidget
             $this->name = $this->config['text']['submit_name'] ? $this->config['text']['submit_name'] : '';
         }
         $labelAttr = ['class' => $this->formatClass()];
-        return $this->formatNestingLabel($this->fileTemplate, $this->attr,$labelAttr);
+        return $this->formatNestingLabel($this->fileTemplate, $this->attr, $labelAttr);
     }
 
     /**
@@ -40,16 +40,7 @@ class FileWidget extends BaseInputWidget
         $btn = $this->config['css']['class']['submit'];
         $btnColor = $this->config['css']['class']['submitColor'];
         $default = $btn . ' ' . $btnColor;
-
-        if (isset($attr['btn'])) {
-
-            if ($attr['btn'] === true) {
-                $attr['btn'] = $btnColor;
-            }
-
-            $this->htmlClass[] = $btn . '-' . $attr['btn'];
-            unset($attr['btn']);
-        }
+        $this->btn($attr, $btn, $btnColor);
 
         if (isset($attr['type'])) {
             unset($attr['type']);
@@ -58,23 +49,17 @@ class FileWidget extends BaseInputWidget
         if (isset($attr['value'])) {
             unset($attr['value']);
         }
-
-        if (ends_with($this->name, '[]')) {
-            $attr['multiple'] = true;
-            $this->name = substr($this->name, 0, -2);
-        }
+        $this->multipleByBrackets($attr);
 
         if (isset($attr['multiple'])) {
-            $this->fileTemplate = $this->gettemplate('fileMultiple');
+            $this->fileTemplate = $this->getTemplate('fileMultiple');
             unset($attr['multiple']);
         } else {
             $this->fileTemplate = $this->getTemplate('file');
         }
 
-        if (isset($attr['accept'])) {
-            if (is_array($attr['accept'])) {
-                $attr['accept'] = implode(', ', $attr['accept']);
-            }
+        if (isset($attr['accept']) && is_array($attr['accept'])) {
+            $attr['accept'] = implode(', ', $attr['accept']);
         }
 
         if (isset($attr['label']) && $attr['label'] === false) {

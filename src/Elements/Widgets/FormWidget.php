@@ -26,7 +26,6 @@ class FormWidget extends Widget
         if ($this->name === 'end') {
             return $this->end();
         }
-
     }
 
     /**
@@ -61,7 +60,7 @@ class FormWidget extends Widget
      * @param $options
      * @return mixed|string
      */
-    private function start($options)
+    protected function start($options)
     {
         $method = $options['_form_method'];
         $action = $options['_form_action'];
@@ -94,7 +93,7 @@ class FormWidget extends Widget
      *
      * @return mixed
      */
-    private function end()
+    protected function end()
     {
         $template = $this->getTemplate('formEnd');
         return $this->formatTemplate($template, false);

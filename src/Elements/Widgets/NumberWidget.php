@@ -24,8 +24,8 @@ class NumberWidget extends BaseInputWidget
      */
     public function checkAttributes(&$attr)
     {
-        $this->setOtherHtmlAttributes('type', 'number');
         $attr['type'] = 'number';
+        $this->setOtherHtmlAttributes('type', 'number');
         $this->parentCheckAttributes($attr);
     }
 }

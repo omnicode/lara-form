@@ -31,9 +31,7 @@ class RadioWidget extends BaseInputWidget
         $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
         if (!empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
-            if (!is_array($val)) {
-                $val = [$val];
-            }
+            $val= $this->strToArray($val);
             if (in_array($attr['value'], $val)) {
                 $attr['checked'] = true;
             }

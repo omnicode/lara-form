@@ -7,7 +7,6 @@ use function Symfony\Component\Debug\Tests\testHeader;
 
 /**
  * Processes and creates select tag
- *
  * Class SelectWidget
  * @package LaraForm\Elements\Widgets
  */
@@ -15,43 +14,37 @@ class SelectWidget extends Widget
 {
     /**
      * Keeped here select template
-     *
      * @var string
      */
-    private $selectTemplate;
+    protected $selectTemplate;
 
     /**
      * Keeped here selected options
-     *
      * @var bool
      */
-    private $selected = [];
+    protected $selected = [];
 
     /**
      * Keeped here disabled options
-     *
      * @var array
      */
-    private $optionDisabled = [];
+    protected $optionDisabled = [];
 
     /**
      * Keeped here disabled group
-     *
      * @var array
      */
-    private $groupDisabled = [];
+    protected $groupDisabled = [];
 
     /**
      * Keeped here options
-     *
      * @var array
      */
-    private $optionsArray = [];
+    protected $optionsArray = [];
 
 
     /**
      * Returns the finished select tag html view
-     *
      * @return mixed|string|void
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -81,11 +74,7 @@ class SelectWidget extends Widget
         $this->generateId($attr);
         $this->generateLabel($attr);
         $this->generateClass($attr, $this->config['css']['class']['select']);
-
-        if (ends_with($this->name, '[]')) {
-            $attr['multiple'] = true;
-            $this->name = substr($this->name, 0, -2);
-        }
+        $this->multipleByBrackets($attr);
 
         if (isset($attr['multiple'])) {
             $this->selectTemplate = $this->getTemplate('selectMultiple');
@@ -115,15 +104,12 @@ class SelectWidget extends Widget
 
         if (isset($attr['selected'])) {
             $this->selected = $attr['selected'];
-
-            if (!is_array($this->selected)) {
-                $this->selected = [$this->selected];
-            }
+            $this->selected = $this->strToArray($this->selected);
             unset($attr['selected']);
-        }else{
+        } else {
             $val = $this->getValue($this->name)['value'];
             if (empty($val)) {
-              $this->selected = [$val];
+                $this->selected = [$val];
             }
         }
 
@@ -131,35 +117,33 @@ class SelectWidget extends Widget
             $attr['disabled'] = 'disabled';
         }
 
-        if (isset($attr['option_disabled']) && $attr['option_disabled'] !== false) {
-            $this->optionDisabled = $attr['option_disabled'];
-
-            if (!is_array($this->optionDisabled)) {
-                $this->optionDisabled = [$this->optionDisabled];
-            }
-            unset($attr['option_disabled']);
-        }
-
-        if (isset($attr['group_disabled']) && $attr['group_disabled'] !== false) {
-            $this->groupDisabled = $attr['group_disabled'];
-
-            if (!is_array($this->groupDisabled)) {
-                $this->groupDisabled = [$this->groupDisabled];
-            }
-            unset($attr['group_disabled']);
-        }
+        $this->disabledBy('option_disabled', $attr, $this->optionDisabled);
+        $this->disabledBy('group_disabled', $attr, $this->groupDisabled);
         $this->parentCheckAttributes($attr);
     }
 
     /**
+     * @param $type
+     * @param $attr
+     * @param $container
+     */
+    protected function disabledBy($type, &$attr, &$container)
+    {
+        if (isset($attr[$type]) && $attr[$type] !== false) {
+            $container = $attr[$type];
+            $container = $this->strToArray($container);
+            unset($attr[$type]);
+        }
+    }
+
+    /**
      * Creates html option tags for select
-     *
      * @param bool $gropup
      * @return bool|string
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    private function renderOptions($gropup = false)
+    protected function renderOptions($gropup = false)
     {
         $optionTemplate = $this->getTemplate('option');
         if ($gropup) {
@@ -191,14 +175,13 @@ class SelectWidget extends Widget
 
     /**
      * Creates html group option tags for select
-     *
      * @param $groupName
      * @param $options
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    private function renderOptgroup($groupName, $options)
+    protected function renderOptgroup($groupName, $options)
     {
         $optgroupTemplate = $this->getTemplate('optgroup', false);
         $childOptionsHtml = $this->renderOptions($options);
@@ -219,7 +202,7 @@ class SelectWidget extends Widget
      * @param array $disabled
      * @return array
      */
-    private function isDisabled($str, array $disabled = [])
+    protected function isDisabled($str, array $disabled = [])
     {
         if (empty($disabled)) {
             $disabled = $this->optionDisabled;
@@ -235,7 +218,7 @@ class SelectWidget extends Widget
      * @param $str
      * @return array
      */
-    private function isSelected($str)
+    protected function isSelected($str)
     {
         $arr = [];
         if (in_array($str, $this->selected, true)) {
@@ -243,4 +226,5 @@ class SelectWidget extends Widget
         }
         return $arr;
     }
+
 }

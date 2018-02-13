@@ -24,8 +24,8 @@ class EmailWidget extends BaseInputWidget
      */
     public function checkAttributes(&$attr)
     {
-        $this->setOtherHtmlAttributes('type', 'email');
         $attr['type'] = 'email';
+        $this->setOtherHtmlAttributes('type', 'email');
         $this->parentCheckAttributes($attr);
     }
 }

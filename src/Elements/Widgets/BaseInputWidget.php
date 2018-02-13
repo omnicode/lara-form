@@ -121,15 +121,15 @@ class BaseInputWidget extends Widget
             unset($attr['value']);
         }
 
-        $notId = ['hidden', 'submit', 'reset', 'button', 'radio', 'checkbox', 'label'];
-
-        if (!in_array($this->getHtmlAttributes('type'), $notId) && !$cTemplate) {
+        $idNotFor = ['radio', 'checkbox', 'label'];
+        $labelNotFor = ['hidden', 'submit', 'reset', 'button'];
+        if (!in_array($this->getHtmlAttributes('type'), array_merge($idNotFor,$labelNotFor)) && !$cTemplate) {
             $attr += $this->getValue($this->name);
         }
 
         $this->generateId($attr);
 
-        if (!in_array($this->getHtmlAttributes('type'), ['hidden', 'submit', 'reset', 'button'])) {
+        if (!in_array($this->getHtmlAttributes('type'), $labelNotFor)) {
             $this->generateLabel($attr);
             $this->generatePlaceholder($attr);
         }
