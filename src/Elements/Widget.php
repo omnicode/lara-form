@@ -292,13 +292,10 @@ class Widget extends BaseWidget implements WidgetInterface
             if ($classes === false) {
                 $this->htmlClass = [];
             } else {
-                $classes = $this->strToArray($classes);
+                $this->htmlClass  = $this->strToArray($classes);
                 if ($this->getHtmlClassControl()) {
-                    $this->htmlClass = array_merge([$default], $classes);
-                } else {
-                    $this->htmlClass = $classes;
+                    $this->htmlClass = array_merge([$default],  $this->htmlClass );
                 }
-
                 unset($attr['class']);
             }
         } else {
