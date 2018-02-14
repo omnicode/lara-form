@@ -10,7 +10,8 @@
     ],
     "require": {
         "laravel/framework": "~5.0",
-        "adamwathan/bootforms": "^0.8.2"
+        "adamwathan/bootforms": "^0.8.2",
+        "omnicode/lara-support": "~0.0"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
