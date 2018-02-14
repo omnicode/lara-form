@@ -349,7 +349,6 @@ class FormBuilder extends BaseFormBuilder
      */
     protected function hasTemplate(&$attr)
     {
-
         $pattern = [
             'pattern' => 'template',
             'div' => 'div',
@@ -362,7 +361,6 @@ class FormBuilder extends BaseFormBuilder
                 unset($attr[1][$item]);
             }
         }
-
         if (!empty($attr[1]['label']) && is_array($attr[1]['label'])) {
             $this->inlineTemplates['label'] = $attr[1]['label'];
             unset($attr[1]['label']);

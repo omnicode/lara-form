@@ -179,6 +179,7 @@ abstract class BaseWidget
         $end = $this->config['separator']['end'];
         $seperatorsStart = ['[', '{', '('];
         $seperatorsEnd = [']', '}', ')'];
+
         if (!starts_with($start, $seperatorsStart) && !ends_with($end, $seperatorsEnd)) {
             $_msg = 'Sintax error, allowed symbols for start '
                 . implode(',', $seperatorsStart)
