@@ -1,7 +1,8 @@
 <?php
+
 namespace LaraForm\ServiceProvider;
 
-use Illuminate\Support\ServiceProvider;
+use AdamWathan\BootForms\BootFormsServiceProvider;
 use LaraForm\Elements\Components\CheckBox;
 use LaraForm\Elements\Components\Inputs\Hidden;
 use LaraForm\Elements\Components\Inputs\Input;
@@ -14,14 +15,22 @@ use LaraForm\Elements\Components\Textarea;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
 use LaraForm\Middleware\LaraFormMiddleware;
+use LaraSupport\LaraServiceProvider;
 
-class LaraFormServiceProvider extends ServiceProvider
+class LaraFormServiceProvider extends LaraServiceProvider
 {
     /**
      *
      */
     public function register()
     {
+        $this->registerProviders(BootFormsServiceProvider::class);
+        $this->registerAliases(
+            [
+                'BootForm' => \AdamWathan\BootForms\Facades\BootForm::class,
+                'LaraForm' => \LaraForm\Facades\LaraForm::class,
+            ]
+        );
         $this->registerFormProtection();
         $this->registerFormElements();
         $this->registerFormBuilder();
@@ -29,59 +38,32 @@ class LaraFormServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the Debugbar Middleware
-     *
-     * @param  string $middleware
-     */
-    protected function registerMiddleware($middleware)
-    {
-        $router = $this->app['router'];
-        $router->pushMiddlewareToGroup('web', $middleware);
-    }
-
-    /**
      *
      */
     protected function registerFormProtection()
     {
-        $this->app->singleton('laraform.protection', function ($app) {
-            return new FormProtection(
-            );
-        });
+        $this->registerSingleton('laraform.protection', FormProtection::class);
     }
+
 
     /**
      *
      */
     protected function registerFormElements()
     {
-        $this->app->singleton('laraform.element.inputs.password', function ($app) {
-            return new Password();
-        });
-        $this->app->singleton('laraform.element.inputs.submit', function ($app) {
-            return new Submit();
-        });
-        $this->app->singleton('laraform.element.inputs.hidden', function ($app) {
-            return new Hidden();
-        });
-        $this->app->singleton('laraform.element.inputs.input', function ($app) {
-            return new Input();
-        });
-        $this->app->singleton('laraform.element.radio.button', function ($app) {
-            return new RadioButton();
-        });
-        $this->app->singleton('laraform.element.checkbox', function ($app) {
-            return new CheckBox();
-        });
-        $this->app->singleton('laraform.element.textarea', function ($app) {
-            return new Textarea();
-        });
-        $this->app->singleton('laraform.element.select', function ($app) {
-            return new Select();
-        });
-        $this->app->singleton('laraform.element.label', function ($app) {
-            return new Label();
-        });
+        $this->registerSingletons(
+            [
+                'laraform.element.inputs.password' => Password::class,
+                'laraform.element.inputs.submit' => Submit::class,
+                'laraform.element.inputs.hidden' => Hidden::class,
+                'laraform.element.inputs.input' => Input::class,
+                'laraform.element.radio.button' => RadioButton::class,
+                'laraform.element.checkbox' => CheckBox::class,
+                'laraform.element.textarea' => Textarea::class,
+                'laraform.element.select' => Select::class,
+                'laraform.element.label' => Label::class
+            ]
+        );
     }
 
     /**
@@ -89,20 +71,7 @@ class LaraFormServiceProvider extends ServiceProvider
      */
     protected function registerFormBuilder()
     {
-        $this->app->singleton('laraform', function ($app) {
-            return new FormBuilder(
-                $app['laraform.protection'],
-                $app['laraform.element.inputs.password'],
-                $app['laraform.element.inputs.submit'],
-                $app['laraform.element.inputs.hidden'],
-                $app['laraform.element.inputs.input'],
-                $app['laraform.element.radio.button'],
-                $app['laraform.element.checkbox'],
-                $app['laraform.element.textarea'],
-                $app['laraform.element.select'],
-                $app['laraform.element.label']
-            );
-        });
+        $this->registerSingleton('laraform', FormBuilder::class);
     }
 
     /**
