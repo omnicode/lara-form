@@ -1,10 +1,8 @@
 <?php
 
-namespace LaraForm\Tests;
+namespace Tests\LaraForm;
 
 use LaraForm\FormProtection;
-use LaraForm\Tests\Core\BaseFormProtectionTest;
-use phpmock\MockBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
@@ -37,13 +35,12 @@ class FormProtectionTest extends BaseTestCase
         };
         if (empty($this->request)) {
             $this->request = $this->getMockBuilder(Request::class)
-                ->setMethods(['ajax','url','route','getAction','getName','getRequestUri','fullUrl'])->getMock();
+                ->setMethods(['ajax', 'url', 'route', 'getAction', 'getName', 'getRequestUri', 'fullUrl'])->getMock();
         }
     }
 
     /**
-     * @throws \PHPUnit_Framework_AssertionFailedError
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \ReflectionException
      */
     public function testConstruct()
     {
@@ -56,8 +53,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \RuntimeException
+     * @throws \ReflectionException
      */
     public function testSetToken()
     {
@@ -68,7 +64,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \ReflectionException
      */
     public function testSetTime()
     {
@@ -135,11 +131,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_AssertionFailedError
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
-     * @throws \RuntimeException
+     * @throws \PHPUnit_Framework_Constraint
      */
     public function testValidateWhenAjaxRequestValueFalse()
     {
@@ -147,11 +139,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_AssertionFailedError
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
-     * @throws \RuntimeException
+     * @throws \PHPUnit_Framework_Constraint
      */
     public function testValidateWhenRequestForgetSession()
     {
@@ -227,10 +215,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
+     * @throws \ReflectionException
      */
    public function testVerificationForAjaxByUrl()
    {
@@ -242,10 +227,7 @@ class FormProtectionTest extends BaseTestCase
    }
 
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
+     * @throws \ReflectionException
      */
     public function testVerificationForAjaxByAction()
     {
@@ -256,11 +238,9 @@ class FormProtectionTest extends BaseTestCase
         $returned = $this->getProtectedMethod($formProtection,'verificationForAjax',[$this->request]);
         $this->assertEquals(false, $returned);
     }
+
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
+     * @throws \ReflectionException
      */
     public function testVerificationForAjaxByRoute()
     {
@@ -271,11 +251,9 @@ class FormProtectionTest extends BaseTestCase
         $returned = $this->getProtectedMethod($formProtection,'verificationForAjax',[$this->request]);
         $this->assertEquals(false, $returned);
     }
+
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
+     * @throws \ReflectionException
      */
     public function testVerificationForAjax()
     {
@@ -388,14 +366,13 @@ class FormProtectionTest extends BaseTestCase
      */
     public function testAddFieldWhenOptionDisabled()
     {
-        $data = ['disabled'];
+        $data = ['disabled'=> true];
         $result = $this->formProtection->addField('field', $data);
-        $this->assertEquals(false, $result);
+        $this->assertFalse($result);
     }
 
     /**
-     * @throws \PHPUnit_Framework_AssertionFailedError
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \ReflectionException
      */
     public function testAddFieldWhenOptionUnlock()
     {
@@ -408,7 +385,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \ReflectionException
      */
     public function testAddFieldByStringField()
     {
@@ -431,7 +408,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \ReflectionException
      */
     public function testAddArrayInputFieldWhenMultiDimensional()
     {
@@ -442,7 +419,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \ReflectionException
      */
     public function testAddArrayInputFieldWhenOnceDimensional()
     {
@@ -452,7 +429,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_AssertionFailedError
+     * @throws \ReflectionException
      */
     public function testConfirm()
     {
@@ -469,7 +446,8 @@ class FormProtectionTest extends BaseTestCase
 
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \PHPUnit_Framework_Constraint
+     * @throws \ReflectionException
      */
     public function testIsValidAction()
     {
@@ -487,10 +465,8 @@ class FormProtectionTest extends BaseTestCase
 
 
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
+     * @throws \PHPUnit_Framework_Constraint
+     * @throws \ReflectionException
      */
     public function testIsValidActionByUrls()
     {
@@ -508,7 +484,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \ReflectionException
      */
     public function testGetAction()
     {
@@ -521,11 +497,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
-     * @throws \RuntimeException
+     * @throws \ReflectionException
      */
     public function testSessionPathWhenEmptyPath()
     {
@@ -538,11 +510,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
-     * @throws \RuntimeException
+     * @throws \ReflectionException
      */
     public function testSessionPathWhenUsedPath()
     {
@@ -555,7 +523,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
+     * @throws \ReflectionException
      */
     public function testGetCheckedFieldsBy()
     {
@@ -567,8 +535,7 @@ class FormProtectionTest extends BaseTestCase
 
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \RuntimeException
+     * @throws \ReflectionException
      */
     public function testRemoveUnlockFieldsWhenUseGlobal()
     {
@@ -585,8 +552,7 @@ class FormProtectionTest extends BaseTestCase
     }
 
     /**
-     * @throws \PHPUnit_Framework_ExpectationFailedException
-     * @throws \RuntimeException
+     * @throws \ReflectionException
      */
     public function testRemoveUnlockFieldsWhenUseLocal()
     {
@@ -596,6 +562,16 @@ class FormProtectionTest extends BaseTestCase
             'removeUnlockFields',
             [$data + $unlockData, 'customUrl']);
         $this->assertEquals($data, $returned);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testSetUrl()
+    {
+        $this->formProtection->setUrl('foo/bar');
+        $url = $this->getProtectedAttributeOf($this->formProtection, 'url');
+        $this->assertEquals('foo/bar', $url);
     }
 
     /**
@@ -668,11 +644,7 @@ class FormProtectionTest extends BaseTestCase
     /**
      * @param bool $ajax
      * @param bool $empty
-     * @throws \InvalidArgumentException
-     * @throws \PHPUnit_Framework_AssertionFailedError
-     * @throws \PHPUnit_Framework_Exception
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
-     * @throws \RuntimeException
+     * @throws \PHPUnit_Framework_Constraint
      */
     private function validateWhenAjax($ajax = true, $empty = true)
     {
@@ -708,11 +680,6 @@ class FormProtectionTest extends BaseTestCase
      */
     private function newFormProtection($methods = null)
     {
-        $formProtection =
-            $this->getMockBuilder(FormProtection::class)
-                ->setConstructorArgs([])
-                ->setMethods($methods)
-                ->getMock();
-        return $formProtection;
+        return $this->newInstance(FormProtection::class,[],$methods);
     }
 }

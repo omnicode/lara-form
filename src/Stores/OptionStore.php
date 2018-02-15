@@ -129,6 +129,14 @@ class OptionStore extends BaseStore
     }
 
     /**
+     * @return mixed
+     */
+    public function render()
+    {
+        return $this->builder->output();
+    }
+
+    /**
      * When there is a mapping then we call the method __toString() from bulider,
      * because the rendering is done there
      * @return mixed

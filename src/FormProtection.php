@@ -209,7 +209,7 @@ class FormProtection extends BaseFormProtection
             return false;
         }
         if (starts_with($maxTime, '+') || starts_with($maxTime, '-')) {
-            abort(500, 'Time must not begin with a + character or with a character -');
+            throw new \Exception('Time must not begin with a + character or with a character -');
         }
 
         $maxSeccounds = strtotime('-' . $maxTime);
