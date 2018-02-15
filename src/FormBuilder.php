@@ -1,345 +1,459 @@
 <?php
+
 namespace LaraForm;
 
-use AdamWathan\BootForms\Facades\BootForm;
-use LaraForm\Elements\Components\Inputs\RadioButton;
 use Illuminate\Support\Facades\Config;
-use LaraForm\Elements\Components\CheckBox;
-use LaraForm\Elements\Components\Inputs\Hidden;
-use LaraForm\Elements\Components\Inputs\Input;
-use LaraForm\Elements\Components\Inputs\Password;
-use LaraForm\Elements\Components\Inputs\Submit;
-use LaraForm\Elements\Components\Label;
-use LaraForm\Elements\Components\Select;
-use LaraForm\Elements\Components\Textarea;
+use LaraForm\Core\BaseFormBuilder;
+use LaraForm\Stores\BindStore;
+use LaraForm\Stores\ErrorStore;
+use LaraForm\Stores\OldInputStore;
+use LaraForm\Stores\OptionStore;
+use LaraForm\Traits\FormControl;
 
-class FormBuilder
+/**
+ * Creates objects of fields and displays them
+ * Class FormBuilder
+ * @package LaraForm
+ */
+class FormBuilder extends BaseFormBuilder
 {
-    /**
-     * @var Password
-     */
-    protected $password;
+    use FormControl;
 
     /**
-     * @var RadioButton
-     */
-    protected $radioButton;
-
-    /**
-     * @var CheckBox
-     */
-    protected $checkBox;
-
-    /**
-     * @var Textarea
-     */
-    protected $textarea;
-
-    /**
-     * @var Submit
-     */
-    protected $submit;
-
-    /**
-     * @var Hidden
-     */
-    protected $hidden;
-
-    /**
-     * @var Select
-     */
-    protected $select;
-
-    /**
-     * @var Label
-     */
-    protected $label;
-
-    /**
-     * @var Input
-     */
-    protected $input;
-
-    /**
-     * @var string
-     */
-    protected $laraFormToken;
-
-    /**
+     * Keeped here object FormProtection
      * @var FormProtection
      */
     protected $formProtection;
 
     /**
-     * @var array
+     * Keeped here object ErrorStore
+     * @var ErrorStore
      */
-    protected $hiddenFields;
+    protected $errorStore;
 
     /**
-     * @var
+     * Keeped here object OldInputStore
+     * @var OldInputStore
      */
-    protected $introPopUps;
-    
+    protected $oldInputStore;
+
+
     /**
+     * Keeped here object OptionStore
+     * @var OptionStore
+     */
+    protected $optionStore;
+
+    /**
+     * Keeped here object BindStore
+     * @var BindStore
+     */
+    protected $bindStore;
+
+    /**
+     * Keeped here objects by  already created fields
+     * @var array
+     */
+    protected $maked = [];
+
+    /**
+     * Keeped here model that was passed in form
+     * @var $model
+     */
+    protected $model;
+
+    /**
+     * Designate the start and end of the form
+     * @var bool
+     */
+    protected $isForm = false;
+
+    /**
+     * Keeped here object of the current field
+     * @var widget
+     */
+    protected $widget;
+
+    /**
+     * @var array
+     */
+    protected $templateDefaultParams = [
+        'pattern' => [],
+        'div' => [],
+        'label' => [],
+        'class_concat' => true,
+        'escept' => false
+    ];
+
+    /**
+     * Keeped modifications for the view template of one element
+     * @var array
+     */
+    protected $inlineTemplates = [];
+
+    /**
+     * Keeped modifications for the view templates inside in form
+     * @var array
+     */
+    protected $localTemplates = [];
+
+    /**
+     * Keeped modifications for the view templates inside in page
+     * @var array
+     */
+    protected $globalTemplates = [];
+
+    /**
+     * Accepts an objects and assigns the properties
      * FormBuilder constructor.
      * @param FormProtection $formProtection
-     * @param Password $password
-     * @param Submit $submit
-     * @param Hidden $hidden
-     * @param Input $input
-     * @param RadioButton $radioButton
-     * @param CheckBox $checkBox
-     * @param Textarea $textarea
-     * @param Select $select
-     * @param Label $label
+     * @param ErrorStore $errorStore
+     * @param OldInputStore $oldInputStore
+     * @param OptionStore $optionStore
+     * @param BindStore $bindStore
      */
     public function __construct(
         FormProtection $formProtection,
-        Password $password,
-        Submit $submit,
-        Hidden $hidden,
-        Input $input,
-        RadioButton $radioButton,
-        CheckBox $checkBox,
-        Textarea $textarea,
-        Select $select,
-        Label $label
-    )
-    {
+        ErrorStore $errorStore,
+        OldInputStore $oldInputStore,
+        OptionStore $optionStore,
+        BindStore $bindStore
+    ) {
         $this->formProtection = $formProtection;
-        $this->radioButton = $radioButton;
-        $this->password = $password;
-        $this->checkBox = $checkBox;
-        $this->textarea = $textarea;
-        $this->submit = $submit;
-        $this->hidden = $hidden;
-        $this->select = $select;
-        $this->label = $label;
-        $this->input = $input;
+        $this->errorStore = $errorStore;
+        $this->oldInputStore = $oldInputStore;
+        $this->optionStore = $optionStore;
+        $this->bindStore = $bindStore;
+        $this->localTemplates = $this->templateDefaultParams;
+        $this->globalTemplates = $this->templateDefaultParams;
+        $this->inlineTemplates = $this->templateDefaultParams;
     }
 
     /**
-     * @param $data
-     * @return bool
-     */
-    public function validate($data)
-    {
-        return $this->formProtection->validate($data);
-    }
-
-    /**
+     * Opens the form, and begins to store data about the fields
+     * Warning!
+     * The attributes of the action and method must be passed in the second parameter or not transmitted at all!!!
      * @param null $model
      * @param array $options
-     * @return string
+     * @return mixed
+     * @throws \Exception
      */
     public function create($model = null, $options = [])
     {
-        $form = BootForm::open();
+        $this->model = $model;
+        $this->setIsForm(true);
+        $token = $this->generateToken();
+        $action = $this->getAction($options);
+        $method = $this->getMethod($options);
+        $options['_form_token'] = $token;
+        $options['_form_action'] = $action;
+        $options['_form_method'] = $method;
 
-        if (!empty($model)) {
-            BootForm::bind($model);
+        $form = $this->make('form', ['start', $options]);
+
+        if ($method === 'get') {
+            return $form;
         }
 
-        
-        $token = md5(str_random(80));
         $this->formProtection->setToken($token);
-
+        $this->formProtection->setTime(time());
+        $this->formProtection->setUrl($action);
+        $this->formProtection->removeByTime();
+        $this->formProtection->removeByCount();
         $unlockFields = $this->getGeneralUnlockFieldsBy($options);
-        $unlockFields[] = '_token';
-
-        $method = $this->getMethodBy($model, $options);
-        if ($method) {
-            $form->{$method}();
-            $unlockFields[] = '_method';
-        }
-
         $this->formProtection->setUnlockFields($unlockFields);
 
-        if (isset($options['action'])) {
-            $form->action($options['action']);
-            unset($options['action']);
-        }
-
-        if (isset($options['file']) && $options['file']) {
-            $options['enctype'] = 'multipart/form-data';
-            unset($options['file']);
-        }
-
-        foreach ($options as $k => $val) {
-            $form->attribute($k, $val);
-        }
-
-        if($method != 'get') {
-            $hidden = $this->hidden(Config::get('lara_form.label.form_protection', 'laraform_token'), $token);
-        } else {
-            $hidden = '';
-        }
-        return $form . $hidden;
+        return $form;
     }
 
     /**
-     * @param $model
-     * @param $options
-     * @param bool $unSet
-     * @return null|string
+     * @return OptionStore|string
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    private function getMethodBy($model, &$options, $unSet = true)
+    public function end()
     {
-        $method = null;
-        if (isset($options['method'])) {
-            if (in_array($options['method'], ['get', 'post', 'put', 'patch', 'delete'])) {
-                $method = $options['method'];
-            }
-            if ($unSet) {
-                unset($options['method']);
-            }
-        } elseif (!empty($model)) {
-            $method = 'put';
+        if (!$this->isForm) {
+            return '';
         }
 
+        $this->formProtection->confirm();
+        $end = $this->make('form', ['end']);
+        $this->resetProperties();
+        return $end;
+    }
+
+    /**
+     * Accepts changes for presentation templates within a form or on a page
+     * @param $templateName
+     * @param bool $templateValue
+     * @param bool $global
+     */
+    public function setTemplate($templateName, $templateValue = false, $global = false)
+    {
+        if (is_array($templateName)) {
+            $options = [];
+
+            if (!empty($templateName['_options'])) {
+                $options = $templateName['_options'];
+                unset($templateName['_options']);
+            }
+
+            if (empty($options['global'])) {
+                $this->addTemplatesAndParams($templateName, $this->localTemplates, $options);
+            } else {
+                $this->addTemplatesAndParams($templateName, $this->globalTemplates, $options);
+            }
+        } elseif ($templateValue) {
+
+            if ($global) {
+                $this->globalTemplates['pattern'][$templateName] = $templateValue;
+            } else {
+                $this->localTemplates['pattern'][$templateName] = $templateValue;
+            }
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function output()
+    {
+        $args = $this->optionStore->getOptions();
+        $this->hasTemplate($args);
+        $data = $this->complateTemplatesAndParams();
+        $this->widget->setArguments($args);
+        $this->widget->setParams($data);
+        $this->optionStore->resetOptions();
+
+        return $this->widget->render();
+    }
+
+    /**
+     * @param $method
+     * @param array $arrgs
+     * @return OptionStore
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
+    public function __call($method, $arrgs = [])
+    {
+        $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
+        $method = $this->getFieldType($attr, $method);
+        $this->fixField($arrgs, $attr, $method);
+        $this->hasTemplate($arrgs);
+        return $this->make($method, $arrgs);
+    }
+
+    /**
+     * @param $attr
+     * @param $default
+     * @return string
+     */
+    protected function getFieldType($attr, $default)
+    {
+        $method = $default;
+        if (isset($attr['type'])) {
+            // button types
+            if (in_array($attr['type'], ['submit', 'reset', 'button'])) {
+                $method = 'submit';
+            }
+            // other field types
+            if (in_array($attr['type'], ['checkbox', 'radio', 'file', 'textarea', 'hidden', 'label'])) {
+                $method = $attr['type'];
+            }
+        }
         return $method;
     }
 
     /**
+     * @param $arrgs
+     * @param $attr
+     * @param $method
+     */
+    protected function fixField($arrgs, $attr, $method)
+    {
+        if (!isset($arrgs[0])) {
+            return;
+        }
+
+        $value = '';
+        if ($method == 'hidden') {
+            $value = isset($attr['value']) ? $attr['value'] : 0;
+        }
+
+        if (!empty($attr['readonly'])) {
+            $val = $this->bindStore->get($arrgs[0]);
+            $value = !empty($val) ? $val : '';
+            $value = isset($attr['value']) ? $attr['value'] : $value;
+        }
+
+        if (!in_array($method, ['submit', 'button', 'reset', 'label']) && $this->getIsForm()) {
+            $this->formProtection->addField($arrgs[0], $attr, $value);
+        }
+    }
+
+    /**
+     * Instantiates field objects and returns an object OptionStore to create a chain
+     * @param $method
+     * @param $arguments
+     * @return OptionStore
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \LogicException
+     */
+    protected function make($method, $arguments)
+    {
+        $modelName = ucfirst($method);
+        $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');
+
+        if (empty($this->maked[$modelName])) {
+            $this->maked[$modelName] = app($classNamspace, [$this->errorStore, $this->oldInputStore]);
+        }
+
+        $this->widget = $this->maked[$modelName];
+
+        if (!empty($this->model)) {
+            $this->bindStore->setModel($this->model);
+            $this->widget->binding($this->bindStore);
+        }
+
+        $this->optionStore->setAttributes($arguments);
+        $this->optionStore->setBuilder($this);
+        return $this->optionStore;
+    }
+
+    /**
+     * Completing modifying templates and their parame
+     * @return array
+     */
+    protected function complateTemplatesAndParams()
+    {
+        $data = [
+            // for once filed
+            'inline' => $this->inlineTemplates,
+            // for fields in form
+            'local' => $this->localTemplates,
+            // for all page
+            'global' => $this->globalTemplates,
+        ];
+
+        $this->inlineTemplates = $this->templateDefaultParams;
+        return $data;
+    }
+
+    /**
+     * Checks whether the template modification has been transferred from a separate field
+     * @param $attr
+     */
+    protected function hasTemplate(&$attr)
+    {
+        $pattern = [
+            'pattern' => 'template',
+            'div' => 'div',
+            'class_concat' => 'class_concat',
+            'escept' => 'escept'
+        ];
+        foreach ($pattern as $key => $item) {
+            if (isset($attr[1][$item])) {
+                $this->inlineTemplates[$key] = $attr[1][$item];
+                unset($attr[1][$item]);
+            }
+        }
+        if (!empty($attr[1]['label']) && is_array($attr[1]['label'])) {
+            $this->inlineTemplates['label'] = $attr[1]['label'];
+            unset($attr[1]['label']);
+        }
+    }
+
+    /**
+     * Remove proprties
+     */
+    protected function resetProperties()
+    {
+        $this->setIsForm(false);
+        $this->maked = [];
+        $this->localTemplates = $this->templateDefaultParams;
+    }
+
+    /**
+     * locally or globally stores modifications and template parameters in properties
+     * @param $data
+     * @param $container
+     * @param $options
+     */
+    protected function addTemplatesAndParams($data, &$container, $options)
+    {
+        foreach ($data as $key => $value) {
+            $container['pattern'][$key] = $value;
+        }
+        if (empty($options)) {
+            return;
+        }
+        $array = ['div', 'class_concat', 'escept'];
+        foreach ($array as $index => $item) {
+            if (isset($options[$item])) {
+                $container[$item] = $options[$item];
+            }
+        }
+        if (!empty($options['label']) && is_array($options['label'])) {
+            if (isset($options['label']['text'])) {
+                unset($options['label']['text']);
+            }
+            $container['label'] = $options['label'];
+        }
+    }
+
+    /**
+     * From the form parameters get a list of fields that should not be validated
      * @param $options
      * @return array|string
      * @throws \Exception
      */
-    private function getGeneralUnlockFieldsBy(&$options)
+    protected function getGeneralUnlockFieldsBy(&$options)
     {
         $unlockFields = [];
+
         if (!empty($options['_unlockFields'])) {
-            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']); // TODO use 
+            $unlockFields = $this->formProtection->processUnlockFields($options['_unlockFields']);
             unset($options['_unlockFields']);
         }
+
+        $unlockFields[] = '_token';
+        $unlockFields[] = '_method';
+        $unlockFields[] = config('lara_form.token_name', 'laraform_token');
         return $unlockFields;
     }
 
     /**
-     * @return mixed
-     */
-    public function end()
-    {
-        $this->formProtection->confirm();
-        return BootForm::close();
-    }
-
-    /**
-     * @param $name
-     * @param array $options
-     * @return mixed
-     */
-    public function input($name, array $options = [])
-    {
-        $this->formProtection->addField($name, $options);
-        $hidden =  (!empty($options['type']) && $options['type'] == 'file') ? $this->hidden->toHtml($name) : '';
-        return $hidden . $this->input->toHtml($name, $options);
-    }
-
-
-    /**
-     * @param $name
-     * @param array $options
-     * @return mixed
-     */
-    public function password($name, array $options = [])
-    {
-        $this->formProtection->addField($name, $options);
-        $options['type'] = 'password';
-        return $this->input->toHtml($name, $options);
-    }
-
-    /**
-     * @param $name
-     * @param array $options
-     * @return mixed
-     */
-    public function select($name, $options = [])
-    {
-        $hidden = '';
-        if (isset($options['empty']) && $options['empty'] === false) {
-            $hidden = $this->hidden->toHtml(substr($name, 0, -2));
-        }
-        $this->formProtection->addField($name, $options); // TODO add options
-//        TODO for select optional check values
-//        $optionValues = $this->select->getOptionValues($options, false);
-//        $this->formProtection->addField($name, $options,  array_keys($optionValues));
-
-        return $hidden.$this->select->toHtml($name, $options);
-    }
-
-    /**
-     * @param string $name
-     * @param array $options
-     * @return mixed
-     */
-    public function submit($name = '', $options = [])
-    {
-        return $this->submit->toHtml($name, $options);
-    }
-
-    /**
-     * @param $name
-     * @param array $options
-     * @return mixed
-     */
-    public function radioButton($name, array $options = [])
-    {
-        $this->formProtection->addField($name, $options);
-        return $this->radioButton->toHtml($name, $options);
-    }
-
-    /**
-     * @param $name
-     * @param array $options
      * @return string
+     * @throws \RuntimeException
      */
-    public function checkbox($name, array $options = [])
+    protected function generateToken()
     {
-        $this->formProtection->addField($name, $options);
-        $checkbox = $this->checkBox->toHtml($name, $options);
-
-        if (isset($options['hidden']) && $options['hidden'] === false) {
-            $hidden = '';
-            unset($options['hidden']);
-        } else {
-            $hidden = ends_with($name, '[]') ? '' : $this->hidden->toHtml($name, 0);
-        }
-
-        if(empty($options['checked'])) {
-            unset($options['checked']);
-        }
-
-        foreach ($options as $k => $v) {
-            if ($k == 'class') {
-                $checkbox->class($v);
-            } else {
-                $checkbox->attribute($k, $v);
-            }
-        }
-
-        return $hidden.$checkbox;
+        return md5(str_random(80));
     }
 
     /**
-     * @param $name
-     * @param array $options
-     * @return string
+     * @param $val
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function hidden($name, $options = [])
+    protected function setIsForm($val)
     {
-        $this->formProtection->addField($name, $options, $this->hidden->getValue($options));
-        return $this->hidden->toHtml($name, $options);
+        if ($this->isForm && $val) {
+            throw new \Exception('Your action is not correct, have is open and not closed tag form!');
+        }
+
+        $this->isForm = $val;
     }
 
     /**
-     * @param $name
-     * @param array $options
-     * @return string
+     * @return bool
      */
-    public function textarea($name, $options = [])
+    protected function getIsForm()
     {
-        $this->formProtection->addField($name, $options);
-        return $this->textarea->toHtml($name, $options);
+        return $this->isForm;
     }
 }
