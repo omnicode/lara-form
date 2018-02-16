@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\LaraForm\Stores;
+namespace Tests\Stores;
 
 use LaraForm\Stores\ErrorStore;
-use Tests\LaraForm\Core\BaseStoreTest;
+use Tests\Core\BaseStoreTest;
 
 class ErrorStoreTest extends BaseStoreTest
 {

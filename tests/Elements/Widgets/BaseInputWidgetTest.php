@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\LaraForm\Elements\Widgets;
+namespace Tests\Elements\Widgets;
 
 use LaraForm\Elements\Widgets\BaseInputWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\LaraForm\Elements\WidgetTest;
+use Tests\Elements\WidgetTest;
 
 class BaseInputWidgetTest extends WidgetTest
 {
@@ -75,7 +75,7 @@ class BaseInputWidgetTest extends WidgetTest
         ];
         $baseInputWidget = $this->newBaseInputWidget($mockedMethods);
         $this->methodWillReturnTrue('completeTemplate', $baseInputWidget);
-        $this->methodWillReturn('input','getTemplate', $baseInputWidget);
+        $this->methodWillReturn('input', 'getTemplate', $baseInputWidget);
         $this->methodWillReturnArgument(0, 'formatTemplate', $baseInputWidget);
         $returned = $this->getProtectedMethod($baseInputWidget, 'formatInputField', ['name', []]);
         $html = $this->getProtectedAttributeOf($baseInputWidget, 'html');
@@ -126,6 +126,26 @@ class BaseInputWidgetTest extends WidgetTest
      */
     public function testGeneralCheckAttributesWhenCTemplateTrue()
     {
+        ;
+        $this->generalCheckAttrTesting(['value' => 'defaultValue']);
+    }
+
+    /**
+     * @throws \PHPUnit_Framework_Constraint
+     * @throws \ReflectionException
+     */
+    public function testGeneralCheckAttributesWhenExistType()
+    {
+        $this->generalCheckAttrTesting(['type' => 'password']);
+    }
+
+    /**
+     * @param $attr
+     * @throws \PHPUnit_Framework_Constraint
+     * @throws \ReflectionException
+     */
+    private function generalCheckAttrTesting($attr)
+    {
         $mockedMethods = [
             'setHtmlAttributes',
             'getHtmlAttributes',
@@ -137,15 +157,14 @@ class BaseInputWidgetTest extends WidgetTest
             'assignOtherhtmlAtrributes',
             'parentCheckAttributes'
         ];
-        $attr = ['value' => 'defaultValue'];
         $baseInputWidget = $this->newBaseInputWidget($mockedMethods);
         $this->setProtectedAttributeOf($baseInputWidget, 'config', config('lara_form'));
         $this->methodWillReturnTrue('parentCheckAttributes', $baseInputWidget);
-        $baseInputWidget->expects($this->any())->method('getHtmlAttributes')->willReturn('text');
+        $type = empty($attr['type']) ? 'text' : $attr['type'];
+        $baseInputWidget->expects($this->any())->method('getHtmlAttributes')->willReturn($type);
         $baseInputWidget->expects($this->any())->method('getValue')->willReturn(['value' => 'default_value']);
-        $this->getProtectedMethod($baseInputWidget, 'generalCheckAttributes', [&$attr,true]);
+        $this->getProtectedMethod($baseInputWidget, 'generalCheckAttributes', [&$attr, true]);
     }
-
 
     /**
      * @param null $methods

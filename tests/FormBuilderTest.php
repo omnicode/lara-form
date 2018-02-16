@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests\LaraForm;
+namespace Tests;
 
+use App\Http\Controllers\Controller;
 use LaraForm\Elements\Widgets\InputWidget;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
@@ -10,7 +11,7 @@ use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use LaraForm\Stores\OptionStore;
 use phpmock\MockBuilder;
-use Tests\LaraForm\Core\BaseFormBuilderTest;
+use Tests\Core\BaseFormBuilderTest;
 
 class FormBuilderTest extends BaseFormBuilderTest
 {
@@ -456,6 +457,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $formBuilder = $this->newFormBuilder();
         $modelName = ucfirst($method);
         $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');
+        $this->setProtectedAttributeOf($formBuilder, 'model',new \stdClass());
         $make = $this->getProtectedMethod($formBuilder, 'make', [$method, $attr]);
         $makedField = $this->getProtectedAttributeOf($formBuilder, 'maked')[$modelName];
         $this->assertInstanceOf($classNamspace, $makedField);
@@ -475,6 +477,24 @@ class FormBuilderTest extends BaseFormBuilderTest
         $this->getProtectedMethod($formBuilder, 'make', $attr);
         $maked = $this->getProtectedAttributeOf($formBuilder, 'maked');
         $this->assertEquals(1, count($maked));
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testMakeWhenExistModel()
+    {
+        $attr = ['input', ['attr']];
+        $formBuilder = $this->newFormBuilder(['setModel', 'binding', 'setAttributes', 'setBuilder']);
+        $this->setProtectedAttributeOf($formBuilder, 'optionStore', $formBuilder);
+        $this->setProtectedAttributeOf($formBuilder, 'bindStore', $formBuilder);
+        $this->setProtectedAttributeOf($formBuilder, 'maked', ['Input' => $formBuilder]);
+        $this->setProtectedAttributeOf($formBuilder, 'model', true);
+        $this->methodWillReturnTrue('setModel',$formBuilder);
+        $this->methodWillReturnTrue('binding',$formBuilder);
+        $this->methodWillReturnTrue('setAttributes',$formBuilder);
+        $this->methodWillReturnTrue('setBuilder',$formBuilder);
+        $this->getProtectedMethod($formBuilder, 'make', $attr);
     }
 
     /**
@@ -556,11 +576,11 @@ class FormBuilderTest extends BaseFormBuilderTest
         });
         $mock = $builder->build();
         $mock->enable();
-        $formBuilder = $this->newFormBuilder();
+        $formBuilder = $this->newFormBuilder(['getRoutes', 'setRequestMethod']);
         $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
         $this->assertEquals([], $options);
         $this->assertEquals('foo/bar', $returned);
-
+        $mock->disable();
     }
 
     /**
@@ -580,11 +600,220 @@ class FormBuilderTest extends BaseFormBuilderTest
      */
     public function testFormControlGetActionWhenExistActionWithUrl()
     {
-        $options = ['action' => 'foo/bar'];
+        $url = 'http://foo/bar';
+        $options = ['action' => $url];
         $formBuilder = $this->newFormBuilder();
         $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
-        $this->assertEquals([], $options);
-        //$this->assertEquals('foo/bar', $returned);
+        $this->assertEquals($url, $returned);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testFormControlGetActionWhenExistActionisMethod()
+    {
+        $options = ['action' => 'create'];
+        $formBuilder = $this->newFormBuilder('getActionWithMethod');
+        $this->methodWillReturnTrue('getActionWithMethod', $formBuilder);
+        $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
+        $this->assertTrue($returned);
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws \phpmock\MockEnabledException
+     */
+    public function testGetActionWithMethodWhenNotParams()
+    {
+        $options = [];
+        $formBuilder = $this->newFormBuilder(['url']);
+        $this->methodWillReturnTrue('url', $formBuilder);
+        $builder = new MockBuilder();
+        $builder->setNamespace("LaraForm\Traits");
+        $builder->setName('request');
+        $builder->setFunction(function () use ($formBuilder) {
+            return $formBuilder;
+        });
+        $mock = $builder->build();
+        $mock->enable();
+        $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
+        $this->assertTrue($returned);
+        $mock->disable();
+    }
+
+    /**
+     * @throws \Exception
+     * @expectedException Exception
+     */
+    public function testGetActionWithMethodWhenNotController()
+    {
+        $builder = new MockBuilder();
+        $builder->setNamespace("LaraForm\Traits");
+        $builder->setName('get_class');
+        $builder->setFunction(function () {
+            return 'class';
+        });
+        $mock = $builder->build();
+        $mock->enable();
+        $formBuilder = $this->newFormBuilder(['getRouteName', 'getController', 'getCurrentRoute']);
+        $this->methodWillReturn($formBuilder, 'getCurrentRoute', $formBuilder);
+        $this->methodWillReturn(Controller::class, 'getController', $formBuilder);
+        $this->methodWillReturnFalse('getRouteName', $formBuilder);
+        $this->getProtectedMethod($formBuilder, 'getActionWithMethod', [['method', 'params']]);
+        $mock->disable();
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws \phpmock\MockEnabledException
+     */
+    public function testGetActionWithMethodWhenExistController()
+    {
+        $builder = new MockBuilder();
+        $builder->setNamespace("LaraForm\Traits");
+        $builder->setName('route');
+        $builder->setFunction(function () {
+            return 'foo/bar';
+        });
+        $mock = $builder->build();
+        $mock->enable();
+        $formBuilder = $this->newFormBuilder('getRouteName');
+        $this->methodWillReturn('route', 'getRouteName', $formBuilder);
+        $returned = $this->getProtectedMethod($formBuilder, 'getActionWithMethod', [['Controller@method', 'params']]);
+        $this->assertEquals('foo/bar', $returned);
+        $mock->disable();
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws \phpmock\MockEnabledException
+     */
+    public function testGetRouteNameWhenExistRoute()
+    {
+        $data = [
+            'route' => [
+                'action' => 'foo/bar',
+                'method' => 'post',
+            ]
+        ];
+        $builder = new MockBuilder();
+        $builder->setNamespace("LaraForm\Traits");
+        $builder->setName('ends_with');
+        $builder->setFunction(function () {
+            return true;
+        });
+        $mock = $builder->build();
+        $mock->enable();
+        $formBuilder = $this->newFormBuilder('getRoutes');
+        $this->methodWillReturn($data, 'getRoutes', $formBuilder);
+        $returned = $this->getProtectedMethod($formBuilder, 'getRouteName', ['bar']);
+        $requestMethod = $this->getProtectedAttributeOf($formBuilder, '_requestMethod');
+        $this->assertEquals('post', $requestMethod);
+        $this->assertEquals('route', $returned);
+        $mock->disable();
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGetRouteNameWhenNotRoute()
+    {
+        $formBuilder = $this->newFormBuilder('getRoutes');
+        $this->methodWillReturn([], 'getRoutes', $formBuilder);
+        $returned = $this->getProtectedMethod($formBuilder, 'getRouteName', ['bar']);
+        $this->assertFalse($returned);
+    }
+    /**
+     * @throws \ReflectionException
+     */
+    public function testSetRequestMethod()
+    {
+        $data = [
+            'routeName' => [
+                'action' => 'foo/bar',
+                'method' => 'post',
+            ]
+        ];
+        $formBuilder = $this->newFormBuilder('getRoutes');
+        $this->methodWillReturn($data, 'getRoutes', $formBuilder);
+        $this->getProtectedMethod($formBuilder, 'setRequestMethod', ['routeName']);
+        $requestMethod = $this->getProtectedAttributeOf($formBuilder, '_requestMethod');
+        $this->assertEquals('post', $requestMethod);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGetMethodWhenExistMethodInOption()
+    {
+        $data = [
+            ['method' => 'get'],
+            ['method' => 'post'],
+            ['method' => 'put'],
+            ['method' => 'patch'],
+            ['method' => 'delete'],
+            ['method' => 'options']
+        ];
+        $formBuilder = $this->newFormBuilder();
+        foreach ($data as $datum) {
+            $method = $datum['method'];
+            $returned = $this->getProtectedMethod($formBuilder, 'getMethod', [&$datum]);
+            $this->assertEquals($method, $returned);
+            $this->assertEquals([], $datum);
+        }
+    }
+
+    /**
+     * @throws \Exception
+     * @expectedException Exception
+     */
+    public function testGetMethodWhenExistInvalidMethodInOption()
+    {
+        $data = ['method' => 'invalidMethod'];
+        $formBuilder = $this->newFormBuilder();
+        $this->getProtectedMethod($formBuilder, 'getMethod', [&$data]);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGetMethodWhenMethodFromRoutes()
+    {
+        $data = [];
+        $formBuilder = $this->newFormBuilder();
+        $this->setProtectedAttributeOf($formBuilder, '_requestMethod', 'post');
+        $returned = $this->getProtectedMethod($formBuilder, 'getMethod', [&$data]);
+        $requestMethod = $this->getProtectedAttributeOf($formBuilder, '_requestMethod');
+        $this->assertNull($requestMethod);
+        $this->assertEquals('post', $returned);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGetMethodWhenExistModelForUpdate()
+    {
+        $data = [];
+        $formBuilder = $this->newFormBuilder();
+        $this->setProtectedAttributeOf($formBuilder, 'model', true);
+        $returned = $this->getProtectedMethod($formBuilder, 'getMethod', [&$data]);
+        $this->assertEquals('put', $returned);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testGetRoutes()
+    {
+        $this->setProtectedAttributeOf($this->formBuilder, '_routes', []);
+        $returned = $this->getProtectedMethod($this->formBuilder, 'getRoutes');
+        $status = true;
+        foreach ($returned as $key => $item) {
+            if (!is_string($key) || !isset($item['action']) || !isset($item['method'])) {
+                $status = false;
+            }
+        }
+        $this->assertTrue($status);
     }
 
     /**

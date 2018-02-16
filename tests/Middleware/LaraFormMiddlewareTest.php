@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\LaraForm\Middleware;
+namespace Tests\Middleware;
 
 use Illuminate\Http\Request;
 use LaraForm\FormProtection;
 use LaraForm\Middleware\LaraFormMiddleware;
-use Tests\LaraForm\Core\BaseStoreTest;
+use Tests\Core\BaseStoreTest;
 
 class LaraFormMiddlewareTest extends BaseStoreTest
 {

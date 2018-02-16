@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\LaraForm\Elements\Widgets;
+namespace Tests\Elements\Widgets;
 
 use LaraForm\Elements\Widgets\RadioWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\LaraForm\Elements\WidgetTest;
+use Tests\Elements\WidgetTest;
 
 class RadioWidgetTest extends WidgetTest
 {

@@ -5,7 +5,7 @@ namespace Label\Elements\Widgets;
 use LaraForm\Elements\Widgets\LabelWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\LaraForm\Elements\WidgetTest;
+use Tests\Elements\WidgetTest;
 
 class LabelWidgetTest extends WidgetTest
 {

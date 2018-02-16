@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\LaraForm\Core;
+namespace Tests\Core;
 
 use LaraForm\Core\BaseStore;
-use Tests\LaraForm\BaseTestCase;
+use Tests\BaseTestCase;
 
 class BaseStoreTest extends BaseTestCase
 {

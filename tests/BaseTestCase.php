@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\LaraForm;
+namespace Tests;
 
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;

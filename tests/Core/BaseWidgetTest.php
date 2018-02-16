@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\LaraForm\Core;
+namespace Tests\Core;
 
 use LaraForm\Core\BaseWidget;
-use Tests\LaraForm\BaseTestCase;
+use Tests\BaseTestCase;
 
 class BaseWidgetTest extends BaseTestCase
 {

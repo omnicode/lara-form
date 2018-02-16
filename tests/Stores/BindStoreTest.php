@@ -1,9 +1,10 @@
 <?php
 
-namespace Tests\LaraForm\Stores;
+namespace Tests\Stores;
 
 use LaraForm\Stores\BindStore;
-use Tests\LaraForm\Core\BaseStoreTest;
+use phpmock\MockBuilder;
+use Tests\Core\BaseStoreTest;
 
 class BindStoreTest extends BaseStoreTest
 {
@@ -133,6 +134,64 @@ class BindStoreTest extends BaseStoreTest
         $this->assertTrue($returned);
     }
 
+    /**
+     * @throws \ReflectionException
+     * @throws \phpmock\MockEnabledException
+     */
+    public function testObjectGetWhenNotProperty()
+    {
+        $returned = $this->getObjectTesting('property_exists');
+        $this->assertEquals('default', $returned);
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws \phpmock\MockEnabledException
+     */
+    public function testObjectGetWhenPropertyExist()
+    {
+        $returned = $this->getObjectTesting('property_exists', true);
+        $this->assertTrue($returned);
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws \phpmock\MockEnabledException
+     */
+    public function testObjectGetWhenExistGetMethod()
+    {
+        $returned = $this->getObjectTesting('method_exists', true);
+        $this->assertTrue($returned);
+    }
+
+    /**
+     * @param $func
+     * @param bool $val
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \phpmock\MockEnabledException
+     */
+    private function getObjectTesting($func,$val = false)
+    {
+
+        $builder = new MockBuilder();
+        $builder->setNamespace("LaraForm\Stores");
+        $builder->setName($func);
+        $builder->setFunction(function () use ($val){
+            return $val;
+        });
+        $mock = $builder->build();
+        $mock->enable();
+        $bindStore = $this->newBindStore('dataGet');
+        $args = [$bindStore, ['data'], 'default'];
+        if ($val) {
+            $this->methodWillReturnTrue('dataGet', $bindStore);;
+        }
+        $returned = $this->getProtectedMethod($bindStore, 'objectGet', $args);
+        $mock->disable();
+        return $returned;
+    }
+    
     /**
      * @param null $methods
      * @return \PHPUnit_Framework_MockObject_MockObject

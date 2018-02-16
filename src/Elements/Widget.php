@@ -64,14 +64,6 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
-     * @param $attr
-     */
-    protected function parentCheckAttributes(&$attr)
-    {
-        self::checkAttributes($attr);
-    }
-
-    /**
      * Adds modifying data to templates and their parameters
      * @param $data
      */
@@ -153,7 +145,6 @@ class Widget extends BaseWidget implements WidgetInterface
         return $data;
     }
 
-
     /**
      * Creates view for html field label
      * @param $name
@@ -180,6 +171,7 @@ class Widget extends BaseWidget implements WidgetInterface
 
         return $this->formatTemplate($template, $rep);
     }
+
 
     /**
      * @param $text
@@ -309,7 +301,6 @@ class Widget extends BaseWidget implements WidgetInterface
         }
     }
 
-
     /**
      * @param $attr
      * @param $key
@@ -321,6 +312,7 @@ class Widget extends BaseWidget implements WidgetInterface
             $attr[$key] = $key;
         }
     }
+
 
     /**
      * Creates a hidden input field
@@ -414,5 +406,13 @@ class Widget extends BaseWidget implements WidgetInterface
             $this->name = substr($this->name, 0, -2);
             $attr['multiple'] = true;
         }
+    }
+
+    /**
+     * @param $attr
+     */
+    protected function parentCheckAttributes(&$attr)
+    {
+        self::checkAttributes($attr);
     }
 }

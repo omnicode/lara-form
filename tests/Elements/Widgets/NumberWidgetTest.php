@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\LaraForm\Elements\Widgets;
+namespace Tests\Elements\Widgets;
 
 use LaraForm\Elements\Widgets\InputWidget;
 use LaraForm\Elements\Widgets\NumberWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\LaraForm\Elements\WidgetTest;
+use Tests\Elements\WidgetTest;
 
 class NumberWidgetTest extends WidgetTest
 {

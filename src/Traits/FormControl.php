@@ -11,12 +11,12 @@ trait FormControl
      * Keepes here all routes
      * @var array
      */
-    private $_routes = [];
+    protected $_routes = [];
 
     /**
      * @var null
      */
-    private $_requestMethod = null;
+    protected $_requestMethod = null;
 
     /**
      * From the form parameters evaluates the action and returns it
@@ -74,10 +74,10 @@ trait FormControl
             $methodName = $currentController . '@' . $methodName;
         }
         $route = $this->getRouteName($methodName);
+
         if (empty($route)) {
             throw new \Exception('[' . $methodName . '] method not allowed!');
         }
-
         return route($route, $action);
     }
 
@@ -120,10 +120,13 @@ trait FormControl
     {
         $method = 'post';
         if (isset($options['method'])) {
-            if (in_array($options['method'], ['get', 'post', 'put', 'patch', 'delete'])) {
+            $validMethods = ['get', 'post', 'put', 'patch', 'delete', 'options'];
+            if (in_array(strtolower($options['method']), $validMethods)) {
                 $method = $options['method'];
+                unset($options['method']);
+            }else{
+                throw new \Exception('The request ['.$options['method'].'] method is not valid');
             }
-            unset($options['method']);
         } elseif (!empty($this->_requestMethod)) {
             $method = $this->_requestMethod;
             $this->_requestMethod = null;
@@ -139,25 +142,25 @@ trait FormControl
      * names of the routes and the value is controller and method
      * @return array
      */
-    private function getRoutes()
+    protected function getRoutes()
     {
-        if (empty($this->routes)) {
+        if (empty($this->_routes)) {
             collect(Route::getRoutes())->map(function ($route) {
                 $data = [
                     'action' => $route->getActionName(),
                     'method' => array_shift($route->methods)
                 ];
-                $this->routes[$route->getName()] = $data;
+                $this->_routes[$route->getName()] = $data;
             });
         }
-        return $this->routes;
+        return $this->_routes;
     }
 
     /**
      * Return current route
      * @return mixed
      */
-    private function getCurrentRoute()
+    protected function getCurrentRoute()
     {
         return Route::getCurrentRoute();
     }

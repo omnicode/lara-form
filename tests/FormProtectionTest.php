@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\LaraForm;
+namespace Tests;
 
 use LaraForm\FormProtection;
 use Illuminate\Http\Request;
@@ -30,9 +30,10 @@ class FormProtectionTest extends BaseTestCase
         if (empty($this->formProtection)) {
             $this->formProtection = $this->getMockBuilder(FormProtection::class)
                 ->setConstructorArgs([])
-                ->setMethods([ 'sessionPath'])
+                ->setMethods(['sessionPath'])
                 ->getMock();
         };
+
         if (empty($this->request)) {
             $this->request = $this->getMockBuilder(Request::class)
                 ->setMethods(['ajax', 'url', 'route', 'getAction', 'getName', 'getRequestUri', 'fullUrl'])->getMock();
@@ -80,7 +81,7 @@ class FormProtectionTest extends BaseTestCase
     public function testSetUnlockFields()
     {
         $formProtection = $this->newFormProtection(['processUnlockFields']);
-        $this->methodWillReturn(555,'processUnlockFields',$formProtection);
+        $this->methodWillReturn(555, 'processUnlockFields', $formProtection);
         $formProtection->setUnlockFields(555);
         $result = $this->getProtectedAttributeOf($formProtection, 'unlockFields');
         $this->assertEquals(555, $result);
@@ -105,7 +106,7 @@ class FormProtectionTest extends BaseTestCase
     public function testValidateWhenEmptyTokenInSession()
     {
         $data = ['laraform_token' => 'token'];
-        $this->methodWillReturn('customUrl','sessionPath', $this->formProtection);
+        $this->methodWillReturn('customUrl', 'sessionPath', $this->formProtection);
         $returned = $this->formProtection->validate($this->request, $data);
         $this->assertEquals(false, $returned);
     }
@@ -163,7 +164,7 @@ class FormProtectionTest extends BaseTestCase
         $this->methodWillReturnTrue('isValidAction', $formProtection);
         $this->methodWillReturn($data, 'removeUnlockFields', $formProtection);
         $this->methodWillReturn(['name' => ''], 'getCheckedFieldsBy', $formProtection);
-        $this->methodWillReturn(false,'ajax',$this->request);
+        $this->methodWillReturn(false, 'ajax', $this->request);
         $returned = $formProtection->validate($this->request, $data);
         $this->assertEquals(false, $returned);
     }
@@ -184,7 +185,7 @@ class FormProtectionTest extends BaseTestCase
         $formProtection = $this->newFormProtection(['isValidAction', 'getCheckedFieldsBy']);
         $this->methodWillReturnTrue('isValidAction', $formProtection);
         $this->methodWillReturn($data, 'getCheckedFieldsBy', $formProtection);
-        $this->methodWillReturn(false,'ajax',$this->request);
+        $this->methodWillReturn(false, 'ajax', $this->request);
         $attr = ['name' => '', 'email' => '', 'phone' => 555, 'laraform_token' => $token];
         $returned = $formProtection->validate($this->request, $attr);
 
@@ -207,35 +208,35 @@ class FormProtectionTest extends BaseTestCase
         $formProtection = $this->newFormProtection(['isValidAction', 'getCheckedFieldsBy', 'removeUnlockFields']);
         $this->methodWillReturnTrue('isValidAction', $formProtection);
         $this->methodWillReturn($data, 'getCheckedFieldsBy', $formProtection);
-        $attr = ['images' => ['large' => ['img1'=>'sss', 'img2'=>'sss']]];
+        $attr = ['images' => ['large' => ['img1' => 'sss', 'img2' => 'sss']]];
         $this->methodWillReturn($attr, 'removeUnlockFields', $formProtection);
-        $this->methodWillReturn(false,'ajax',$this->request);
-        $returned = $formProtection->validate($this->request, $attr+['laraform_token' => $token]);
+        $this->methodWillReturn(false, 'ajax', $this->request);
+        $returned = $formProtection->validate($this->request, $attr + ['laraform_token' => $token]);
         $this->assertEquals(false, $returned);
     }
 
     /**
      * @throws \ReflectionException
      */
-   public function testVerificationForAjaxByUrl()
-   {
-       Config::set('lara_form.ajax_request.url',['foo/bar','bar/foo']);
-       $this->methodWillReturn('foo/bar','url',$this->request);
-       $formProtection = $this->newFormProtection();
-       $returned = $this->getProtectedMethod($formProtection,'verificationForAjax',[$this->request]);
-       $this->assertEquals(false, $returned);
-   }
+    public function testVerificationForAjaxByUrl()
+    {
+        Config::set('lara_form.ajax_request.url', ['foo/bar', 'bar/foo']);
+        $this->methodWillReturn('foo/bar', 'url', $this->request);
+        $formProtection = $this->newFormProtection();
+        $returned = $this->getProtectedMethod($formProtection, 'verificationForAjax', [$this->request]);
+        $this->assertEquals(false, $returned);
+    }
 
     /**
      * @throws \ReflectionException
      */
     public function testVerificationForAjaxByAction()
     {
-        Config::set('lara_form.ajax_request.action',['CustomController@customMethod']);
-        $this->methodWillReturn(['controller' => 'App\Http\Controllers\CustomController@customMethod'],'getAction',$this->request);
-        $this->methodWillReturn($this->request,'route',$this->request);
+        Config::set('lara_form.ajax_request.action', ['CustomController@customMethod']);
+        $this->methodWillReturn(['controller' => 'App\Http\Controllers\CustomController@customMethod'], 'getAction', $this->request);
+        $this->methodWillReturn($this->request, 'route', $this->request);
         $formProtection = $this->newFormProtection();
-        $returned = $this->getProtectedMethod($formProtection,'verificationForAjax',[$this->request]);
+        $returned = $this->getProtectedMethod($formProtection, 'verificationForAjax', [$this->request]);
         $this->assertEquals(false, $returned);
     }
 
@@ -244,11 +245,11 @@ class FormProtectionTest extends BaseTestCase
      */
     public function testVerificationForAjaxByRoute()
     {
-        Config::set('lara_form.ajax_request.route',['user.store']);
-        $this->methodWillReturn('user.store','getName',$this->request);
-        $this->methodWillReturn($this->request,'route',$this->request);
+        Config::set('lara_form.ajax_request.route', ['user.store']);
+        $this->methodWillReturn('user.store', 'getName', $this->request);
+        $this->methodWillReturn($this->request, 'route', $this->request);
         $formProtection = $this->newFormProtection();
-        $returned = $this->getProtectedMethod($formProtection,'verificationForAjax',[$this->request]);
+        $returned = $this->getProtectedMethod($formProtection, 'verificationForAjax', [$this->request]);
         $this->assertEquals(false, $returned);
     }
 
@@ -257,11 +258,11 @@ class FormProtectionTest extends BaseTestCase
      */
     public function testVerificationForAjax()
     {
-        Config::set('lara_form.ajax_request.url',[]);
-        Config::set('lara_form.ajax_request.action',[]);
-        Config::set('lara_form.ajax_request.route',[]);
+        Config::set('lara_form.ajax_request.url', []);
+        Config::set('lara_form.ajax_request.action', []);
+        Config::set('lara_form.ajax_request.route', []);
         $formProtection = $this->newFormProtection();
-        $returned = $this->getProtectedMethod($formProtection,'verificationForAjax',[$this->request]);
+        $returned = $this->getProtectedMethod($formProtection, 'verificationForAjax', [$this->request]);
         $this->assertEquals(true, $returned);
     }
 
@@ -333,6 +334,17 @@ class FormProtectionTest extends BaseTestCase
 
     /**
      * @throws \Exception
+     * @expectedException Exception
+     */
+    public function testRemoveByTimeWhenStartTimeExistPluse()
+    {
+        Config::set('lara_form.session.lifetime', '+10 minutes');
+        $this->addToSession();
+        $this->formProtection->removeByTime();
+    }
+
+    /**
+     * @throws \Exception
      * @throws \PHPUnit_Framework_ExpectationFailedException
      */
     public function testProcessUnlockFieldsByString()
@@ -366,7 +378,7 @@ class FormProtectionTest extends BaseTestCase
      */
     public function testAddFieldWhenOptionDisabled()
     {
-        $data = ['disabled'=> true];
+        $data = ['disabled' => true];
         $result = $this->formProtection->addField('field', $data);
         $this->assertFalse($result);
     }
@@ -402,9 +414,9 @@ class FormProtectionTest extends BaseTestCase
     public function testAddFieldByArrayFields()
     {
         $formProtection = $this->newFormProtection(['addArrayInputField']);
-        $this->methodWillReturn(null,'addArrayInputField',$formProtection);
+        $this->methodWillReturn(null, 'addArrayInputField', $formProtection);
         $returned = $formProtection->addField('user[name]');
-        $this->assertEquals(null,$returned);
+        $this->assertEquals(null, $returned);
     }
 
     /**
@@ -452,12 +464,12 @@ class FormProtectionTest extends BaseTestCase
     public function testIsValidAction()
     {
         $unlock = ['action', 'url', 'route'];
-        Config::set('lara_form.session.paths.unlock',$unlock);
+        Config::set('lara_form.session.paths.unlock', $unlock);
         $this->formProtection->expects($this->any())->method('sessionPath')->willReturn('customUrl');
 
         foreach ($unlock as $item) {
             $this->withSession(['customUrl' => [$item]]);
-            $returned = $this->getProtectedMethod($this->formProtection,'isValidAction',[$this->request,'token']);
+            $returned = $this->getProtectedMethod($this->formProtection, 'isValidAction', [$this->request, 'token']);
             $this->assertEquals(true, $returned);
             $this->flushSession();
         }
@@ -477,7 +489,7 @@ class FormProtectionTest extends BaseTestCase
         $formProtection = $this->newFormProtection(['getAction']);
         foreach ($urls as $item) {
             $formProtection->expects($this->any())->method('getAction')->willReturn($item);
-            $returned = $this->getProtectedMethod($formProtection,'isValidAction',[$this->request,'token']);
+            $returned = $this->getProtectedMethod($formProtection, 'isValidAction', [$this->request, 'token']);
             $this->assertEquals(true, $returned);
             $this->flushSession();
         }
@@ -652,7 +664,7 @@ class FormProtectionTest extends BaseTestCase
         $token = array_keys($added);
         $token = array_shift($token);
         $data = ['laraform_token' => $token];
-        $path = config('lara_form.session.name').'.'.$token;
+        $path = config('lara_form.session.name') . '.' . $token;
         $formProtection = $this->newFormProtection(['sessionPath', 'isValidAction', 'verificationForAjax', 'removeUnlockFields']);
 
         $formProtection->expects($this->any(2))->method('sessionPath')->willReturn($path);
@@ -680,6 +692,6 @@ class FormProtectionTest extends BaseTestCase
      */
     private function newFormProtection($methods = null)
     {
-        return $this->newInstance(FormProtection::class,[],$methods);
+        return $this->newInstance(FormProtection::class, [], $methods);
     }
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\LaraForm\Elements\Widgets;
+namespace Tests\Elements\Widgets;
 
 use LaraForm\Elements\Widgets\CheckboxWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\LaraForm\Elements\WidgetTest;
+use Tests\Elements\WidgetTest;
 
 class CheckboxWidgetTest extends WidgetTest
 {
@@ -28,17 +28,17 @@ class CheckboxWidgetTest extends WidgetTest
     }
 
     /**
+     * @throws \PHPUnit_Framework_Constraint
      * @throws \ReflectionException
      */
     public function testRender()
     {
-        $this->checkboxWidget->expects($this->at(0))->method('getTemplate')->willReturn('template');
-        $this->checkboxWidget->expects($this->at(1))->method('getTemplate')->willReturn('currentTemplate');
+        $this->checkboxWidget->expects($this->any(2))->method('getTemplate')->will($this->returnArgument(0));
         $this->methodWillReturnArgument(0, 'formatNestingLabel', $this->checkboxWidget);
         $returned = $this->checkboxWidget->render();
         $currentTemplate = $this->getProtectedAttributeOf($this->checkboxWidget, 'currentTemplate');
-        $this->assertEquals('template', $returned);
-       // $this->assertEquals('currentTemplate', $currentTemplate);
+        $this->assertEquals('checkbox', $returned);
+        $this->assertEquals('checkboxContainer', $currentTemplate);
     }
 
     /**
@@ -55,7 +55,7 @@ class CheckboxWidgetTest extends WidgetTest
             'type' => 'checkbox',
             'value' => 'defaultValue'
         ];
-        $checkboxWidget = $this->newCheckboxWidget(['getValue', 'setHidden', 'generateId', 'parentCheckAttributes','strToArray']);
+        $checkboxWidget = $this->newCheckboxWidget(['getValue', 'setHidden', 'generateId', 'parentCheckAttributes', 'strToArray']);
         $this->setProtectedAttributeOf($checkboxWidget, 'name', 'name');
         $this->methodWillReturn(['value' => 'defaultValue'], 'getValue', $checkboxWidget);
         $this->methodWillReturn(['defaultValue'], 'strToArray', $checkboxWidget);
@@ -87,18 +87,18 @@ class CheckboxWidgetTest extends WidgetTest
         $attr = [];
         $checkboxWidget = $this->newCheckboxWidget(['getValue', 'setHidden', 'generateId', 'parentCheckAttributes']);
         $checkboxWidget->expects($this->once())->method('setHidden')->willReturn('hidden');
-        $this->setProtectedAttributeOf($checkboxWidget,'name', 'field[]');
+        $this->setProtectedAttributeOf($checkboxWidget, 'name', 'field[]');
         $checkboxWidget->checkAttributes($attr);
         $hidden1 = $this->getProtectedAttributeOf($checkboxWidget, 'hidden');
-        $this->setProtectedAttributeOf($checkboxWidget,'name', 'field[]');
+        $this->setProtectedAttributeOf($checkboxWidget, 'name', 'field[]');
         $checkboxWidget->checkAttributes($attr);
         $hidden2 = $this->getProtectedAttributeOf($checkboxWidget, 'hidden');
-        $this->setProtectedAttributeOf($checkboxWidget,'name', 'field[]');
+        $this->setProtectedAttributeOf($checkboxWidget, 'name', 'field[]');
         $checkboxWidget->checkAttributes($attr);
         $hidden3 = $this->getProtectedAttributeOf($checkboxWidget, 'hidden');
-        $this->assertEquals('hidden',$hidden1);
-        $this->assertEquals('',$hidden2);
-        $this->assertEquals('',$hidden3);
+        $this->assertEquals('hidden', $hidden1);
+        $this->assertEquals('', $hidden2);
+        $this->assertEquals('', $hidden3);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\LaraForm\Stores;
+namespace Tests\Stores;
 
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
@@ -8,7 +8,7 @@ use LaraForm\Stores\BindStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use LaraForm\Stores\OptionStore;
-use Tests\LaraForm\Core\BaseStoreTest;
+use Tests\Core\BaseStoreTest;
 
 class OptionStoreTest extends BaseStoreTest
 {
@@ -153,11 +153,15 @@ class OptionStoreTest extends BaseStoreTest
      */
     public function testToString()
     {
-        $formBuilder = $this->newFormBuilder(['output']);
-        $this->methodWillReturn('output', 'output', $formBuilder);
-        $this->optionStore->setBuilder($formBuilder);
-        $returned = $this->optionStore->__toString();
-        $this->assertEquals('output', $returned);
+        $this->outputTesting('__toString');
+    }
+
+    /**
+     *
+     */
+    public function testRender()
+    {
+        $this->outputTesting('render');
     }
 
     /**
@@ -167,7 +171,7 @@ class OptionStoreTest extends BaseStoreTest
     {
         $optionStore = $this->newOptionStore(['_class']);
         $returnedThis = $optionStore->class(['header']);
-        $this->assertEquals($optionStore,$returnedThis);
+        $this->assertEquals($optionStore, $returnedThis);
     }
 
     /**
@@ -177,8 +181,21 @@ class OptionStoreTest extends BaseStoreTest
     {
         $optionStore = $this->newOptionStore();
         $returnedThis = $optionStore->otherMethodName(['header']);
-        $this->assertEquals(null,$returnedThis);
+        $this->assertEquals(null, $returnedThis);
     }
+
+    /**
+     *
+     */
+    private function outputTesting($func)
+    {
+        $formBuilder = $this->newFormBuilder(['output']);
+        $this->methodWillReturn('output', 'output', $formBuilder);
+        $this->optionStore->setBuilder($formBuilder);
+        $returned = $this->optionStore->{$func}();
+        $this->assertEquals('output', $returned);
+    }
+
     /**
      * @param $data
      * @throws \ReflectionException
@@ -218,6 +235,6 @@ class OptionStoreTest extends BaseStoreTest
             app(OptionStore::class),
             app(BindStore::class),
         ];
-        return $this->newInstance(FormBuilder::class,$args,$methods);
+        return $this->newInstance(FormBuilder::class, $args, $methods);
     }
 }

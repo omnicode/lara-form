@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\LaraForm\Core;
+namespace Tests\Core;
 
-use Tests\LaraForm\BaseTestCase;
+use Tests\BaseTestCase;
 
 class BaseFormProtectionTest extends BaseTestCase
 {

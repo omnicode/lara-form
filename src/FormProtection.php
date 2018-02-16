@@ -202,7 +202,6 @@ class FormProtection extends BaseFormProtection
         if (!$maxTime) {
             return false;
         }
-
         $formHistory = session(config('lara_form.session.name'));
 
         if (empty($formHistory)) {

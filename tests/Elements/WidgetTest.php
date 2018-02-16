@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\LaraForm\Elements;
+namespace Tests\Elements;
 
 use LaraForm\Elements\Widget;
 use LaraForm\Stores\BindStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\LaraForm\Core\BaseWidgetTest;
+use Tests\Core\BaseWidgetTest;
 
 class WidgetTest extends BaseWidgetTest
 {
