@@ -100,7 +100,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $val = str_random(5);
         $this->methodWillReturn($val, 'make', $formBuilder);
         $this->methodWillReturnTrue('resetProperties', $formBuilder);
-        $this->getProtectedMethod($formBuilder, 'setIsForm', [true]);
+        $this->invokeMethod($formBuilder, 'setIsForm', [true]);
         $end = $formBuilder->end();
         $this->assertEquals($val, $end);
     }
@@ -189,6 +189,7 @@ class FormBuilderTest extends BaseFormBuilderTest
 
     /**
      * @throws \ReflectionException
+     * @throws \PHPUnit_Framework_Constraint
      */
     public function testFixFieldWithHiddenByDefaultValue()
     {
@@ -197,6 +198,7 @@ class FormBuilderTest extends BaseFormBuilderTest
 
     /**
      * @throws \ReflectionException
+     * @throws \PHPUnit_Framework_Constraint
      */
     public function testFixFieldWithHiddenByCustomValue()
     {
@@ -205,6 +207,7 @@ class FormBuilderTest extends BaseFormBuilderTest
 
     /**
      * @throws \ReflectionException
+     * @throws \PHPUnit_Framework_Constraint
      */
     public function testFixFieldWithReadonly()
     {
@@ -213,6 +216,7 @@ class FormBuilderTest extends BaseFormBuilderTest
 
     /**
      * @throws \ReflectionException
+     * @throws \PHPUnit_Framework_Constraint
      */
     public function testFixFieldWithSubmit()
     {
@@ -221,6 +225,7 @@ class FormBuilderTest extends BaseFormBuilderTest
 
     /**
      * @throws \ReflectionException
+     * @throws \PHPUnit_Framework_Constraint
      */
     public function testFixFieldWithReset()
     {
@@ -228,6 +233,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     }
 
     /**
+     * @throws \PHPUnit_Framework_Constraint
      * @throws \ReflectionException
      */
     public function testFixFieldWithButton()
@@ -237,6 +243,7 @@ class FormBuilderTest extends BaseFormBuilderTest
 
     /**
      * @throws \ReflectionException
+     * @throws \PHPUnit_Framework_Constraint
      */
     public function testFixFieldWithLabel()
     {
@@ -262,6 +269,7 @@ class FormBuilderTest extends BaseFormBuilderTest
 
     /**
      * @throws \PHPUnit_Framework_AssertionFailedError
+     * @throws \ReflectionException
      */
     public function testSetTemplatesByArrayWhenNotOptions()
     {
@@ -297,7 +305,7 @@ class FormBuilderTest extends BaseFormBuilderTest
      */
     public function testSetIsForm()
     {
-        $this->getProtectedMethod($this->formBuilder, 'setIsForm', [true]);
+        $this->invokeMethod($this->formBuilder, 'setIsForm', [true]);
         $isForm = $this->getProtectedAttributeOf($this->formBuilder, 'isForm');
         $this->assertTrue($isForm);
     }
@@ -308,8 +316,8 @@ class FormBuilderTest extends BaseFormBuilderTest
      */
     public function testSetIsFormSecondTime()
     {
-        $this->getProtectedMethod($this->formBuilder, 'setIsForm', [true]);
-        $this->getProtectedMethod($this->formBuilder, 'setIsForm', [true]);
+        $this->invokeMethod($this->formBuilder, 'setIsForm', [true]);
+        $this->invokeMethod($this->formBuilder, 'setIsForm', [true]);
     }
 
     /**
@@ -330,7 +338,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $formProtection = $this->newInstance(FormProtection::class, [], 'processUnlockFields');
         $this->methodWillReturnArgument(0, 'processUnlockFields', $formProtection);
         $this->setProtectedAttributeOf($formBuilder, 'formProtection', $formProtection);
-        $unlockedFields = $this->getProtectedMethod($formBuilder, 'getGeneralUnlockFieldsBy', [&$options]);
+        $unlockedFields = $this->invokeMethod($formBuilder, 'getGeneralUnlockFieldsBy', [&$options]);
         $array[] = '_method';
         $array[] = '_token';
         $array[] = config('lara_form.token_name');
@@ -349,7 +357,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $options = [];
         $formBuilder = $this->newFormBuilder();
-        $unlockedFields = $this->getProtectedMethod($formBuilder, 'getGeneralUnlockFieldsBy', [&$options]);
+        $unlockedFields = $this->invokeMethod($formBuilder, 'getGeneralUnlockFieldsBy', [&$options]);
         $array[] = '_method';
         $array[] = '_token';
         $array[] = config('lara_form.token_name');
@@ -384,7 +392,7 @@ class FormBuilderTest extends BaseFormBuilderTest
             'escept' => true
         ];
         $formBuilder = $this->newFormBuilder();
-        $this->getProtectedMethod($formBuilder, 'addTemplatesAndParams', [$data, &$container, $options]);
+        $this->invokeMethod($formBuilder, 'addTemplatesAndParams', [$data, &$container, $options]);
         unset($options['label']['text']);
         $this->assertEquals($data, $container['pattern']);
         $this->assertEquals($options['div'], $container['div']);
@@ -401,7 +409,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $formBuilder = $this->newFormBuilder('setIsForm');
         $this->setProtectedAttributeOf($formBuilder, 'maked', ['value']);
         $this->setProtectedAttributeOf($formBuilder, 'templateDefaultParams', 'localData');
-        $this->getProtectedMethod($formBuilder, 'resetProperties');
+        $this->invokeMethod($formBuilder, 'resetProperties');
         $local = $this->getProtectedAttributeOf($formBuilder, 'localTemplates');
         $maked = $this->getProtectedAttributeOf($formBuilder, 'maked');
         $this->assertEquals([], $maked);
@@ -432,7 +440,7 @@ class FormBuilderTest extends BaseFormBuilderTest
             ]
         ];
         $params = $attr;
-        $this->getProtectedMethod($this->formBuilder, 'hasTemplate', [&$attr]);
+        $this->invokeMethod($this->formBuilder, 'hasTemplate', [&$attr]);
         $inline = $this->getProtectedAttributeOf($this->formBuilder, 'inlineTemplates');
         $this->assertEquals($inline['pattern'], $params[1]['template']);
         $this->assertEquals($inline['div'], $params[1]['div']);
@@ -458,7 +466,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $modelName = ucfirst($method);
         $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');
         $this->setProtectedAttributeOf($formBuilder, 'model',new \stdClass());
-        $make = $this->getProtectedMethod($formBuilder, 'make', [$method, $attr]);
+        $make = $this->invokeMethod($formBuilder, 'make', [$method, $attr]);
         $makedField = $this->getProtectedAttributeOf($formBuilder, 'maked')[$modelName];
         $this->assertInstanceOf($classNamspace, $makedField);
         $this->assertInstanceOf(OptionStore::class, $make);
@@ -471,10 +479,10 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $attr = ['input', ['attr']];
         $formBuilder = $this->newFormBuilder();
-        $this->getProtectedMethod($formBuilder, 'make', $attr);
-        $this->getProtectedMethod($formBuilder, 'make', $attr);
-        $this->getProtectedMethod($formBuilder, 'make', $attr);
-        $this->getProtectedMethod($formBuilder, 'make', $attr);
+        $this->invokeMethod($formBuilder, 'make', $attr);
+        $this->invokeMethod($formBuilder, 'make', $attr);
+        $this->invokeMethod($formBuilder, 'make', $attr);
+        $this->invokeMethod($formBuilder, 'make', $attr);
         $maked = $this->getProtectedAttributeOf($formBuilder, 'maked');
         $this->assertEquals(1, count($maked));
     }
@@ -494,7 +502,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $this->methodWillReturnTrue('binding',$formBuilder);
         $this->methodWillReturnTrue('setAttributes',$formBuilder);
         $this->methodWillReturnTrue('setBuilder',$formBuilder);
-        $this->getProtectedMethod($formBuilder, 'make', $attr);
+        $this->invokeMethod($formBuilder, 'make', $attr);
     }
 
     /**
@@ -544,7 +552,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $this->setProtectedAttributeOf($this->formBuilder, 'localTemplates', 'local');
         $this->setProtectedAttributeOf($this->formBuilder, 'globalTemplates', 'global');
         $this->setProtectedAttributeOf($this->formBuilder, 'templateDefaultParams', 'pattern');
-        $returned = $this->getProtectedMethod($this->formBuilder, 'complateTemplatesAndParams');
+        $returned = $this->invokeMethod($this->formBuilder, 'complateTemplatesAndParams');
         $inline = $this->getProtectedAttributeOf($this->formBuilder, 'inlineTemplates');
         $this->assertEquals('pattern', $inline);
         $this->assertEquals($data, $returned);
@@ -557,7 +565,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $formBuilder = $this->newFormBuilder();
         $this->setProtectedAttributeOf($formBuilder, 'isForm', 'form');
-        $returned = $this->getProtectedMethod($formBuilder, 'getIsForm');
+        $returned = $this->invokeMethod($formBuilder, 'getIsForm');
         $this->assertEquals('form', $returned);
     }
 
@@ -577,7 +585,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $mock = $builder->build();
         $mock->enable();
         $formBuilder = $this->newFormBuilder(['getRoutes', 'setRequestMethod']);
-        $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
+        $returned = $this->invokeMethod($formBuilder, 'getAction', [&$options]);
         $this->assertEquals([], $options);
         $this->assertEquals('foo/bar', $returned);
         $mock->disable();
@@ -590,7 +598,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $options = ['url' => 'foo/bar'];
         $formBuilder = $this->newFormBuilder();
-        $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
+        $returned = $this->invokeMethod($formBuilder, 'getAction', [&$options]);
         $this->assertEquals([], $options);
         $this->assertEquals('foo/bar', $returned);
     }
@@ -603,7 +611,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $url = 'http://foo/bar';
         $options = ['action' => $url];
         $formBuilder = $this->newFormBuilder();
-        $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
+        $returned = $this->invokeMethod($formBuilder, 'getAction', [&$options]);
         $this->assertEquals($url, $returned);
     }
 
@@ -615,7 +623,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $options = ['action' => 'create'];
         $formBuilder = $this->newFormBuilder('getActionWithMethod');
         $this->methodWillReturnTrue('getActionWithMethod', $formBuilder);
-        $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
+        $returned = $this->invokeMethod($formBuilder, 'getAction', [&$options]);
         $this->assertTrue($returned);
     }
 
@@ -636,7 +644,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         });
         $mock = $builder->build();
         $mock->enable();
-        $returned = $this->getProtectedMethod($formBuilder, 'getAction', [&$options]);
+        $returned = $this->invokeMethod($formBuilder, 'getAction', [&$options]);
         $this->assertTrue($returned);
         $mock->disable();
     }
@@ -659,7 +667,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $this->methodWillReturn($formBuilder, 'getCurrentRoute', $formBuilder);
         $this->methodWillReturn(Controller::class, 'getController', $formBuilder);
         $this->methodWillReturnFalse('getRouteName', $formBuilder);
-        $this->getProtectedMethod($formBuilder, 'getActionWithMethod', [['method', 'params']]);
+        $this->invokeMethod($formBuilder, 'getActionWithMethod', [['method', 'params']]);
         $mock->disable();
     }
 
@@ -679,7 +687,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $mock->enable();
         $formBuilder = $this->newFormBuilder('getRouteName');
         $this->methodWillReturn('route', 'getRouteName', $formBuilder);
-        $returned = $this->getProtectedMethod($formBuilder, 'getActionWithMethod', [['Controller@method', 'params']]);
+        $returned = $this->invokeMethod($formBuilder, 'getActionWithMethod', [['Controller@method', 'params']]);
         $this->assertEquals('foo/bar', $returned);
         $mock->disable();
     }
@@ -706,7 +714,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $mock->enable();
         $formBuilder = $this->newFormBuilder('getRoutes');
         $this->methodWillReturn($data, 'getRoutes', $formBuilder);
-        $returned = $this->getProtectedMethod($formBuilder, 'getRouteName', ['bar']);
+        $returned = $this->invokeMethod($formBuilder, 'getRouteName', ['bar']);
         $requestMethod = $this->getProtectedAttributeOf($formBuilder, '_requestMethod');
         $this->assertEquals('post', $requestMethod);
         $this->assertEquals('route', $returned);
@@ -720,7 +728,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $formBuilder = $this->newFormBuilder('getRoutes');
         $this->methodWillReturn([], 'getRoutes', $formBuilder);
-        $returned = $this->getProtectedMethod($formBuilder, 'getRouteName', ['bar']);
+        $returned = $this->invokeMethod($formBuilder, 'getRouteName', ['bar']);
         $this->assertFalse($returned);
     }
     /**
@@ -736,7 +744,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         ];
         $formBuilder = $this->newFormBuilder('getRoutes');
         $this->methodWillReturn($data, 'getRoutes', $formBuilder);
-        $this->getProtectedMethod($formBuilder, 'setRequestMethod', ['routeName']);
+        $this->invokeMethod($formBuilder, 'setRequestMethod', ['routeName']);
         $requestMethod = $this->getProtectedAttributeOf($formBuilder, '_requestMethod');
         $this->assertEquals('post', $requestMethod);
     }
@@ -757,7 +765,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $formBuilder = $this->newFormBuilder();
         foreach ($data as $datum) {
             $method = $datum['method'];
-            $returned = $this->getProtectedMethod($formBuilder, 'getMethod', [&$datum]);
+            $returned = $this->invokeMethod($formBuilder, 'getMethod', [&$datum]);
             $this->assertEquals($method, $returned);
             $this->assertEquals([], $datum);
         }
@@ -771,7 +779,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $data = ['method' => 'invalidMethod'];
         $formBuilder = $this->newFormBuilder();
-        $this->getProtectedMethod($formBuilder, 'getMethod', [&$data]);
+        $this->invokeMethod($formBuilder, 'getMethod', [&$data]);
     }
 
     /**
@@ -782,7 +790,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $data = [];
         $formBuilder = $this->newFormBuilder();
         $this->setProtectedAttributeOf($formBuilder, '_requestMethod', 'post');
-        $returned = $this->getProtectedMethod($formBuilder, 'getMethod', [&$data]);
+        $returned = $this->invokeMethod($formBuilder, 'getMethod', [&$data]);
         $requestMethod = $this->getProtectedAttributeOf($formBuilder, '_requestMethod');
         $this->assertNull($requestMethod);
         $this->assertEquals('post', $returned);
@@ -796,7 +804,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $data = [];
         $formBuilder = $this->newFormBuilder();
         $this->setProtectedAttributeOf($formBuilder, 'model', true);
-        $returned = $this->getProtectedMethod($formBuilder, 'getMethod', [&$data]);
+        $returned = $this->invokeMethod($formBuilder, 'getMethod', [&$data]);
         $this->assertEquals('put', $returned);
     }
 
@@ -806,7 +814,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     public function testGetRoutes()
     {
         $this->setProtectedAttributeOf($this->formBuilder, '_routes', []);
-        $returned = $this->getProtectedMethod($this->formBuilder, 'getRoutes');
+        $returned = $this->invokeMethod($this->formBuilder, 'getRoutes');
         $status = true;
         foreach ($returned as $key => $item) {
             if (!is_string($key) || !isset($item['action']) || !isset($item['method'])) {
@@ -831,7 +839,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         }
         $params = [[$name], $attr, $method];
         $this->formBuilder->expects($this->any())->method('getIsForm')->willReturn(true);
-        $this->getProtectedMethod($this->formBuilder, 'fixField', $params);
+        $this->invokeMethod($this->formBuilder, 'fixField', $params);
         $formProtection = $this->getProtectedAttributeOf($this->formBuilder, 'formProtection');
 
         if ($empty) {
@@ -849,7 +857,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     private function assertGetFieldType($type, $value)
     {
         $params = [['type' => $type], 'input'];
-        $method = $this->getProtectedMethod($this->formBuilder, 'getFieldType', $params);
+        $method = $this->invokeMethod($this->formBuilder, 'getFieldType', $params);
         $this->assertEquals($value, $method);
     }
 

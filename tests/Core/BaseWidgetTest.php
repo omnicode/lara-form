@@ -3,9 +3,9 @@
 namespace Tests\Core;
 
 use LaraForm\Core\BaseWidget;
-use Tests\BaseTestCase;
+use Tests\LaraFormTestCase;
 
-class BaseWidgetTest extends BaseTestCase
+class BaseWidgetTest extends LaraFormTestCase
 {
     /**
      * @var
@@ -44,7 +44,7 @@ class BaseWidgetTest extends BaseTestCase
             'permission'
         ];
         $this->setProtectedAttributeOf($this->baseWidget, 'config', config('lara_form'));
-        $this->getProtectedMethod($this->baseWidget, 'addTemplateAndAttributes', $params);
+        $this->invokeMethod($this->baseWidget, 'addTemplateAndAttributes', $params);
         $div = $this->getProtectedAttributeOf($this->baseWidget, 'containerParams');
         $classConcat = $this->getProtectedAttributeOf($this->baseWidget, 'classConcat');
         $label = $this->getProtectedAttributeOf($this->baseWidget, 'labelAttr');
@@ -62,7 +62,7 @@ class BaseWidgetTest extends BaseTestCase
      */
     public function testFormatTemplateWhenEmptyAttributes()
     {
-        $returned = $this->getProtectedMethod($this->baseWidget, 'formatTemplate', ['template', []]);
+        $returned = $this->invokeMethod($this->baseWidget, 'formatTemplate', ['template', []]);
         $this->assertEquals('template', $returned);
     }
 
@@ -78,7 +78,7 @@ class BaseWidgetTest extends BaseTestCase
             ]
         ];
         $baseWidget = $this->newBaseWidget('transformTemplate');
-        $returned = $this->getProtectedMethod($baseWidget, 'formatTemplate', $data);
+        $returned = $this->invokeMethod($baseWidget, 'formatTemplate', $data);
         $this->assertEquals('<input name="user">', $returned);
     }
 
@@ -92,7 +92,7 @@ class BaseWidgetTest extends BaseTestCase
         \Config::set('lara_form.separator.end','&');
         $tmp = '<input name="#name$">';
         $this->setProtectedAttributeOf($this->baseWidget, 'config', config('lara_form'));
-        $this->getProtectedMethod($this->baseWidget, 'transformTemplate', [&$tmp]);
+        $this->invokeMethod($this->baseWidget, 'transformTemplate', [&$tmp]);
     }
 
     /**
@@ -103,7 +103,7 @@ class BaseWidgetTest extends BaseTestCase
         \Config::set('lara_form.separator', ['start' => '{', 'end' => '}']);
         $template = '<input name="{name}">';
         $this->setProtectedAttributeOf($this->baseWidget, 'config', config('lara_form'));
-        $this->getProtectedMethod($this->baseWidget, 'transformTemplate', [&$template]);
+        $this->invokeMethod($this->baseWidget, 'transformTemplate', [&$template]);
         $this->assertEquals('<input name="{%name%}">', $template);
     }
 
@@ -114,7 +114,7 @@ class BaseWidgetTest extends BaseTestCase
     {
         $baseWidget = $this->newBaseWidget('formatClass');
         $this->methodWillReturn('', 'formatClass', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'formatAttributes', [[]]);
+        $returned = $this->invokeMethod($baseWidget, 'formatAttributes', [[]]);
         $this->assertEquals('', $returned);
     }
 
@@ -130,7 +130,7 @@ class BaseWidgetTest extends BaseTestCase
         ];
         $baseWidget = $this->newBaseWidget(['setOtherHtmlAttributes', 'formatClass']);
         $this->methodWillReturn('col', 'formatClass', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'formatAttributes', [$data]);
+        $returned = $this->invokeMethod($baseWidget, 'formatAttributes', [$data]);
         $this->assertEquals('id="field-id" readonly class="col" ', $returned);
     }
 
@@ -139,7 +139,7 @@ class BaseWidgetTest extends BaseTestCase
      */
     public function testFormatClassWhenEmptyClasses()
     {
-        $returned = $this->getProtectedMethod($this->baseWidget, 'formatClass', [[]]);
+        $returned = $this->invokeMethod($this->baseWidget, 'formatClass', [[]]);
         $this->assertEquals('', $returned);
     }
 
@@ -150,7 +150,7 @@ class BaseWidgetTest extends BaseTestCase
     {
         $data = ['col', 'col', 'header', 'col header', 'col-md-2 col-md-2'];
         $this->setProtectedAttributeOf($this->baseWidget, 'htmlClass', $data);
-        $returned = $this->getProtectedMethod($this->baseWidget, 'formatClass', [[]]);
+        $returned = $this->invokeMethod($this->baseWidget, 'formatClass', [[]]);
         $this->assertEquals('col header col-md-2', $returned);
     }
 
@@ -171,7 +171,7 @@ class BaseWidgetTest extends BaseTestCase
         $this->methodWillReturn([], 'getContainerAllAttributes', $baseWidget);
         $this->methodWillReturn($currentTemplate, 'formatTemplate', $baseWidget);
 
-        $returned = $this->getProtectedMethod($baseWidget, 'completeTemplate');
+        $returned = $this->invokeMethod($baseWidget, 'completeTemplate');
         $this->assertEquals($currentTemplate, $returned);
     }
 
@@ -192,7 +192,7 @@ class BaseWidgetTest extends BaseTestCase
         $this->methodWillReturn([], 'getContainerAllAttributes', $baseWidget);
         $this->methodWillReturnArgument(0, 'formatTemplate', $baseWidget);
 
-        $returned = $this->getProtectedMethod($baseWidget, 'completeTemplate');
+        $returned = $this->invokeMethod($baseWidget, 'completeTemplate');
         $this->assertEquals($currentTemplate, $returned);
     }
 
@@ -213,7 +213,7 @@ class BaseWidgetTest extends BaseTestCase
         $this->methodWillReturn([], 'getContainerAllAttributes', $baseWidget);
         $this->methodWillReturnArgument(0, 'formatTemplate', $baseWidget);
 
-        $returned = $this->getProtectedMethod($baseWidget, 'completeTemplate');
+        $returned = $this->invokeMethod($baseWidget, 'completeTemplate');
         $this->assertEquals(strip_tags($currentTemplate), $returned);
     }
 
@@ -226,7 +226,7 @@ class BaseWidgetTest extends BaseTestCase
         $baseWidget = $this->newBaseWidget('getHtmlAttributes');
         $this->setProtectedAttributeOf($baseWidget, 'html', 'html');
         $baseWidget->expects($this->any(2))->method('getHtmlAttributes')->willReturn('hidden');
-        $returned = $this->getProtectedMethod($baseWidget, 'completeTemplate');
+        $returned = $this->invokeMethod($baseWidget, 'completeTemplate');
         $this->assertEquals('html', $returned);
     }
 
@@ -239,7 +239,7 @@ class BaseWidgetTest extends BaseTestCase
         $this->setProtectedAttributeOf($this->baseWidget, 'label', 'label');
         $this->setProtectedAttributeOf($this->baseWidget, 'htmlClass', ['class']);
         $this->setProtectedAttributeOf($this->baseWidget, 'attr', ['attr']);
-        $this->getProtectedMethod($this->baseWidget, 'resetProperties');
+        $this->invokeMethod($this->baseWidget, 'resetProperties');
         $icon = $this->getProtectedAttributeOf($this->baseWidget, 'icon');
         $label = $this->getProtectedAttributeOf($this->baseWidget, 'label');
         $htmlClass = $this->getProtectedAttributeOf($this->baseWidget, 'htmlClass');
@@ -260,7 +260,7 @@ class BaseWidgetTest extends BaseTestCase
                 'field' => 'content'
             ]
         ];
-        $returned = $this->getProtectedMethod($this->baseWidget, 'getModifiedData', [$data]);
+        $returned = $this->invokeMethod($this->baseWidget, 'getModifiedData', [$data]);
         $this->assertEquals($data['inline'], $returned);
     }
 
@@ -274,7 +274,7 @@ class BaseWidgetTest extends BaseTestCase
                 'field' => 'content'
             ]
         ];
-        $returned = $this->getProtectedMethod($this->baseWidget, 'getModifiedData', [$data]);
+        $returned = $this->invokeMethod($this->baseWidget, 'getModifiedData', [$data]);
         $this->assertEquals($data['local'], $returned);
     }
 
@@ -288,7 +288,7 @@ class BaseWidgetTest extends BaseTestCase
                 'field' => 'content'
             ]
         ];
-        $returned = $this->getProtectedMethod($this->baseWidget, 'getModifiedData', [$data]);
+        $returned = $this->invokeMethod($this->baseWidget, 'getModifiedData', [$data]);
         $this->assertEquals($data['global'], $returned);
     }
 
@@ -297,7 +297,7 @@ class BaseWidgetTest extends BaseTestCase
      */
     public function testGetModifiedDataDefault()
     {
-        $returned = $this->getProtectedMethod($this->baseWidget, 'getModifiedData', [[], 'default']);
+        $returned = $this->invokeMethod($this->baseWidget, 'getModifiedData', [[], 'default']);
         $this->assertEquals('default', $returned);
     }
 
@@ -333,7 +333,7 @@ class BaseWidgetTest extends BaseTestCase
         $baseWidget = $this->newBaseWidget('getModifiedData');
         $this->setProtectedAttributeOf($baseWidget, 'labelAttr', 'value');
         $this->methodWillReturnArgument(0, 'getModifiedData', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'getLabelAttributes');
+        $returned = $this->invokeMethod($baseWidget, 'getLabelAttributes');
         $this->assertEquals('value', $returned);
     }
 
@@ -390,7 +390,7 @@ class BaseWidgetTest extends BaseTestCase
         $baseWidget->expects($this->at(0))->method('getContainerAttributes')->willReturn($params1);
         $baseWidget->expects($this->at(1))->method('getContainerAttributes')->willReturn($params2);
         $baseWidget->expects($this->at(2))->method('getContainerAttributes')->willReturn($params3);
-        $returned = $this->getProtectedMethod($baseWidget, 'getContainerAllAttributes');
+        $returned = $this->invokeMethod($baseWidget, 'getContainerAllAttributes');
         $this->assertEquals($params3, $returned);
     }
 
@@ -406,7 +406,7 @@ class BaseWidgetTest extends BaseTestCase
         $this->methodWillReturn([], 'containerAttributeType', $baseWidget);
         $this->methodWillReturn([], 'containerAttributeClass', $baseWidget);
         $this->methodWillReturn('data', 'formatAttributes', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'getContainerAttributes', [['containerAttrs' => 'data']]);
+        $returned = $this->invokeMethod($baseWidget, 'getContainerAttributes', [['containerAttrs' => 'data']]);
         $this->assertEquals(['containerAttrs' => 'data'], $returned);
     }
 
@@ -418,7 +418,7 @@ class BaseWidgetTest extends BaseTestCase
         $data = [];
         $baseWidget = $this->newBaseWidget('getOtherHtmlAttributes');
         $this->methodWillReturnTrue('getOtherHtmlAttributes', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'containerAttributeRequiredAndDisabled', [&$data, 'required']);
+        $returned = $this->invokeMethod($baseWidget, 'containerAttributeRequiredAndDisabled', [&$data, 'required']);
         $this->assertEquals(['required' => 'required'], $returned);
     }
 
@@ -430,7 +430,7 @@ class BaseWidgetTest extends BaseTestCase
         $data = ['required' => 'customClass'];
         $baseWidget = $this->newBaseWidget('getOtherHtmlAttributes');
         $this->methodWillReturnTrue('getOtherHtmlAttributes', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'containerAttributeRequiredAndDisabled', [&$data, 'required']);
+        $returned = $this->invokeMethod($baseWidget, 'containerAttributeRequiredAndDisabled', [&$data, 'required']);
         $this->assertEquals(['required' => 'customClass'], $returned);
     }
 
@@ -442,7 +442,7 @@ class BaseWidgetTest extends BaseTestCase
         $data = ['required' => 'customClass'];
         $baseWidget = $this->newBaseWidget('getOtherHtmlAttributes');
         $this->methodWillReturnFalse('getOtherHtmlAttributes', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'containerAttributeRequiredAndDisabled', [&$data, 'required']);
+        $returned = $this->invokeMethod($baseWidget, 'containerAttributeRequiredAndDisabled', [&$data, 'required']);
         $this->assertEquals([], $data);
         $this->assertEquals([], $returned);
     }
@@ -457,7 +457,7 @@ class BaseWidgetTest extends BaseTestCase
         $data = [];
         $baseWidget = $this->newBaseWidget('getOtherHtmlAttributes');
         $baseWidget->expects($this->any(2))->method('getOtherHtmlAttributes')->willReturn(true);
-        $returned = $this->getProtectedMethod($baseWidget, 'containerAttributeType', [&$data]);
+        $returned = $this->invokeMethod($baseWidget, 'containerAttributeType', [&$data]);
         $this->assertEquals(['type' => true], $returned);
     }
 
@@ -470,7 +470,7 @@ class BaseWidgetTest extends BaseTestCase
         $baseWidget = $this->newBaseWidget(['getOtherHtmlAttributes', 'getHtmlAttributes']);
         $this->methodWillReturnFalse('getOtherHtmlAttributes', $baseWidget);
         $this->methodWillReturnTrue('getHtmlAttributes', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'containerAttributeType', [&$data]);
+        $returned = $this->invokeMethod($baseWidget, 'containerAttributeType', [&$data]);
         $this->assertEquals(['type' => true], $returned);
     }
 
@@ -480,7 +480,7 @@ class BaseWidgetTest extends BaseTestCase
     public function testContainerAttributeTypeWhenExistParam()
     {
         $data = ['type' => 'value'];
-        $returned = $this->getProtectedMethod($this->baseWidget, 'containerAttributeType', [&$data]);
+        $returned = $this->invokeMethod($this->baseWidget, 'containerAttributeType', [&$data]);
         $this->assertEquals([], $data);
         $this->assertEquals(['type' => 'value'], $returned);
     }
@@ -491,7 +491,7 @@ class BaseWidgetTest extends BaseTestCase
     public function testContainerAttributeClassWhenEmptyClass()
     {
         $data = [];
-        $returned = $this->getProtectedMethod($this->baseWidget, 'containerAttributeClass', [&$data]);
+        $returned = $this->invokeMethod($this->baseWidget, 'containerAttributeClass', [&$data]);
         $this->assertEquals([], $returned);
     }
 
@@ -503,7 +503,7 @@ class BaseWidgetTest extends BaseTestCase
         $data = ['class' => 'col-12'];
         $baseWidget = $this->newBaseWidget('formatClass');
         $this->methodWillReturn('class', 'formatClass', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, 'containerAttributeClass', [&$data]);
+        $returned = $this->invokeMethod($baseWidget, 'containerAttributeClass', [&$data]);
         $this->assertEquals(['class' => 'class'], $returned);
         $this->assertEquals([], $data);
     }
@@ -520,7 +520,7 @@ class BaseWidgetTest extends BaseTestCase
                 'field-3'
             ]
         ];
-        $this->getProtectedMethod($this->baseWidget, 'setOtherHtmlAttributes', $data);
+        $this->invokeMethod($this->baseWidget, 'setOtherHtmlAttributes', $data);
         $returned = $this->getProtectedAttributeOf($this->baseWidget, 'otherHtmlAttributes');
         $this->assertEquals($data[0], $returned);
     }
@@ -530,7 +530,7 @@ class BaseWidgetTest extends BaseTestCase
      */
     public function testSetOtherHtmlAttributesByKeyValue()
     {
-        $this->getProtectedMethod($this->baseWidget, 'setOtherHtmlAttributes', ['key', 'value']);
+        $this->invokeMethod($this->baseWidget, 'setOtherHtmlAttributes', ['key', 'value']);
         $returned = $this->getProtectedAttributeOf($this->baseWidget, 'otherHtmlAttributes');
         $this->assertEquals(['key' => 'value'], $returned);
     }
@@ -540,7 +540,7 @@ class BaseWidgetTest extends BaseTestCase
      */
     public function testAssignOtherhtmlAtrributes()
     {
-        $this->getProtectedMethod($this->baseWidget, 'assignOtherhtmlAtrributes', ['data']);
+        $this->invokeMethod($this->baseWidget, 'assignOtherhtmlAtrributes', ['data']);
         $returned = $this->getProtectedAttributeOf($this->baseWidget, 'otherHtmlAttributes');
         $this->assertEquals('data', $returned);
     }
@@ -574,7 +574,7 @@ class BaseWidgetTest extends BaseTestCase
      */
     public function testSetHtmlAttributes()
     {
-        $this->getProtectedMethod($this->baseWidget, 'setHtmlAttributes', ['key', 'value']);
+        $this->invokeMethod($this->baseWidget, 'setHtmlAttributes', ['key', 'value']);
         $returned = $this->getProtectedAttributeOf($this->baseWidget, 'htmlAttributes');
         $this->assertEquals(['key' => 'value'], $returned);
     }
@@ -614,7 +614,7 @@ class BaseWidgetTest extends BaseTestCase
     {
         $data = ['key1' => 'value1', 'key2' => 'value2'];
         $this->setProtectedAttributeOf($this->baseWidget, $attribute, $data);
-        $returned = $this->getProtectedMethod($this->baseWidget, $method, [$key]);
+        $returned = $this->invokeMethod($this->baseWidget, $method, [$key]);
         if ($isEmpty) {
             $this->assertFalse($returned);
         } else {
@@ -650,7 +650,7 @@ class BaseWidgetTest extends BaseTestCase
         $baseWidget = $this->newBaseWidget('getModifiedData');
         $this->setProtectedAttributeOf($baseWidget, $prop, 'value');
         $this->methodWillReturnArgument(0, 'getModifiedData', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, $method);
+        $returned = $this->invokeMethod($baseWidget, $method);
         $this->assertEquals('value', $returned);
     }
 
@@ -663,7 +663,7 @@ class BaseWidgetTest extends BaseTestCase
         $baseWidget = $this->newBaseWidget('getModifiedData');
         $this->setProtectedAttributeOf($baseWidget, 'config', config('lara_form'));
         $this->methodWillReturnArgument(1, 'getModifiedData', $baseWidget);
-        $returned = $this->getProtectedMethod($baseWidget, $method);
+        $returned = $this->invokeMethod($baseWidget, $method);
         $this->assertEquals('value', $returned);
     }
 
@@ -680,7 +680,7 @@ class BaseWidgetTest extends BaseTestCase
             ]
         ];
         $this->setProtectedAttributeOf($this->baseWidget, 'templates', $data);
-        $returned = $this->getProtectedMethod($this->baseWidget, 'getTemplate', ['input']);
+        $returned = $this->invokeMethod($this->baseWidget, 'getTemplate', ['input']);
         $this->assertEquals($tmp, $returned);
     }
 

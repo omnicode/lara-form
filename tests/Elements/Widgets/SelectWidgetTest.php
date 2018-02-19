@@ -192,7 +192,7 @@ class SelectWidgetTest extends WidgetTest
         $selectWidget->expects($this->any(count($options)))->method('isDisabled')->willReturn([]);
         $selectWidget->expects($this->any(count($options)))->method('isSelected')->willReturn([]);
         $this->setProtectedAttributeOf($selectWidget, 'optionsArray', $options);
-        $returned = $this->getProtectedMethod($selectWidget, 'renderOptions', [false]);
+        $returned = $this->invokeMethod($selectWidget, 'renderOptions', [false]);
         $this->assertEquals($str, $returned);
     }
 
@@ -227,7 +227,7 @@ class SelectWidgetTest extends WidgetTest
         $this->methodWillReturnArgument(0, 'strToArray', $selectWidget);
         $selectWidget->expects($this->any(count($options)))->method('renderOptgroups')->willReturn('group');
         $this->setProtectedAttributeOf($selectWidget, 'optionsArray', $options);
-        $returned = $this->getProtectedMethod($selectWidget, 'renderOptions', [false]);
+        $returned = $this->invokeMethod($selectWidget, 'renderOptions', [false]);
         $this->assertEquals($str, $returned);
     }
 
@@ -256,7 +256,7 @@ class SelectWidgetTest extends WidgetTest
         $this->methodWillReturnArgument(0, 'formatAttributes', $selectWidget);
         $this->methodWillReturnArgument(0, 'getLabelName', $selectWidget);
         $this->methodWillReturnArgument(0, 'renderOptions', $selectWidget);
-        $returned = $this->getProtectedMethod($selectWidget, 'renderOptgroups', ['groupName', $options]);
+        $returned = $this->invokeMethod($selectWidget, 'renderOptgroups', ['groupName', $options]);
         $this->assertEquals($pattern, $returned);
     }
 
@@ -294,7 +294,7 @@ class SelectWidgetTest extends WidgetTest
         $this->methodWillReturnArgument(0, 'formatAttributes', $selectWidget);
         $this->methodWillReturnArgument(0, 'getLabelName', $selectWidget);
         $this->methodWillReturnArgument(0, 'renderOptions', $selectWidget);
-        $returned = $this->getProtectedMethod($selectWidget, 'renderOptgroups', ['groupName', $options]);
+        $returned = $this->invokeMethod($selectWidget, 'renderOptgroups', ['groupName', $options]);
         $this->assertEquals($pattern, $returned);
 
     }
@@ -305,7 +305,7 @@ class SelectWidgetTest extends WidgetTest
     public function testIsDisabledWhenNotDisabledOptions()
     {
         $this->setProtectedAttributeOf($this->selectWidget, 'optionDisabled', ['str']);
-        $returned = $this->getProtectedMethod($this->selectWidget, 'isDisabled', ['str']);
+        $returned = $this->invokeMethod($this->selectWidget, 'isDisabled', ['str']);
         $this->assertEquals(['disabled' => 'disabled'], $returned);
     }
 
@@ -315,7 +315,7 @@ class SelectWidgetTest extends WidgetTest
     public function testIsDisabledWhenExistDisabledOptions()
     {
         $opt = ['str'];
-        $returned = $this->getProtectedMethod($this->selectWidget, 'isDisabled', ['str', $opt]);
+        $returned = $this->invokeMethod($this->selectWidget, 'isDisabled', ['str', $opt]);
         $this->assertEquals(['disabled' => 'disabled'], $returned);
     }
 
@@ -325,7 +325,7 @@ class SelectWidgetTest extends WidgetTest
     public function testIsSelected()
     {
         $this->setProtectedAttributeOf($this->selectWidget, 'selected', ['str']);
-        $returned = $this->getProtectedMethod($this->selectWidget, 'isSelected', ['str']);
+        $returned = $this->invokeMethod($this->selectWidget, 'isSelected', ['str']);
         $this->assertEquals(['selected' => 'selected'], $returned);
     }
 
@@ -340,7 +340,7 @@ class SelectWidgetTest extends WidgetTest
         $container = [];
         $selectWidget = $this->newSelectWidget('strToArray');
         $this->methodWillReturn([5], 'strToArray', $selectWidget);
-        $this->getProtectedMethod($selectWidget, 'disabledBy', ['type', &$attr, &$container]);
+        $this->invokeMethod($selectWidget, 'disabledBy', ['type', &$attr, &$container]);
         $this->assertEquals([], $attr);
         $this->assertEquals([5], $container);
     }

@@ -2,9 +2,9 @@
 
 namespace Tests\Core;
 
-use Tests\BaseTestCase;
+use Tests\LaraFormTestCase;
 
-class BaseFormProtectionTest extends BaseTestCase
+class BaseFormProtectionTest extends LaraFormTestCase
 {
     public function testTo(){
         $this->assertTrue(true);

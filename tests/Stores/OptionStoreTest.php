@@ -203,7 +203,7 @@ class OptionStoreTest extends BaseStoreTest
     private function methodClassArguemntBy($data)
     {
         $this->optionStore->setAttributes(['name', ['attr']]);
-        $returnedThis = $this->getProtectedMethod($this->optionStore, '_class', [$data]);
+        $returnedThis = $this->invokeMethod($this->optionStore, '_class', [$data]);
         $attribute = $this->getProtectedAttributeOf($this->optionStore, 'attributes');
         $this->assertEquals($data, $attribute[1]['class']);
         $this->assertEquals($this->optionStore, $returnedThis);

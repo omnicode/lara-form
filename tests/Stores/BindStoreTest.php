@@ -61,7 +61,7 @@ class BindStoreTest extends BaseStoreTest
     {
         $bindStore = $this->newBindStore('dataGet');
         $this->methodWillReturnArgument(1, 'dataGet', $bindStore);
-        $returned = $this->getProtectedMethod($bindStore, 'dotGet', ['user.name', null]);
+        $returned = $this->invokeMethod($bindStore, 'dotGet', ['user.name', null]);
         $this->assertEquals(['user', 'name'], $returned);
     }
 
@@ -72,7 +72,7 @@ class BindStoreTest extends BaseStoreTest
     {
         $args = ['model', [], null];
         $bindStore = $this->newBindStore(null);
-        $returned = $this->getProtectedMethod($bindStore, 'dataGet', $args);
+        $returned = $this->invokeMethod($bindStore, 'dataGet', $args);
         $this->assertEquals('model', $returned);
     }
 
@@ -84,7 +84,7 @@ class BindStoreTest extends BaseStoreTest
         $args = [['field-1', 'field-2'], ['user'], null];
         $bindStore = $this->newBindStore(['arrayGet']);
         $this->methodWillReturnTrue('arrayGet', $bindStore);
-        $returned = $this->getProtectedMethod($bindStore, 'dataGet', $args);
+        $returned = $this->invokeMethod($bindStore, 'dataGet', $args);
         $this->assertTrue($returned);
     }
 
@@ -96,7 +96,7 @@ class BindStoreTest extends BaseStoreTest
         $args = [$this, ['user'], null];
         $bindStore = $this->newBindStore(['objectGet']);
         $this->methodWillReturnTrue('objectGet', $bindStore);
-        $returned = $this->getProtectedMethod($bindStore, 'dataGet', $args);
+        $returned = $this->invokeMethod($bindStore, 'dataGet', $args);
         $this->assertTrue($returned);
     }
 
@@ -107,7 +107,7 @@ class BindStoreTest extends BaseStoreTest
     {
         $args = ['', ['user'], 'default'];
         $bindStore = $this->newBindStore();
-        $returned = $this->getProtectedMethod($bindStore, 'dataGet', $args);
+        $returned = $this->invokeMethod($bindStore, 'dataGet', $args);
         $this->assertEquals('default', $returned);
     }
 
@@ -118,7 +118,7 @@ class BindStoreTest extends BaseStoreTest
     {
         $args = [['email' => 'email@example.com'], ['user'], 'default'];
         $bindStore = $this->newBindStore();
-        $returned = $this->getProtectedMethod($bindStore, 'arrayGet', $args);
+        $returned = $this->invokeMethod($bindStore, 'arrayGet', $args);
         $this->assertEquals('default', $returned);
     }
 
@@ -130,7 +130,7 @@ class BindStoreTest extends BaseStoreTest
         $args = [['user' => 'jon'], ['user'], 'default'];
         $bindStore = $this->newBindStore('dataGet');
         $this->methodWillReturnTrue('dataGet', $bindStore);
-        $returned = $this->getProtectedMethod($bindStore, 'arrayGet', $args);
+        $returned = $this->invokeMethod($bindStore, 'arrayGet', $args);
         $this->assertTrue($returned);
     }
 
@@ -187,7 +187,7 @@ class BindStoreTest extends BaseStoreTest
         if ($val) {
             $this->methodWillReturnTrue('dataGet', $bindStore);;
         }
-        $returned = $this->getProtectedMethod($bindStore, 'objectGet', $args);
+        $returned = $this->invokeMethod($bindStore, 'objectGet', $args);
         $mock->disable();
         return $returned;
     }

@@ -137,7 +137,7 @@ class WidgetTest extends BaseWidgetTest
         $oldInputStore = $this->newInstance(OldInputStore::class, [], 'hasOldInput');
         $this->methodWillReturnFalse('hasOldInput', $oldInputStore);
         $this->setProtectedAttributeOf($this->widget, 'oldInputs', $oldInputStore);
-        $returned = $this->getProtectedMethod($this->widget, 'getValue', ['name']);
+        $returned = $this->invokeMethod($this->widget, 'getValue', ['name']);
         $this->assertEquals(['value' => ''], $returned);
     }
 
@@ -152,7 +152,7 @@ class WidgetTest extends BaseWidgetTest
         $this->methodWillReturn('bindData', 'get', $bindStore);
         $this->setProtectedAttributeOf($this->widget, 'oldInputs', $oldInputStore);
         $this->setProtectedAttributeOf($this->widget, 'bind', $bindStore);
-        $returned = $this->getProtectedMethod($this->widget, 'getValue', ['name']);
+        $returned = $this->invokeMethod($this->widget, 'getValue', ['name']);
         $this->assertEquals(['value' => 'bindData'], $returned);
     }
 
@@ -168,7 +168,7 @@ class WidgetTest extends BaseWidgetTest
         $this->methodWillReturn('bindData', 'get', $bindStore);
         $this->setProtectedAttributeOf($this->widget, 'oldInputs', $oldInputStore);
         $this->setProtectedAttributeOf($this->widget, 'bind', $bindStore);
-        $returned = $this->getProtectedMethod($this->widget, 'getValue', ['name']);
+        $returned = $this->invokeMethod($this->widget, 'getValue', ['name']);
         $this->assertEquals(['value' => 'oldInputData'], $returned);
     }
 
@@ -185,7 +185,7 @@ class WidgetTest extends BaseWidgetTest
         $widget = $this->newWidget(['getTemplate', 'formatAttributes', 'formatTemplate', 'formatClass']);
         $this->methodWillReturnTrue('formatAttributes', $widget);
         $this->methodWillReturnArgument(1, 'formatTemplate', $widget);
-        $returned = $this->getProtectedMethod($widget, 'renderLabel', ['name', ['class' => 'class']]);
+        $returned = $this->invokeMethod($widget, 'renderLabel', ['name', ['class' => 'class']]);
         $this->assertEquals($data, $returned);
     }
 
@@ -196,7 +196,7 @@ class WidgetTest extends BaseWidgetTest
     {
         $widget = $this->newWidget('getIsEscept');
         $this->methodWillReturnTrue('getIsEscept', $widget);
-        $returned = $this->getProtectedMethod($widget, 'escept', ['text']);
+        $returned = $this->invokeMethod($widget, 'escept', ['text']);
         $this->assertEquals('text', $returned);
     }
 
@@ -208,7 +208,7 @@ class WidgetTest extends BaseWidgetTest
         $data = ['inputName', ['id' => 'customId'], true];
         $widget = $this->newWidget(['escept', 'renderLabel']);
         $this->methodWillReturnArgument(1, 'renderLabel', $widget);
-        $returned = $this->getProtectedMethod($widget, 'checkLabel', $data);
+        $returned = $this->invokeMethod($widget, 'checkLabel', $data);
         $this->assertEquals(['for' => 'customId'], $returned);
     }
 
@@ -220,7 +220,7 @@ class WidgetTest extends BaseWidgetTest
         $data = ['inputName', [], false];
         $widget = $this->newWidget(['renderLabel', 'translate', 'getLabelName']);
         $this->methodWillReturnArgument(1, 'renderLabel', $widget);
-        $returned = $this->getProtectedMethod($widget, 'checkLabel', $data);
+        $returned = $this->invokeMethod($widget, 'checkLabel', $data);
         $this->assertEquals(['for' => 'inputName'], $returned);
     }
 
@@ -230,7 +230,7 @@ class WidgetTest extends BaseWidgetTest
     public function testGenerateIdWhenIdFalse()
     {
         $data = ['id' => false];
-        $this->getProtectedMethod($this->widget, 'generateId', [&$data]);
+        $this->invokeMethod($this->widget, 'generateId', [&$data]);
         $this->assertEquals([], $data);
     }
 
@@ -244,7 +244,7 @@ class WidgetTest extends BaseWidgetTest
         \Config::set('lara_form.css.id_prefix', 'prefix_');
         $this->methodWillReturn('generated_id', 'getId', $widget);
         $this->setProtectedAttributeOf($widget, 'config', config('lara_form'));
-        $this->getProtectedMethod($widget, 'generateId', [&$data]);
+        $this->invokeMethod($widget, 'generateId', [&$data]);
         $this->assertEquals(['id' => 'prefix_generated_id'], $data);
     }
 
@@ -256,7 +256,7 @@ class WidgetTest extends BaseWidgetTest
         $data = ['id' => 'custom_id', 'id_prefix' => 'custom_prefix_'];
         $widget = $this->newWidget();
         $this->setProtectedAttributeOf($widget, 'config', config('lara_form'));
-        $this->getProtectedMethod($widget, 'generateId', [&$data]);
+        $this->invokeMethod($widget, 'generateId', [&$data]);
         $this->assertEquals(['id' => 'custom_prefix_custom_id'], $data);
     }
 
@@ -268,7 +268,7 @@ class WidgetTest extends BaseWidgetTest
         $data = ['id' => 'custom_id', 'value' => 5];
         $widget = $this->newWidget();
         $this->setProtectedAttributeOf($widget, 'config', config('lara_form'));
-        $this->getProtectedMethod($widget, 'generateId', [&$data, true]);
+        $this->invokeMethod($widget, 'generateId', [&$data, true]);
         unset($data['value']);
         $this->assertEquals(['id' => 'custom_id-5'], $data);
     }
@@ -280,7 +280,7 @@ class WidgetTest extends BaseWidgetTest
     {
         $data = ['label' => 'custom_label'];
         $widget = $this->newWidget(['getLabelAttributes', 'checkLabel']);
-        $this->getProtectedMethod($widget, 'generateLabel', [&$data]);
+        $this->invokeMethod($widget, 'generateLabel', [&$data]);
         $this->assertEquals([], $data);
     }
 
@@ -293,7 +293,7 @@ class WidgetTest extends BaseWidgetTest
         $attributes = ['text' => 'customLabel'];
         $widget = $this->newWidget(['getLabelAttributes', 'checkLabel']);
         $this->methodWillReturn($attributes, 'getLabelAttributes', $widget);
-        $this->getProtectedMethod($widget, 'generateLabel', [&$data]);
+        $this->invokeMethod($widget, 'generateLabel', [&$data]);
     }
 
     /**
@@ -305,7 +305,7 @@ class WidgetTest extends BaseWidgetTest
         $widget = $this->newWidget(['getLabelAttributes', 'checkLabel']);
         $this->setProtectedAttributeOf($widget, 'config', config('lara_form'));
         $this->methodWillReturnFalse('getLabelAttributes', $widget);
-        $this->getProtectedMethod($widget, 'generateLabel', [&$data]);
+        $this->invokeMethod($widget, 'generateLabel', [&$data]);
     }
 
     /**
@@ -316,7 +316,7 @@ class WidgetTest extends BaseWidgetTest
         $data = ['placeholder' => true];
         $widget = $this->newWidget(['translate', 'getLabelName']);
         $this->methodWillReturn('custom_placeholder', 'translate', $widget);
-        $this->getProtectedMethod($widget, 'generatePlaceholder', [&$data]);
+        $this->invokeMethod($widget, 'generatePlaceholder', [&$data]);
         $this->assertEquals(['placeholder' => 'custom_placeholder'], $data);
     }
 
@@ -330,7 +330,7 @@ class WidgetTest extends BaseWidgetTest
         $widget = $this->newWidget(['getLabelName']);
         $this->setProtectedAttributeOf($widget, 'config', config('lara_form'));
         $this->methodWillReturn('custom_placeholder', 'getLabelName', $widget);
-        $this->getProtectedMethod($widget, 'generatePlaceholder', [&$data]);
+        $this->invokeMethod($widget, 'generatePlaceholder', [&$data]);
         $this->assertEquals(['placeholder' => 'custom_placeholder'], $data);
     }
 
@@ -340,7 +340,7 @@ class WidgetTest extends BaseWidgetTest
     public function testGenerateClassWhenExistClassByValueFalse()
     {
         $data = ['class' => false];
-        $this->getProtectedMethod($this->widget, 'generateClass', [&$data,false,false]);
+        $this->invokeMethod($this->widget, 'generateClass', [&$data,false,false]);
         $hemlClass = $this->getProtectedAttributeOf($this->widget,'htmlClass');
         $this->assertEquals([],$hemlClass);
     }
@@ -351,7 +351,7 @@ class WidgetTest extends BaseWidgetTest
     public function testGenerateClassWhenNotClass()
     {
         $data = [];
-        $this->getProtectedMethod($this->widget, 'generateClass', [&$data,'default',false]);
+        $this->invokeMethod($this->widget, 'generateClass', [&$data,'default',false]);
         $hemlClass = $this->getProtectedAttributeOf($this->widget,'htmlClass');
         $this->assertEquals(['default'],$hemlClass);
     }
@@ -369,7 +369,7 @@ class WidgetTest extends BaseWidgetTest
         $this->setProtectedAttributeOf($widget, 'config', config('lara_form'));
         $this->methodWillReturnTrue('getHtmlClassControl',$widget);
         $this->methodWillReturn('custom_class_str','formatClass',$widget);
-        $this->getProtectedMethod($widget, 'generateClass', [&$data]);
+        $this->invokeMethod($widget, 'generateClass', [&$data]);
         $hemlClass = $this->getProtectedAttributeOf($widget,'htmlClass');
         $this->assertEquals(  [false, 'custom_class', 'error_class'], $hemlClass);
         $this->assertEquals(  ['class' => 'custom_class_str'], $data);
@@ -383,7 +383,7 @@ class WidgetTest extends BaseWidgetTest
         $data = ['key' => true];
         $widget = $this->newWidget('setOtherHtmlAttributes');
         $this->methodWillReturnTrue('setOtherHtmlAttributes',$widget);
-        $this->getProtectedMethod($widget, 'setOtherHtmlAttributesBy', [&$data,'key']);
+        $this->invokeMethod($widget, 'setOtherHtmlAttributesBy', [&$data,'key']);
         $this->assertEquals(['key' => 'key'],$data);
     }
 
@@ -394,7 +394,7 @@ class WidgetTest extends BaseWidgetTest
     {
         $widget = $this->newWidget(['getTemplate' , 'formatTemplate']);
         $this->methodWillReturn('hidden','formatTemplate',$widget);
-        $returned = $this->getProtectedMethod($widget,'setHidden',['name']);
+        $returned = $this->invokeMethod($widget,'setHidden',['name']);
         $this->assertEquals('hidden',$returned);
     }
 
@@ -406,7 +406,7 @@ class WidgetTest extends BaseWidgetTest
         \Config::set('lara_form.translate_directive','form');
         $widget = $this->newWidget(['getTemplate' , 'formatTemplate']);
         $this->setProtectedAttributeOf($widget, 'config', config('lara_form'));
-        $returned = $this->getProtectedMethod($widget,'translate',['str']);
+        $returned = $this->invokeMethod($widget,'translate',['str']);
         $this->assertEquals('form.str',$returned);
     }
 
@@ -440,7 +440,7 @@ class WidgetTest extends BaseWidgetTest
     public function testBtnByTrue()
     {
         $attr = ['btn' => true];
-        $this->getProtectedMethod($this->widget, 'btn', [&$attr,'btn','default']);
+        $this->invokeMethod($this->widget, 'btn', [&$attr,'btn','default']);
         $htmlClass = $this->getProtectedAttributeOf($this->widget, 'htmlClass');
         $this->assertEquals([], $attr);
         $this->assertEquals(['btn-default'], $htmlClass);
@@ -453,7 +453,7 @@ class WidgetTest extends BaseWidgetTest
     {
         $attr = [];
         $this->setProtectedAttributeOf($this->widget, 'name', 'name[]');
-        $this->getProtectedMethod($this->widget, 'multipleByBrackets', [&$attr]);
+        $this->invokeMethod($this->widget, 'multipleByBrackets', [&$attr]);
         $name = $this->getProtectedAttributeOf($this->widget, 'name');
         $this->assertEquals('name', $name);
         $this->assertEquals(['multiple' => true], $attr);
@@ -468,7 +468,7 @@ class WidgetTest extends BaseWidgetTest
         \Config::set('lara_form.css.id_case',$case);
         $this->setProtectedAttributeOf($this->widget, 'config', config('lara_form'));
         $str = 'customField';
-        $returned = $this->getProtectedMethod($this->widget, 'getId', [$str]);
+        $returned = $this->invokeMethod($this->widget, 'getId', [$str]);
         $str = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $str);
         $strCaseFunc = $case.'_case';
         $this->assertEquals($strCaseFunc($str),$returned);

@@ -55,7 +55,7 @@ class BaseInputWidgetTest extends WidgetTest
         ];
         $baseInputWidget = $this->newBaseInputWidget($mockedMethods);
         $this->methodWillReturnTrue('completeTemplate', $baseInputWidget);
-        $returned = $this->getProtectedMethod($baseInputWidget, 'formatInputField', ['name', [], true]);
+        $returned = $this->invokeMethod($baseInputWidget, 'formatInputField', ['name', [], true]);
         $this->assertTrue($returned);
     }
 
@@ -77,7 +77,7 @@ class BaseInputWidgetTest extends WidgetTest
         $this->methodWillReturnTrue('completeTemplate', $baseInputWidget);
         $this->methodWillReturn('input', 'getTemplate', $baseInputWidget);
         $this->methodWillReturnArgument(0, 'formatTemplate', $baseInputWidget);
-        $returned = $this->getProtectedMethod($baseInputWidget, 'formatInputField', ['name', []]);
+        $returned = $this->invokeMethod($baseInputWidget, 'formatInputField', ['name', []]);
         $html = $this->getProtectedAttributeOf($baseInputWidget, 'html');
         $this->assertEquals('input', $html);
         $this->assertTrue($returned);
@@ -114,7 +114,7 @@ class BaseInputWidgetTest extends WidgetTest
         $this->methodWillReturnTrue('completeTemplate', $baseInputWidget);
         $this->methodWillReturn('', 'formatAttributes', $baseInputWidget);
         $this->methodWillReturnArgument(1, 'formatTemplate', $baseInputWidget);
-        $returned = $this->getProtectedMethod($baseInputWidget, 'formatNestingLabel', $data);
+        $returned = $this->invokeMethod($baseInputWidget, 'formatNestingLabel', $data);
         $templateAttr = $this->getProtectedAttributeOf($baseInputWidget, 'html');
         $this->assertEquals($templateAttrPattern, $templateAttr);
         $this->assertTrue($returned);
@@ -163,7 +163,7 @@ class BaseInputWidgetTest extends WidgetTest
         $type = empty($attr['type']) ? 'text' : $attr['type'];
         $baseInputWidget->expects($this->any())->method('getHtmlAttributes')->willReturn($type);
         $baseInputWidget->expects($this->any())->method('getValue')->willReturn(['value' => 'default_value']);
-        $this->getProtectedMethod($baseInputWidget, 'generalCheckAttributes', [&$attr, true]);
+        $this->invokeMethod($baseInputWidget, 'generalCheckAttributes', [&$attr, true]);
     }
 
     /**

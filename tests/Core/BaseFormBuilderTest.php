@@ -2,9 +2,9 @@
 
 namespace Tests\Core;
 
-use Tests\BaseTestCase;
+use Tests\LaraFormTestCase;
 
-class BaseFormBuilderTest extends BaseTestCase
+class BaseFormBuilderTest extends LaraFormTestCase
 {
     public function testTo()
     {

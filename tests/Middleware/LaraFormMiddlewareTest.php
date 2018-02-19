@@ -155,7 +155,7 @@ class LaraFormMiddlewareTest extends BaseStoreTest
         \Config::set('lara_form.except.url', $exceptUrl);
         \Config::set('lara_form.except.route', $route);
         $laraFormMiddleware = $this->newLaraFormMiddleware();
-        return $this->getProtectedMethod($laraFormMiddleware, 'isGlobalException', [$this->request]);
+        return $this->invokeMethod($laraFormMiddleware, 'isGlobalException', [$this->request]);
     }
 
     /**

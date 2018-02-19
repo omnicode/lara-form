@@ -73,7 +73,7 @@ class FormWidgetTest extends WidgetTest
         $formWidget = $this->newFormWidget(['checkAttributes', 'getTemplate', 'formatAttributes', 'formatTemplate']);
         $this->methodWillReturnArgument(0,'formatAttributes',$formWidget);
         $this->methodWillReturnArgument(1,'formatTemplate',$formWidget);
-        $returned = $this->getProtectedMethod($formWidget,'start', [$options]);
+        $returned = $this->invokeMethod($formWidget,'start', [$options]);
         $options['method'] = 'GET';
         $options['action'] = 'foo/bar';
         $this->assertEquals($options,$returned['attrs']);
@@ -93,7 +93,7 @@ class FormWidgetTest extends WidgetTest
         $this->methodWillReturn('','formatAttributes',$formWidget);
         $this->methodWillReturn('','formatTemplate',$formWidget);
         $this->methodWillReturnArgument(1,'setHidden',$formWidget);
-        $returned = $this->getProtectedMethod($formWidget,'start', [$options]);
+        $returned = $this->invokeMethod($formWidget,'start', [$options]);
         $pattern = csrf_field().'token';
         $this->assertEquals($pattern,$returned);
     }
@@ -112,7 +112,7 @@ class FormWidgetTest extends WidgetTest
         $this->methodWillReturn('','formatAttributes',$formWidget);
         $this->methodWillReturn('','formatTemplate',$formWidget);
         $this->methodWillReturnArgument(1,'setHidden',$formWidget);
-        $returned = $this->getProtectedMethod($formWidget,'start', [$options]);
+        $returned = $this->invokeMethod($formWidget,'start', [$options]);
         $pattern = csrf_field().method_field('PUT').'token';
         $this->assertEquals($pattern,$returned);
     }
@@ -125,7 +125,7 @@ class FormWidgetTest extends WidgetTest
         $formWidget = $this->newFormWidget(['getTemplate', 'formatTemplate']);
         $this->methodWillReturnArgument(0,'getTemplate',$formWidget);
         $this->methodWillReturnArgument(0,'formatTemplate',$formWidget);
-        $returned = $this->getProtectedMethod($formWidget,'end');
+        $returned = $this->invokeMethod($formWidget,'end');
         $this->assertEquals('formEnd',$returned);
     }
 

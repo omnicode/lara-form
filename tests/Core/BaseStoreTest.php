@@ -3,9 +3,9 @@
 namespace Tests\Core;
 
 use LaraForm\Core\BaseStore;
-use Tests\BaseTestCase;
+use Tests\LaraFormTestCase;
 
-class BaseStoreTest extends BaseTestCase
+class BaseStoreTest extends LaraFormTestCase
 {
     /**
      * @throws \ReflectionException
@@ -14,7 +14,7 @@ class BaseStoreTest extends BaseTestCase
     {
         $str = 'user[name][]';
         $baseStore = $this->newInstance(BaseStore::class);
-        $returned = $this->getProtectedMethod($baseStore,'transformKey',[$str]);
+        $returned = $this->invokeMethod($baseStore,'transformKey',[$str]);
         $this->assertEquals('user.name',$returned);
     }
 }
