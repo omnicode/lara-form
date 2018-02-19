@@ -150,6 +150,7 @@ class OptionStore extends BaseStore
      * @param $method
      * @param $attr
      * @return $this
+     * @throws \Exception
      */
     public function __call($method, $attr)
     {
@@ -157,5 +158,7 @@ class OptionStore extends BaseStore
             $this->_class(...$attr);
             return $this;
         }
+
+        throw  new \Exception('['.$method.'] method does not exist!');
     }
 }

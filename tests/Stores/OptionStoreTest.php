@@ -175,13 +175,12 @@ class OptionStoreTest extends BaseStoreTest
     }
 
     /**
-     *
+     * @throws \Exception
+     * @expectedException Exception
      */
-    public function testCallWhenEmpty()
+    public function testCallWhenMethodNotExist()
     {
-        $optionStore = $this->newOptionStore();
-        $returnedThis = $optionStore->otherMethodName(['header']);
-        $this->assertEquals(null, $returnedThis);
+        $this->optionStore->customMethod(['header']);
     }
 
     /**
