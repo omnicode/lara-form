@@ -2,6 +2,7 @@
 
 namespace LaraForm\ServiceProvider;
 
+use LaraForm\Facades\LaraForm;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
 use LaraForm\Middleware\LaraFormMiddleware;
@@ -18,6 +19,7 @@ class LaraFormServiceProvider extends LaraServiceProvider
      */
     public function register()
     {
+        $this->registerAlias('LaraForm', LaraForm::class);
         $this->registerMiddleware(LaraFormMiddleware::class);
         $this->registerSingletons([
             'laraform.protection' => FormProtection::class,
