@@ -24,6 +24,7 @@ return [
             'password' => 'form-control',
             'email' => 'form-control',
             'number' => 'form-control',
+            'date' => 'form-control',
             'select' => 'form-control',
             'checkbox' => false,
             'radio' => false,

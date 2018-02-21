@@ -19,7 +19,6 @@ class BaseInputWidgetTest extends WidgetTest
      */
     public function setUp()
     {
-        parent::setUp();
         if (empty($this->baseInputWidget)) {
             $this->baseInputWidget = $this->newBaseInputWidget();
         };
