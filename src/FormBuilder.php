@@ -261,7 +261,7 @@ class FormBuilder extends BaseFormBuilder
                 $method = 'submit';
             }
             // other field types
-            if (in_array($attr['type'], ['checkbox', 'radio', 'file', 'textarea', 'hidden', 'label'])) {
+            if (in_array($attr['type'], ['checkbox', 'radio', 'file', 'textarea', 'hidden', 'label', 'select'])) {
                 $method = $attr['type'];
             }
         }
