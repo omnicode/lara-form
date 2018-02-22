@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -11,7 +12,7 @@ class InputWidget extends BaseInputWidget
     /**
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         return $this->parentRender();
     }
@@ -20,7 +21,7 @@ class InputWidget extends BaseInputWidget
      * @param $attr
      * @return mixed|void
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         $this->parentCheckAttributes($attr);
     }

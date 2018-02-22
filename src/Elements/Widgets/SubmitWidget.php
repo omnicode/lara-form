@@ -1,7 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
+/**
+ * Processes and creates button tags
+ * Class SubmitWidget
+ * @package LaraForm\Elements\Widgets
+ */
 class SubmitWidget extends BaseInputWidget
 {
     /**
@@ -9,7 +15,7 @@ class SubmitWidget extends BaseInputWidget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render()
+    public function render(): string
     {
         $this->checkAttributes($this->attr);
         $template = $this->getTemplate('button');
@@ -36,7 +42,7 @@ class SubmitWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         $btn = $this->config['css']['class']['submit'];
         $btnColor = $this->config['css']['class']['submitColor'];

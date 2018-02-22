@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -49,7 +50,7 @@ class SelectWidget extends Widget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function render()
+    public function render(): string
     {
         $this->checkAttributes($this->attr);
         $optionsHtml = $this->renderOptions();
@@ -69,7 +70,7 @@ class SelectWidget extends Widget
      * @param $attr
      * @return mixed|void
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         $this->generateId($attr);
         $this->generateLabel($attr);
@@ -128,10 +129,10 @@ class SelectWidget extends Widget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function renderOptions($gropup = false)
+    protected function renderOptions(?array $gropup = null): string
     {
         $optionTemplate = $this->getTemplate('option');
-        $options = $gropup ? $gropup : $this->optionsArray;
+        $options = empty($gropup) ? $this->optionsArray: $gropup;
         $options = $this->strToArray($options);
         $optionsHtml = '';
         foreach ($options as $index => $option) {
@@ -160,7 +161,7 @@ class SelectWidget extends Widget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function renderOptgroups($groupName, $options)
+    protected function renderOptgroups(string $groupName, array $options): string
     {
         $optgroupTemplate = $this->getTemplate('optgroup');
         $childOptionsHtml = $this->renderOptions($options);
@@ -183,7 +184,7 @@ class SelectWidget extends Widget
      * @param array $disabled
      * @return array
      */
-    protected function isDisabled($str, $disabled = [])
+    protected function isDisabled($str, array $disabled = []): array
     {
         if (empty($disabled)) {
             $disabled = $this->optionDisabled;
@@ -199,7 +200,7 @@ class SelectWidget extends Widget
      * @param $str
      * @return array
      */
-    protected function isSelected($str)
+    protected function isSelected($str): array
     {
         $arr = [];
         if (in_array($str, $this->selected, true)) {
@@ -213,7 +214,7 @@ class SelectWidget extends Widget
      * @param $attr
      * @param $container
      */
-    protected function disabledBy($type, &$attr, &$container)
+    protected function disabledBy(string $type, &$attr, &$container): void
     {
         if (isset($attr[$type]) && $attr[$type] !== false) {
             $container = $this->strToArray($attr[$type]);

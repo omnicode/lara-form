@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -13,7 +14,7 @@ class RadioWidget extends BaseInputWidget
     /**
      * @return mixed|string
      */
-    public function render()
+    public function render(): string
     {
         $template = $this->getTemplate('radio');
         $this->checkAttributes($this->attr);
@@ -26,9 +27,9 @@ class RadioWidget extends BaseInputWidget
      * @param $attr
      * @return mixed|void
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
-        $attr['value'] = isset($attr['value']) ? $attr['value'] : 1;
+        $attr['value'] =  $attr['value'] ?? 1;
         if (!empty($attr['value'])) {
             $val = $this->getValue($this->name)['value'];
             $val= $this->strToArray($val);

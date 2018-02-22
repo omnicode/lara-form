@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Stores;
 
+use Illuminate\Database\Eloquent\Model;
 use LaraForm\Core\BaseStore;
 
 /**
@@ -21,7 +23,7 @@ class BindStore extends BaseStore
     /**
      * @param $data
      */
-    public function setModel($data)
+    public function setModel(Model $data)
     {
         $this->data = $data;
     }
@@ -31,7 +33,7 @@ class BindStore extends BaseStore
      * @param null $default
      * @return mixed
      */
-    public function get($name, $default = null)
+    public function get(string $name, ?string $default = null)
     {
         return $this->dotGet($this->transformKey($name), $default);
     }
@@ -39,7 +41,7 @@ class BindStore extends BaseStore
     /**
      * @return mixed
      */
-    public function data()
+    public function data(): Model
     {
         return $this->data;
     }
@@ -49,7 +51,7 @@ class BindStore extends BaseStore
      * @param $default
      * @return mixed
      */
-    protected function dotGet($dotKey, $default)
+    protected function dotGet(string $dotKey,?string $default)
     {
         $keyParts = explode('.', $dotKey);
         return $this->dataGet($this->data, $keyParts, $default);
@@ -61,7 +63,7 @@ class BindStore extends BaseStore
      * @param $default
      * @return mixed
      */
-    protected function dataGet($target, $keyParts, $default)
+    protected function dataGet($target, array $keyParts, ?string $default)
     {
         if (count($keyParts) == 0) {
             return $target;
@@ -84,7 +86,7 @@ class BindStore extends BaseStore
      * @param $default
      * @return mixed
      */
-    protected function arrayGet($target, $keyParts, $default)
+    protected function arrayGet(array $target, array $keyParts, ?string $default)
     {
         $key = array_shift($keyParts);
 
@@ -101,7 +103,7 @@ class BindStore extends BaseStore
      * @param $default
      * @return mixed
      */
-    protected function objectGet($target, $keyParts, $default)
+    protected function objectGet(Model $target, array $keyParts, ?string $default)
     {
         $key = array_shift($keyParts);
 

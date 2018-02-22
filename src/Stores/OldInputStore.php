@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Stores;
 
@@ -31,7 +32,7 @@ class OldInputStore extends BaseStore
     /**
      * @return bool
      */
-    public function hasOldInput()
+    public function hasOldInput(): bool
     {
         return ($this->session->get('_old_input')) ? true : false ;
     }
@@ -40,7 +41,7 @@ class OldInputStore extends BaseStore
      * @param $key
      * @return mixed
      */
-    public function getOldInput($key)
+    public function getOldInput($key): ?string
     {
         return $this->session->getOldInput($this->transformKey($key));
     }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -17,7 +18,7 @@ class ErrorListWidget extends Widget
      *
      * @return mixed|string|void
      */
-    public function render()
+    public function render(): string
     {
         if (empty($this->errors->hasErrors())) {
             return $this->html;
@@ -36,7 +37,7 @@ class ErrorListWidget extends Widget
     /**
      * @param $attr
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
 
     }

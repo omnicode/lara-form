@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Stores;
 
@@ -23,12 +24,12 @@ class OptionStore extends BaseStore
      * Keeped here all field attributes
      * @var array
      */
-    protected $attributes = [];
+    protected  $attributes = [];
 
     /**
      * @param $attrs
      */
-    public function setAttributes($attrs)
+    public function setAttributes(array $attrs): void
     {
         $this->attributes = $attrs;
     }
@@ -39,7 +40,7 @@ class OptionStore extends BaseStore
      * @param $values
      * @return $this
      */
-    public function attr($options, $values = null)
+    public function attr($options, $values = null): self
     {
         if (!is_array($options)) {
             if (isset($values)) {
@@ -63,7 +64,7 @@ class OptionStore extends BaseStore
      * @param $strId
      * @return $this
      */
-    public function id($strId)
+    public function id($strId): self
     {
         $this->attributes[1]['id'] = $strId;
         return $this;
@@ -74,7 +75,7 @@ class OptionStore extends BaseStore
      * @param $var
      * @return $this
      */
-    protected function _class($var)
+    protected function _class($var): self
     {
         $classies = [];
         if (is_array($var)) {
@@ -96,7 +97,7 @@ class OptionStore extends BaseStore
      * @param $value
      * @return $this
      */
-    public function data($name, $value)
+    public function data(string $name, string $value): self
     {
         $this->attributes[1]['data-' . $name] = $value;
         return $this;
@@ -106,7 +107,7 @@ class OptionStore extends BaseStore
      * Gets the field attibutes
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->attributes;
     }
@@ -114,7 +115,7 @@ class OptionStore extends BaseStore
     /**
      * Remove field attibutes
      */
-    public function resetOptions()
+    public function resetOptions(): void
     {
         $this->attributes = [];
     }
@@ -123,7 +124,7 @@ class OptionStore extends BaseStore
      * Accepts an object and assigns the property
      * @param $model
      */
-    public function setBuilder(FormBuilder $model)
+    public function setBuilder(FormBuilder $model): void
     {
         $this->builder = $model;
     }
@@ -131,7 +132,7 @@ class OptionStore extends BaseStore
     /**
      * @return mixed
      */
-    public function render()
+    public function render(): string
     {
         return $this->builder->output();
     }
@@ -141,7 +142,7 @@ class OptionStore extends BaseStore
      * because the rendering is done there
      * @return mixed
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->builder->output();
     }
@@ -152,7 +153,7 @@ class OptionStore extends BaseStore
      * @return $this
      * @throws \Exception
      */
-    public function __call($method, $attr)
+    public function __call(string $method, ?array $attr): self
     {
         if ($method === 'class') {
             $this->_class(...$attr);

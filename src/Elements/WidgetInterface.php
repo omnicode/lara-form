@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements;
 
@@ -11,12 +12,12 @@ interface WidgetInterface
     /**
      * @return mixed
      */
-    public function render();
+    public function render(): string;
 
     /**
      * @param $attr
      * @return mixed
      */
-    public function checkAttributes(&$attr);
+    public function checkAttributes(array &$attr): void;
 
 }

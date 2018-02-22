@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -13,7 +14,7 @@ class EmailWidget extends BaseInputWidget
     /**
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         return $this->parentRender();
     }
@@ -22,7 +23,7 @@ class EmailWidget extends BaseInputWidget
     /**
      * @param $attr
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         $attr['type'] = 'email';
         $this->setOtherHtmlAttributes('type', 'email');

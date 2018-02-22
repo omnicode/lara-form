@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use LaraForm\Core\BaseFormBuilder;
 use LaraForm\Stores\BindStore;
@@ -138,7 +140,7 @@ class FormBuilder extends BaseFormBuilder
      * @return mixed
      * @throws \Exception
      */
-    public function create($model = null, $options = [])
+    public function create(?Model $model = null, array $options = []): OptionStore
     {
         $this->model = $model;
         $this->setIsForm(true);
@@ -173,7 +175,7 @@ class FormBuilder extends BaseFormBuilder
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function end()
+    public function end(): string
     {
         if (!$this->isForm) {
             return '';
@@ -182,7 +184,7 @@ class FormBuilder extends BaseFormBuilder
         $this->formProtection->confirm();
         $end = $this->make('form', ['end']);
         $this->resetProperties();
-        return $end;
+        return $end.'';
     }
 
     /**
@@ -191,7 +193,7 @@ class FormBuilder extends BaseFormBuilder
      * @param bool $templateValue
      * @param bool $global
      */
-    public function setTemplate($templateName, $templateValue = false, $global = false)
+    public function setTemplate(?array $templateName, ?string $templateValue = null, bool $global = false): void
     {
         if (is_array($templateName)) {
             $options = [];
@@ -206,7 +208,7 @@ class FormBuilder extends BaseFormBuilder
             } else {
                 $this->addTemplatesAndParams($templateName, $this->globalTemplates, $options);
             }
-        } elseif ($templateValue) {
+        } elseif (!empty($templateValue)) {
 
             if ($global) {
                 $this->globalTemplates['pattern'][$templateName] = $templateValue;
@@ -219,7 +221,7 @@ class FormBuilder extends BaseFormBuilder
     /**
      * @return mixed
      */
-    public function output()
+    public function output(): string
     {
         $args = $this->optionStore->getOptions();
         $this->hasTemplate($args);
@@ -227,7 +229,6 @@ class FormBuilder extends BaseFormBuilder
         $this->widget->setArguments($args);
         $this->widget->setParams($data);
         $this->optionStore->resetOptions();
-
         return $this->widget->render();
     }
 
@@ -238,7 +239,7 @@ class FormBuilder extends BaseFormBuilder
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
      */
-    public function __call($method, $arrgs = [])
+    public function __call(string $method, array $arrgs = []): OptionStore
     {
         $attr = !empty($arrgs[1]) ? $arrgs[1] : [];
         $method = $this->getFieldType($attr, $method);
@@ -252,7 +253,7 @@ class FormBuilder extends BaseFormBuilder
      * @param $default
      * @return string
      */
-    protected function getFieldType($attr, $default)
+    protected function getFieldType(array $attr, string $default): string
     {
         $method = $default;
         if (isset($attr['type'])) {
@@ -273,7 +274,7 @@ class FormBuilder extends BaseFormBuilder
      * @param $attr
      * @param $method
      */
-    protected function fixField($arrgs, $attr, $method)
+    protected function fixField(array $arrgs, array $attr, string $method): void
     {
         if (!isset($arrgs[0])) {
             return;
@@ -303,7 +304,7 @@ class FormBuilder extends BaseFormBuilder
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
      */
-    protected function make($method, $arguments)
+    protected function make(string $method, array $arguments): OptionStore
     {
         $modelName = ucfirst($method);
         $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');
@@ -328,7 +329,7 @@ class FormBuilder extends BaseFormBuilder
      * Completing modifying templates and their parame
      * @return array
      */
-    protected function complateTemplatesAndParams()
+    protected function complateTemplatesAndParams(): array
     {
         $data = [
             // for once filed
@@ -347,7 +348,7 @@ class FormBuilder extends BaseFormBuilder
      * Checks whether the template modification has been transferred from a separate field
      * @param $attr
      */
-    protected function hasTemplate(&$attr)
+    protected function hasTemplate(array &$attr): void
     {
         $pattern = [
             'pattern' => 'template',
@@ -370,7 +371,7 @@ class FormBuilder extends BaseFormBuilder
     /**
      * Remove proprties
      */
-    protected function resetProperties()
+    protected function resetProperties(): void
     {
         $this->setIsForm(false);
         $this->maked = [];
@@ -383,7 +384,7 @@ class FormBuilder extends BaseFormBuilder
      * @param $container
      * @param $options
      */
-    protected function addTemplatesAndParams($data, &$container, $options)
+    protected function addTemplatesAndParams(array $data, array &$container, array $options): void
     {
         foreach ($data as $key => $value) {
             $container['pattern'][$key] = $value;
@@ -411,7 +412,7 @@ class FormBuilder extends BaseFormBuilder
      * @return array|string
      * @throws \Exception
      */
-    protected function getGeneralUnlockFieldsBy(&$options)
+    protected function getGeneralUnlockFieldsBy(array &$options): array
     {
         $unlockFields = [];
 
@@ -430,7 +431,7 @@ class FormBuilder extends BaseFormBuilder
      * @return string
      * @throws \RuntimeException
      */
-    protected function generateToken()
+    protected function generateToken(): string
     {
         return md5(str_random(80));
     }
@@ -440,7 +441,7 @@ class FormBuilder extends BaseFormBuilder
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function setIsForm($val)
+    protected function setIsForm(bool $val): void
     {
         if ($this->isForm && $val) {
             throw new \Exception('Your action is not correct, have is open and not closed tag form!');
@@ -452,7 +453,7 @@ class FormBuilder extends BaseFormBuilder
     /**
      * @return bool
      */
-    protected function getIsForm()
+    protected function getIsForm(): bool
     {
         return $this->isForm;
     }

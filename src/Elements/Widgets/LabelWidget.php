@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -17,7 +18,7 @@ class LabelWidget extends Widget
      *
      * @return mixed|void
      */
-    public function render()
+    public function render(): string
     {
         return $this->renderLabel($this->name,$this->attr);
     }
@@ -26,7 +27,7 @@ class LabelWidget extends Widget
      * @param $attr
      * @return mixed|void
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
 
     }

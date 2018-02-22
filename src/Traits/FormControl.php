@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace LaraForm\Traits;
 
@@ -25,8 +25,14 @@ trait FormControl
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function getAction(&$options = [])
+    protected function getAction(array &$options = []): string
     {
+        if (!empty($options['url']) && is_string($options['url'])) {
+            $url = $options['url'];
+            unset($options['url']);
+            return $url;
+        }
+
         if (!empty($options['route'])) {
             $route = $options['route'];
             unset($options['route']);
@@ -37,12 +43,6 @@ trait FormControl
             $this->getRoutes();
             $this->setRequestMethod(array_values($route)[0]);
             return route(...$route);
-        }
-
-        if (!empty($options['url']) && is_string($options['url'])) {
-            $url = $options['url'];
-            unset($options['url']);
-            return $url;
         }
 
         if (isset($options['action'])) {
@@ -64,7 +64,7 @@ trait FormControl
      * @param $action
      * @return string
      */
-    protected function getActionWithMethod($action)
+    protected function getActionWithMethod(array $action): string
     {
         $methodName = array_shift($action);
 
@@ -85,7 +85,7 @@ trait FormControl
      * @param $methodName
      * @return bool|int|string
      */
-    protected function getRouteName($methodName)
+    protected function getRouteName(string $methodName): ?string
     {
         $allRoutes = $this->getRoutes();
         foreach ($allRoutes as $routeName => $route) {
@@ -94,13 +94,13 @@ trait FormControl
                 return $routeName;
             }
         }
-        return false;
+        return null;
     }
 
     /**
      * @param $routeName
      */
-    protected function setRequestMethod($routeName)
+    protected function setRequestMethod(string $routeName): void
     {
         $allRoutes = $this->getRoutes();
         if (isset($allRoutes[$routeName])) {
@@ -116,7 +116,7 @@ trait FormControl
      * @internal param $model
      * @internal param bool $unSet
      */
-    protected function getMethod(&$options)
+    protected function getMethod(array &$options): string
     {
         $method = 'post';
         if (isset($options['method'])) {
@@ -124,8 +124,8 @@ trait FormControl
             if (in_array(strtolower($options['method']), $validMethods)) {
                 $method = $options['method'];
                 unset($options['method']);
-            }else{
-                throw new \Exception('The request ['.$options['method'].'] method is not valid');
+            } else {
+                throw new \Exception('The request [' . $options['method'] . '] method is not valid');
             }
         } elseif (!empty($this->_requestMethod)) {
             $method = $this->_requestMethod;
@@ -142,7 +142,7 @@ trait FormControl
      * names of the routes and the value is controller and method
      * @return array
      */
-    protected function getRoutes()
+    protected function getRoutes(): array
     {
         if (empty($this->_routes)) {
             collect(Route::getRoutes())->map(function ($route) {
@@ -160,7 +160,7 @@ trait FormControl
      * Return current route
      * @return mixed
      */
-    protected function getCurrentRoute()
+    protected function getCurrentRoute(): \Illuminate\Routing\Route
     {
         return Route::getCurrentRoute();
     }

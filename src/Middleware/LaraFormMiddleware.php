@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use LaraForm\FormProtection;
 
@@ -47,9 +49,9 @@ class LaraFormMiddleware
 
             $validate = $this->formProtection->validate($request, $data);
 
-           /* if ($validate === false) {
+           if ($validate === false) {
                 abort(403, 'Your Action Is Forbidden');
-            }*/
+            }
 
             unset($request[config('lara_form.token_name', 'laraform_token')]);
         }
@@ -63,7 +65,7 @@ class LaraFormMiddleware
      * @param $request
      * @return bool
      */
-    protected function isGlobalException($request)
+    protected function isGlobalException(Request $request): bool
     {
         $isExcept = false;
         $exceptUrls = config('lara_form.except.url');;

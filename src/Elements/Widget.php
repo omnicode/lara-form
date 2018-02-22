@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements;
 
@@ -30,9 +31,9 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      *
      */
-    public function render()
+    public function render(): string
     {
-
+        return '';
     }
 
     /**
@@ -41,7 +42,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         if (!empty($attr['icon'])) {
             $iconTemplate = $this->getTemplate('icon');
@@ -67,7 +68,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * Adds modifying data to templates and their parameters
      * @param $data
      */
-    public function setParams($data)
+    public function setParams(array $data): void
     {
         $this->containerParams = [];
         $this->templates = [];
@@ -83,7 +84,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * Adds and model in BindStore and creates the object
      * @param $data
      */
-    public function binding($data)
+    public function binding(BindStore $data): void
     {
         $this->bind = $data;
     }
@@ -92,7 +93,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * Creates a field name and their options if they exist
      * @param $arguments
      */
-    public function setArguments($arguments)
+    public function setArguments(array $arguments): void
     {
         $this->name = array_shift($arguments);
         if (!empty($arguments[0])) {
@@ -106,7 +107,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function getErrorByFieldName($name)
+    public function getErrorByFieldName(string $name): array
     {
         $errorParams = [
             'help' => '',
@@ -128,7 +129,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @return array
      */
-    protected function getValue($name)
+    protected function getValue(string $name): array
     {
         $value = '';
         $data = [];
@@ -153,7 +154,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function renderLabel($name, $attr)
+    protected function renderLabel(string $name, array $attr): string
     {
         $template = $this->getTemplate('label');
 
@@ -177,7 +178,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $text
      * @return string
      */
-    protected function escept($text)
+    protected function escept(string $text): string
     {
         if (!$this->getIsEscept()) {
             return htmlspecialchars($text);
@@ -195,9 +196,9 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function checkLabel($inputName, $option, $treatment = false, $labelAttr = [])
+    protected function checkLabel(string $inputName, array $option, bool $treatment = false, array $labelAttr = []): string
     {
-        $for = isset($option['id']) ? $option['id'] : $inputName;
+        $for =  $option['id'] ?? $inputName;
         $labelName = $treatment ? $this->escept($inputName) : $this->translate($this->getLabelName($inputName));
         $labelAttr = array_merge($labelAttr, ['for' => $for]);
         $this->label = $this->renderLabel($labelName, $labelAttr);
@@ -209,12 +210,13 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $attr
      * @param bool $multi
      */
-    protected function generateId(&$attr, $multi = false)
+    protected function generateId(array &$attr, bool $multi = false): void
     {
         if (isset($attr['id']) && $attr['id'] == false) {
             unset($attr['id']);
         } else {
-            $attr['id'] = isset($attr['id']) ? $attr['id'] : $this->getId($this->name);
+            $name = $this->name ? $this->name : '';
+            $attr['id'] = $attr['id'] ?? $this->getId($name);
             if ($this->config['css']['id_prefix'] && !isset($attr['id_prefix'])) {
                 $attr['id'] = $this->config['css']['id_prefix'] . $attr['id'];
             } elseif (isset($attr['id_prefix']) && $attr['id'] !== false) {
@@ -233,7 +235,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function generateLabel(&$attr)
+    protected function generateLabel(array &$attr): void
     {
         $labelName = $this->name;
         $attributes = $this->getLabelAttributes();
@@ -259,7 +261,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * Generates placeholder by property attr
      * @param $attr
      */
-    protected function generatePlaceholder(&$attr)
+    protected function generatePlaceholder(array &$attr): void
     {
         if (isset($attr['placeholder'])) {
             if (is_bool($attr['placeholder']) && $attr['placeholder'] !== false) {
@@ -276,7 +278,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param bool $default
      * @param bool $format
      */
-    protected function generateClass(&$attr, $default = false, $format = true)
+    protected function generateClass(array &$attr, $default = false, bool $format = true): void
     {
         if (isset($attr['class'])) {
             $classes = $attr['class'];
@@ -293,7 +295,8 @@ class Widget extends BaseWidget implements WidgetInterface
         } else {
             $this->htmlClass[] = $default;
         }
-        if ($this->errors->getError($this->name)) {
+        $name = $this->name ? $this->name : '';
+        if ($this->errors->getError($name)) {
             $this->htmlClass[] = $this->config['css']['class']['error'];
         }
         if ($format) {
@@ -305,7 +308,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $attr
      * @param $key
      */
-    protected function setOtherHtmlAttributesBy(&$attr, $key)
+    protected function setOtherHtmlAttributesBy(array &$attr, string $key): void
     {
         if (!empty($attr[$key])) {
             $this->setOtherHtmlAttributes($key, $key);
@@ -322,7 +325,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function setHidden($name, $value = 0)
+    protected function setHidden(string $name, $value = 0): string
     {
         $hiddenTemplate = $this->getTemplate('hiddenInput');
         $attr = ['name' => $name, 'value' => $value,];
@@ -334,7 +337,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @return string
      */
-    protected function getLabelName($name)
+    protected function getLabelName(string $name): string
     {
         return ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name));
     }
@@ -344,7 +347,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $name
      * @return mixed
      */
-    protected function getId($name)
+    protected function getId(string $name): string
     {
         $str = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $name);
         $case = $this->config['css']['id_case'];
@@ -362,7 +365,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $str
      * @return string|\Symfony\Component\Translation\TranslatorInterface
      */
-    protected function translate($str)
+    protected function translate(string $str): string
     {
         $path = $this->config['translate_directive'];
         if (!empty($path) && !ends_with('.', $path)) {
@@ -384,7 +387,7 @@ class Widget extends BaseWidget implements WidgetInterface
      * @param $attr
      * @param $btnColor
      */
-    protected function btn(&$attr,$btn, $btnColor)
+    protected function btn(array &$attr, string $btn, string $btnColor): void
     {
         if (isset($attr['btn'])) {
 
@@ -400,7 +403,7 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      * @param $attr
      */
-    protected function multipleByBrackets(&$attr)
+    protected function multipleByBrackets(array &$attr): void
     {
         if (ends_with($this->name, '[]')) {
             $this->name = substr($this->name, 0, -2);
@@ -411,7 +414,7 @@ class Widget extends BaseWidget implements WidgetInterface
     /**
      * @param $attr
      */
-    protected function parentCheckAttributes(&$attr)
+    protected function parentCheckAttributes(array &$attr): void
     {
         self::checkAttributes($attr);
     }

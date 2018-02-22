@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -18,7 +19,7 @@ class TextareaWidget extends Widget
      *
      * @return mixed|string|void
      */
-    public function render()
+    public function render(): string
     {
         $template = $this->getTemplate('textarea');
         $this->checkAttributes($this->attr);
@@ -35,7 +36,7 @@ class TextareaWidget extends Widget
      * @param $attr
      * @return mixed|void
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         if (isset($attr['type'])) {
             unset($attr['type']);

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -18,7 +19,7 @@ class FormWidget extends Widget
      *
      * @return array|string|void
      */
-    public function render()
+    public function render(): string
     {
         if ($this->name === 'start') {
             return $this->start($this->attr);
@@ -26,13 +27,15 @@ class FormWidget extends Widget
         if ($this->name === 'end') {
             return $this->end();
         }
+
+        throw new \Exception('Method not found!');
     }
 
     /**
      * @param $attr
      * @return mixed|void
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         if (!empty($attr['file'])) {
             $attr['enctype'] = 'multipart/form-data';
@@ -60,7 +63,7 @@ class FormWidget extends Widget
      * @param $options
      * @return mixed|string
      */
-    protected function start($options)
+    protected function start(array $options): string
     {
         $method = $options['_form_method'];
         $action = $options['_form_action'];
@@ -93,9 +96,9 @@ class FormWidget extends Widget
      *
      * @return mixed
      */
-    protected function end()
+    protected function end(): string
     {
         $template = $this->getTemplate('formEnd');
-        return $this->formatTemplate($template, false);
+        return $this->formatTemplate($template, null);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\ServiceProvider;
 
@@ -16,7 +17,7 @@ class LaraFormServiceProvider extends LaraServiceProvider
     /**
      *
      */
-    public function register()
+    public function register(): void
     {
         $this->registerMiddleware(LaraFormMiddleware::class);
         $this->registerSingletons([
@@ -32,7 +33,7 @@ class LaraFormServiceProvider extends LaraServiceProvider
     /**
      *
      */
-    public function boot()
+    public function boot(): void
     {
         $this->mergeConfig(__DIR__);
         $this->mergeConfig(__DIR__, 'lara_form_core', false);
@@ -42,7 +43,7 @@ class LaraFormServiceProvider extends LaraServiceProvider
      * Get the services provided by the provider.
      * @return array
      */
-    public function provides()
+    public function provides(): array
     {
         return ['laraform'];
     }

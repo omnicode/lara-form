@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -19,7 +20,7 @@ class FileWidget extends BaseInputWidget
      * Returns the finished html file input view
      * @return mixed|string
      */
-    public function render()
+    public function render(): string
     {
         $this->checkAttributes($this->attr);
         $this->currentTemplate = $this->getTemplate('fileContainer');
@@ -35,7 +36,7 @@ class FileWidget extends BaseInputWidget
      * @param $attr
      * @return mixed|void
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         $btn = $this->config['css']['class']['submit'];
         $btnColor = $this->config['css']['class']['submitColor'];

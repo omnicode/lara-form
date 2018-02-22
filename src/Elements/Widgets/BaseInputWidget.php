@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Elements\Widgets;
 
@@ -15,7 +16,7 @@ class BaseInputWidget extends Widget
      * Returns the finished html view
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         $this->checkAttributes($this->attr);
         return $this->formatInputField($this->name, $this->attr);
@@ -25,7 +26,7 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @return mixed|void
      */
-    public function checkAttributes(&$attr)
+    public function checkAttributes(array &$attr): void
     {
         parent::checkAttributes($attr);
     }
@@ -45,12 +46,12 @@ class BaseInputWidget extends Widget
      * @param bool $cTemplate
      * @return mixed|string
      */
-    protected function formatInputField($name, $attr, $cTemplate = false)
+    protected function formatInputField(string $name, array $attr, ?string $cTemplate = null): string
     {
-        if ($cTemplate) {
-            $template = $cTemplate;
-        } else {
+        if (empty($cTemplate)) {
             $template = $this->getTemplate('input');
+        } else {
+            $template = $cTemplate;
         }
 
         $this->generalCheckAttributes($attr, $cTemplate);
@@ -67,7 +68,7 @@ class BaseInputWidget extends Widget
      * @param array $labelAttrs
      * @return mixed|string
      */
-    protected function formatNestingLabel($template, $attr, $labelAttrs = [])
+    protected function formatNestingLabel(string $template, array $attr, array $labelAttrs = []): string
     {
         $anonymous = true;
         $text = '';
@@ -106,7 +107,7 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param $cTemplate
      */
-    protected function generalCheckAttributes(&$attr, $cTemplate)
+    protected function generalcheckAttributes(array &$attr, ?string $cTemplate): void
     {
         if (!empty($attr['type'])) {
             $this->setHtmlAttributes('type', $attr['type']);
@@ -136,7 +137,7 @@ class BaseInputWidget extends Widget
 
         $type = $this->getHtmlAttributes('type');
         if ($type !== 'hidden') {
-            $defaultClass = isset($this->config['css']['class'][$type]) ? $this->config['css']['class'][$type] : false;
+            $defaultClass = $this->config['css']['class'][$type] ?? false;
             $this->generateClass($attr, $defaultClass);
         }
         $this->assignOtherhtmlAtrributes($attr);

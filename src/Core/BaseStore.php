@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Core;
 
@@ -14,7 +15,7 @@ abstract  class BaseStore
      * @param $key
      * @return mixed
      */
-    protected function transformKey($key)
+    protected function transformKey(string $key): string
     {
         return str_ireplace(['[]', '[', ']'], ['', '.', ''], $key);
     }

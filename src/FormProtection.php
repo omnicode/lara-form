@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm;
 
@@ -68,7 +69,7 @@ class FormProtection extends BaseFormProtection
     /**
      * @param $token
      */
-    public function setToken($token)
+    public function setToken(string $token): void
     {
         $this->token = $token;
     }
@@ -76,7 +77,7 @@ class FormProtection extends BaseFormProtection
     /**
      * @param $time
      */
-    public function setTime($time)
+    public function setTime(int $time): void
     {
         $this->created_time = $time;
     }
@@ -84,7 +85,7 @@ class FormProtection extends BaseFormProtection
     /**
      * @param $url
      */
-    public function setUrl($url)
+    public function setUrl(string $url): void
     {
         $this->url = $url;
     }
@@ -93,7 +94,7 @@ class FormProtection extends BaseFormProtection
      * @param $unlockFields
      * @throws \Exception
      */
-    public function setUnlockFields($unlockFields)
+    public function setUnlockFields(array $unlockFields): void
     {
         $this->unlockFields = $this->processUnlockFields($unlockFields);
     }
@@ -106,7 +107,7 @@ class FormProtection extends BaseFormProtection
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function validate(Request $request, $data)
+    public function validate(Request $request, array $data): bool
     {
         $this->removeByTime();
         $tokenName = config('lara_form.token_name', 'laraform_token');
@@ -166,7 +167,7 @@ class FormProtection extends BaseFormProtection
      * @param $request
      * @return bool
      */
-    protected function verificationForAjax($request)
+    protected function verificationForAjax(Request $request): bool
     {
         if (!empty($this->ajax['url']) && in_array($request->url(), $this->ajax['url'])) {
             return false;
@@ -195,17 +196,17 @@ class FormProtection extends BaseFormProtection
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeByTime()
+    public function removeByTime(): void
     {
         $maxTime = config('lara_form.session.lifetime', false);
 
         if (!$maxTime) {
-            return false;
+            return;
         }
         $formHistory = session(config('lara_form.session.name'));
 
         if (empty($formHistory)) {
-            return false;
+            return;
         }
         if (starts_with($maxTime, '+') || starts_with($maxTime, '-')) {
             throw new \Exception('Time must not begin with a + character or with a character -');
@@ -228,12 +229,12 @@ class FormProtection extends BaseFormProtection
      * To monitor the number of tokens in the session and delete them to a specified count
      * @return bool
      */
-    public function removeByCount()
+    public function removeByCount(): void
     {
         $maxCount = config('lara_form.session.max_count', false);
 
         if (!$maxCount) {
-            return false;
+            return;
         }
 
         $formHistory = session(config('lara_form.session.name'));
@@ -249,7 +250,7 @@ class FormProtection extends BaseFormProtection
      * @return array|string
      * @throws \Exception
      */
-    public function processUnlockFields($unlockFields)
+    public function processUnlockFields(array $unlockFields): array
     {
         if (is_string($unlockFields)) {
             $unlockFields = [$unlockFields];
@@ -272,10 +273,10 @@ class FormProtection extends BaseFormProtection
      * @param string $value
      * @return bool
      */
-    public function addField($field, &$options = [], $value = '')
+    public function addField(string $field, &$options = [], $value = ''): void
     {
         if (!empty($options['disabled'])) {
-            return false;
+            return;
         }
 
         if (!empty($options['_unlock'])) {
@@ -297,7 +298,7 @@ class FormProtection extends BaseFormProtection
      * Transforms a multidimensional array into a string
      * @param $field
      */
-    public function addArrayInputField($field)
+    public function addArrayInputField(string $field): void
     {
 
         $arr = explode('[', $field);
@@ -317,7 +318,7 @@ class FormProtection extends BaseFormProtection
     /**
      * Fields saves in session
      */
-    public function confirm()
+    public function confirm(): void
     {
         $data = [
             $this->configSession['paths']['check'] => $this->fields,
@@ -337,7 +338,7 @@ class FormProtection extends BaseFormProtection
      * @param $request
      * @return bool
      */
-    public function isValidAction(Request $request, $token)
+    public function isValidAction(Request $request, string $token): bool
     {
         $path = $token . '.' . $this->configSession['paths']['unlock'];
         $unlockFields = session($this->sessionPath($path));
@@ -360,7 +361,7 @@ class FormProtection extends BaseFormProtection
      * @param $token
      * @return mixed
      */
-    protected function getAction($token)
+    protected function getAction(string $token): string
     {
         $path = $token . '.' . $this->configSession['paths']['action'];
         return session($this->sessionPath($path));
@@ -370,7 +371,7 @@ class FormProtection extends BaseFormProtection
      * @param string $path
      * @return string
      */
-    protected function sessionPath($path = '')
+    protected function sessionPath(string $path = ''): string
     {
         $path = empty($path) ? $this->token : $path;
         return $this->configSession['name'] . '.' . $path;
@@ -380,7 +381,7 @@ class FormProtection extends BaseFormProtection
      * @param $token
      * @return bool|mixed
      */
-    protected function getCheckedFieldsBy($token)
+    protected function getCheckedFieldsBy(string $token): string
     {
         $path = $token . '.' . $this->configSession['paths']['check'];
         return session($this->sessionPath($path));
@@ -392,7 +393,7 @@ class FormProtection extends BaseFormProtection
      * @param $token
      * @return mixed
      */
-    protected function removeUnlockFields($data, $token)
+    protected function removeUnlockFields(array $data, string $token): array
     {
         $path = $token . '.' . $this->configSession['paths']['unlock'];
         $unlockFields = session($this->sessionPath($path));

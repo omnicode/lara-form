@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Stores;
 
+use Illuminate\Support\ViewErrorBag;
 use LaraForm\Core\BaseStore;
 
 /**
@@ -30,7 +32,7 @@ class ErrorStore extends BaseStore
      * @param $key
      * @return bool
      */
-    public function hasError($key)
+    public function hasError(string $key): bool
     {
         if (!$this->hasErrors()) {
             return false;
@@ -44,7 +46,7 @@ class ErrorStore extends BaseStore
      * @param $key
      * @return null
      */
-    public function getError($key)
+    public function getError(string $key): ?string
     {
         if (!$this->hasError($key)) {
             return null;
@@ -57,7 +59,7 @@ class ErrorStore extends BaseStore
     /**
      * @return mixed
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return $this->session->has('errors');
     }
@@ -65,7 +67,7 @@ class ErrorStore extends BaseStore
     /**
      * @return null
      */
-    public function getErrors()
+    public function getErrors(): ?ViewErrorBag
     {
         return $this->hasErrors() ? $this->session->get('errors') : null;
     }

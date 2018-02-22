@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LaraForm\Core;
 
@@ -129,7 +130,7 @@ abstract class BaseWidget
      * @param $data
      * @param $permission
      */
-    protected function addTemplateAndAttributes($data, $permission)
+    protected function addTemplateAndAttributes(array $data, string $permission): void
     {
         $this->containerParams[$permission] = $data['div'];
         $this->classConcat[$permission] = $data['class_concat'];
@@ -150,7 +151,7 @@ abstract class BaseWidget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function formatTemplate($template, $attributes)
+    protected function formatTemplate(string $template, ?array $attributes): string
     {
         if (empty($attributes)) {
             return $template;
@@ -173,7 +174,7 @@ abstract class BaseWidget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function transformTemplate(&$template)
+    protected function transformTemplate(string &$template): void
     {
         $start = $this->config['separator']['start'];
         $end = $this->config['separator']['end'];
@@ -195,7 +196,7 @@ abstract class BaseWidget
      * @param $attributes
      * @return string
      */
-    protected function formatAttributes($attributes)
+    protected function formatAttributes(array $attributes): string
     {
         $attr = '';
         if (empty($attributes['class'])) {
@@ -237,9 +238,9 @@ abstract class BaseWidget
      * @param array $classes
      * @return string
      */
-    protected function formatClass($classes = [])
+    protected function formatClass(array $classes = []): string
     {
-        $class = '';
+        $strClass = '';
         if (empty($classes)) {
             $classes = $this->htmlClass;
             $this->htmlClass = [];
@@ -250,7 +251,7 @@ abstract class BaseWidget
             } else {
                 $exClasses = [];
                 foreach ($classes as $index => $class) {
-                    $exClasses = array_merge($exClasses, explode(' ', $class));
+                    $exClasses = array_merge($exClasses, explode(' ', (string)$class));
                 }
                 $classes = $exClasses;
             }
@@ -263,14 +264,14 @@ abstract class BaseWidget
             });
 
             if (empty($classes)) {
-                return $class;
+                return $strClass;
             }
 
             $uniqueClass = $this->array_iunique($classes);
-            $class = implode(' ', $uniqueClass);
+            $strClass = implode(' ', $uniqueClass);
         }
 
-        return $class;
+        return $strClass;
     }
 
     /**
@@ -279,7 +280,7 @@ abstract class BaseWidget
      * @return array
      * @link http://stackoverflow.com/a/2276400/932473
      */
-    private function array_iunique($array)
+    private function array_iunique(array $array): array
     {
         $lowered = array_map('mb_strtolower', $array);
         return array_intersect_key($array, array_unique($lowered));
@@ -291,7 +292,7 @@ abstract class BaseWidget
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function completeTemplate()
+    protected function completeTemplate(): string
     {
         $containerAttributes = [
             'text' => $this->label,
@@ -315,8 +316,8 @@ abstract class BaseWidget
             !is_array($this->containerParams['global'])) {
             $container = strip_tags($container);
         }
-
-        $containerAttributes += $this->getErrorByFieldName($this->name);
+        $name = $this->name ? $this->name : '';
+        $containerAttributes += $this->getErrorByFieldName($name);
         $containerAttributes += $this->getContainerAllAttributes();
         $this->resetProperties();
         return $this->formatTemplate($container, $containerAttributes);
@@ -325,7 +326,7 @@ abstract class BaseWidget
     /**
      * Removes proprties
      */
-    protected function resetProperties()
+    protected function resetProperties(): void
     {
         $this->icon = '';
         $this->label = '';
@@ -338,7 +339,7 @@ abstract class BaseWidget
      * @param bool $default
      * @return bool
      */
-    protected function getModifiedData($data, $default = false)
+    protected function getModifiedData(array $data, $default = false)
     {
         $datum = $default;
         if (!empty($data['inline'])) {
@@ -356,7 +357,7 @@ abstract class BaseWidget
      * @param $templateName
      * @return mixed
      */
-    protected function getTemplate($templateName)
+    protected function getTemplate(string $templateName): string
     {
 
         $template = $this->config['templates'][$templateName];
@@ -392,7 +393,7 @@ abstract class BaseWidget
      * Returns a default value or a modification for escept html tags,
      * @return bool
      */
-    protected function getIsEscept()
+    protected function getIsEscept(): bool
     {
         return $this->getModifiedData($this->escept, $this->config['escept']);
     }
@@ -401,7 +402,7 @@ abstract class BaseWidget
      * Returns all parameters for the field container
      * @return array
      */
-    protected function getContainerAllAttributes()
+    protected function getContainerAllAttributes(): array
     {
         $params = [
             'required' => '',
@@ -411,9 +412,9 @@ abstract class BaseWidget
             'class' => '',
         ];
 
-        $globalParams = $this->getContainerAttributes($this->containerParams['global']);
-        $localParams = $this->getContainerAttributes($this->containerParams['local']);
-        $inlineParams = $this->getContainerAttributes($this->containerParams['inline']);
+        $globalParams = $this->getContainerAttributes($this->getDataOrNull($this->containerParams['global']));
+        $localParams = $this->getContainerAttributes($this->getDataOrNull($this->containerParams['local']));
+        $inlineParams = $this->getContainerAttributes($this->getDataOrNull($this->containerParams['inline']));
         $params = array_replace($params, $globalParams, $localParams, $inlineParams);
         return $params;
     }
@@ -423,7 +424,7 @@ abstract class BaseWidget
      * @param $data
      * @return array
      */
-    protected function getContainerAttributes($data)
+    protected function getContainerAttributes(?array $data): array
     {
         $attributes = [];
 
@@ -443,7 +444,7 @@ abstract class BaseWidget
      * @param $data
      * @return array
      */
-    protected function containerAttributeRequiredAndDisabled(&$data,$key)
+    protected function containerAttributeRequiredAndDisabled(?array &$data, string $key): array
     {
         $params = [];
         if ($this->getOtherHtmlAttributes($key)) {
@@ -463,7 +464,7 @@ abstract class BaseWidget
      * @param $data
      * @return array
      */
-    protected function containerAttributeType(&$data)
+    protected function containerAttributeType(?array &$data): array
     {
         $params = [];
         if (empty($data['type'])) {
@@ -479,7 +480,7 @@ abstract class BaseWidget
      * @param $data
      * @return array
      */
-    protected function containerAttributeClass(&$data)
+    protected function containerAttributeClass(?array &$data): array
     {
         $params = [];
         if (!empty($data['class'])) {
@@ -496,7 +497,7 @@ abstract class BaseWidget
      * @param $key
      * @param null $value
      */
-    protected function setOtherHtmlAttributes($key, $value = null)
+    protected function setOtherHtmlAttributes($key, $value = null): void
     {
         if (is_array($key) && empty($value)) {
             $this->otherHtmlAttributes += $key;
@@ -508,7 +509,7 @@ abstract class BaseWidget
     /**
      * @param $data
      */
-    protected function assignOtherhtmlAtrributes($data)
+    protected function assignOtherhtmlAtrributes(array $data): void
     {
         $this->otherHtmlAttributes = $data;
     }
@@ -517,7 +518,7 @@ abstract class BaseWidget
      * @param null $key
      * @return array|bool|mixed
      */
-    protected function getOtherHtmlAttributes($key = null)
+    protected function getOtherHtmlAttributes(?string $key = null)
     {
         if (empty($key)) {
             return $this->otherHtmlAttributes;
@@ -531,7 +532,7 @@ abstract class BaseWidget
      * @param $key
      * @param $value
      */
-    protected function setHtmlAttributes($key, $value)
+    protected function setHtmlAttributes(string $key, $value): void
     {
         $this->htmlAttributes[$key] = $value;
     }
@@ -540,24 +541,33 @@ abstract class BaseWidget
      * @param null $key
      * @return array|bool|mixed
      */
-    protected function getHtmlAttributes($key = null)
+    protected function getHtmlAttributes(?string $key = null)
     {
         if (empty($key)) {
             return $this->htmlAttributes;
         }
 
-        return isset($this->htmlAttributes[$key]) ? $this->htmlAttributes[$key] : false;
+        return $this->htmlAttributes[$key] ?? false;
     }
 
     /**
      * @param $param
      * @return array
      */
-    protected function strToArray($param)
+    protected function strToArray($param): array
     {
         if (!is_array($param)) {
             $param = [$param];
         }
         return $param;
+    }
+
+    /**
+     * @param $data
+     * @return null
+     */
+    protected function getDataOrNull($data)
+    {
+        return $data ? $data : null;
     }
 }
