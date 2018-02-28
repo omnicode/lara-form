@@ -2,7 +2,9 @@
 
 namespace Tests\Core;
 
+
 use Tests\LaraFormTestCase;
+use TestsTestCase;
 
 class BaseFormProtectionTest extends LaraFormTestCase
 {

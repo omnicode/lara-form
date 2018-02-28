@@ -4,10 +4,12 @@ namespace Tests\Middleware;
 
 use Illuminate\Http\Request;
 use LaraForm\FormProtection;
-use LaraForm\Middleware\LaraFormMiddleware;
+use LaraForm\MiddlewareMiddleware;
 use Tests\Core\BaseStoreTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class LaraFormMiddlewareTest extends BaseStoreTest
+class LaraFormMiddlewareTest extends LaraFormTestCase
 {
     /**
      * @var

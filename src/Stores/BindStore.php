@@ -106,7 +106,6 @@ class BindStore extends BaseStore
     protected function objectGet(Model $target, array $keyParts, ?string $default)
     {
         $key = array_shift($keyParts);
-
         if (!(property_exists($target, $key) || method_exists($target, '__get'))) {
             return $default;
         }

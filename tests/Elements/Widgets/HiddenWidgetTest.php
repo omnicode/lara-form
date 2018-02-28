@@ -6,8 +6,10 @@ use LaraForm\Elements\Widgets\HiddenWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class HiddenWidgetTest extends WidgetTest
+class HiddenWidgetTest extends LaraFormTestCase
 {
     protected $hiddenWidget;
 
@@ -29,9 +31,9 @@ class HiddenWidgetTest extends WidgetTest
      */
     public function testRender()
     {
-        $this->methodWillReturnTrue('parentRender', $this->hiddenWidget);
+        $this->methodWillReturn('value','parentRender', $this->hiddenWidget);
         $returned = $this->hiddenWidget->render();
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**

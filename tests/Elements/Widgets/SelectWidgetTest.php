@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\SelectWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class SelectWidgetTest extends WidgetTest
+class SelectWidgetTest extends LaraFormTestCase
 {
     protected $selectWidget;
 
@@ -38,22 +39,18 @@ class SelectWidgetTest extends WidgetTest
      */
     public function testRender()
     {
-        $pattern = [
-            'content' => 'renderedOptions',
-            'name' => null,
-            'attrs' => 'formatedAttributes'
-        ];
+        $this->setProtectedAttributeOf($this->selectWidget, 'selectTemplate', 'template');
         $this->methodWillReturnArgument(0, 'getTemplate', $this->selectWidget);
-        $this->methodWillReturnArgument(1, 'formatTemplate', $this->selectWidget);
-        $this->methodWillReturnTrue('completeTemplate', $this->selectWidget);
+        $this->methodWillReturnArgument(0, 'formatTemplate', $this->selectWidget);
+        $this->methodWillReturn('select','completeTemplate', $this->selectWidget);
         $this->methodWillReturn('renderedOptions', 'renderOptions', $this->selectWidget);
         $this->methodWillReturn('formatedAttributes', 'formatAttributes', $this->selectWidget);
         $returned = $this->selectWidget->render();
         $currentTemplate = $this->getProtectedAttributeOf($this->selectWidget, 'currentTemplate');
         $html = $this->getProtectedAttributeOf($this->selectWidget, 'html');
-        $this->assertTrue($returned);
+        $this->assertEquals('select',$returned);
         $this->assertEquals('selectContainer', $currentTemplate);
-        $this->assertEquals($pattern, $html);
+        $this->assertEquals('template', $html);
     }
 
     /**
@@ -192,7 +189,7 @@ class SelectWidgetTest extends WidgetTest
         $selectWidget->expects($this->any(count($options)))->method('isDisabled')->willReturn([]);
         $selectWidget->expects($this->any(count($options)))->method('isSelected')->willReturn([]);
         $this->setProtectedAttributeOf($selectWidget, 'optionsArray', $options);
-        $returned = $this->invokeMethod($selectWidget, 'renderOptions', [false]);
+        $returned = $this->invokeMethod($selectWidget, 'renderOptions', [null]);
         $this->assertEquals($str, $returned);
     }
 
@@ -213,10 +210,10 @@ class SelectWidgetTest extends WidgetTest
         ];
 
         $options = [
-            1 => [1, 2, 3],
-            2 => [1, 2, 3],
-            3 => [1, 2, 3],
-            4 => [1, 2, 3],
+            '1name' => [1, 2, 3],
+            '2name' => [1, 2, 3],
+            '3name' => [1, 2, 3],
+            '4name' => [1, 2, 3]
         ];
         $str = '';
         foreach ($options as $option) {
@@ -227,10 +224,13 @@ class SelectWidgetTest extends WidgetTest
         $this->methodWillReturnArgument(0, 'strToArray', $selectWidget);
         $selectWidget->expects($this->any(count($options)))->method('renderOptgroups')->willReturn('group');
         $this->setProtectedAttributeOf($selectWidget, 'optionsArray', $options);
-        $returned = $this->invokeMethod($selectWidget, 'renderOptions', [false]);
+        $returned = $this->invokeMethod($selectWidget, 'renderOptions', [null]);
         $this->assertEquals($str, $returned);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testRenderOptgroupsWhenNotDisabled()
     {
         $mockMethods = [
@@ -252,12 +252,13 @@ class SelectWidgetTest extends WidgetTest
             'attrs' => []
         ];
         $selectWidget = $this->newSelectWidget($mockMethods);
-        $this->methodWillReturnArgument(1, 'formatTemplate', $selectWidget);
-        $this->methodWillReturnArgument(0, 'formatAttributes', $selectWidget);
+        $this->methodWillReturnArgument(0, 'formatTemplate', $selectWidget);
+        $this->methodWillReturn('attrs', 'formatAttributes', $selectWidget);
+        $this->methodWillReturnArgument(0, 'getTemplate', $selectWidget);
         $this->methodWillReturnArgument(0, 'getLabelName', $selectWidget);
-        $this->methodWillReturnArgument(0, 'renderOptions', $selectWidget);
+        $this->methodWillReturn('option', 'renderOptions', $selectWidget);
         $returned = $this->invokeMethod($selectWidget, 'renderOptgroups', ['groupName', $options]);
-        $this->assertEquals($pattern, $returned);
+        $this->assertEquals('optgroup', $returned);
     }
 
     /**
@@ -274,28 +275,21 @@ class SelectWidgetTest extends WidgetTest
             'isDisabled'
         ];
         $options = [
-            1 => 1,
-            2 => 2,
-            3 => 3,
-            4 => 4,
+            '1key' => '1value',
+            '2key' => '2value',
+            '3key' => '3value',
+            '4key' => '4value',
         ];
-        $pattern = [
-            'label' => 'groupName',
-            'content' => $options,
-            'attrs' => [
-                'disabled' => 'disabled'
-            ]
-        ];
-
         $selectWidget = $this->newSelectWidget($mockMethods);
-        $this->setProtectedAttributeOf($selectWidget, 'groupDisabled', 'disabled');
+        $this->setProtectedAttributeOf($selectWidget, 'groupDisabled', ['disabled']);
+        $this->methodWillReturnArgument(0, 'getTemplate', $selectWidget);
         $this->methodWillReturn(['disabled' => 'disabled'], 'isDisabled', $selectWidget);
-        $this->methodWillReturnArgument(1, 'formatTemplate', $selectWidget);
-        $this->methodWillReturnArgument(0, 'formatAttributes', $selectWidget);
+        $this->methodWillReturnArgument(0, 'formatTemplate', $selectWidget);
+        $this->methodWillReturn('attrs', 'formatAttributes', $selectWidget);
         $this->methodWillReturnArgument(0, 'getLabelName', $selectWidget);
-        $this->methodWillReturnArgument(0, 'renderOptions', $selectWidget);
+        $this->methodWillReturn('option', 'renderOptions', $selectWidget);
         $returned = $this->invokeMethod($selectWidget, 'renderOptgroups', ['groupName', $options]);
-        $this->assertEquals($pattern, $returned);
+        $this->assertEquals('optgroup', $returned);
 
     }
 
@@ -357,6 +351,7 @@ class SelectWidgetTest extends WidgetTest
         $keys = array_keys($attr['options']);
         $selectWidget = $this->newSelectWidget($mockMethods);
         $this->setProtectedAttributeOf($selectWidget, 'config', config('lara_form'));
+        $this->setProtectedAttributeOf($selectWidget, 'name', 'name');
         $this->methodWillReturnArgument(0, 'getTemplate', $selectWidget);
         $this->methodWillReturn(['value' => $keys], 'getValue', $selectWidget);
         $this->methodWillReturn($keys, 'strToArray', $selectWidget);

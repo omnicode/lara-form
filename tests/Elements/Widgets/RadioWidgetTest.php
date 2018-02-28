@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\RadioWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class RadioWidgetTest extends WidgetTest
+class RadioWidgetTest extends LaraFormTestCase
 {
     protected $radioWidget;
 
@@ -26,6 +27,7 @@ class RadioWidgetTest extends WidgetTest
     }
 
     /**
+     * @throws \PHPUnit_Framework_Constraint
      * @throws \ReflectionException
      */
     public function testRender()
@@ -52,6 +54,7 @@ class RadioWidgetTest extends WidgetTest
         ];
         $pattern = $pattern+$attr;
         $radioWidget = $this->newRadioWidget(['getValue', 'generateId', 'parentCheckAttributes','strToArray']);
+        $this->setProtectedAttributeOf($radioWidget, 'name', 'name');
         $this->methodWillReturn(['value' => 'defaultValue'], 'getValue', $radioWidget);
         $this->methodWillReturn(['defaultValue'], 'strToArray', $radioWidget);
         $radioWidget->checkAttributes($attr);

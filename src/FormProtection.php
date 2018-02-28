@@ -250,7 +250,7 @@ class FormProtection extends BaseFormProtection
      * @return array|string
      * @throws \Exception
      */
-    public function processUnlockFields(array $unlockFields): array
+    public function processUnlockFields($unlockFields): array
     {
         if (is_string($unlockFields)) {
             $unlockFields = [$unlockFields];
@@ -381,7 +381,7 @@ class FormProtection extends BaseFormProtection
      * @param $token
      * @return bool|mixed
      */
-    protected function getCheckedFieldsBy(string $token): string
+    protected function getCheckedFieldsBy(string $token): ?array
     {
         $path = $token . '.' . $this->configSession['paths']['check'];
         return session($this->sessionPath($path));

@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\BaseInputWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class BaseInputWidgetTest extends WidgetTest
+class BaseInputWidgetTest extends LaraFormTestCase
 {
     /**
      * @var
@@ -19,6 +20,7 @@ class BaseInputWidgetTest extends WidgetTest
      */
     public function setUp()
     {
+        parent::setUp();
         if (empty($this->baseInputWidget)) {
             $this->baseInputWidget = $this->newBaseInputWidget();
         };
@@ -32,10 +34,10 @@ class BaseInputWidgetTest extends WidgetTest
     public function testRender()
     {
         $baseInputWidget = $this->newBaseInputWidget(['checkAttributes', 'formatInputField']);
-        $this->methodWillReturnTrue('formatInputField', $baseInputWidget);
+        $this->setProtectedAttributeOf($baseInputWidget, 'name', 'name');
+        $this->methodWillReturn('value','formatInputField', $baseInputWidget);
         $returned = $baseInputWidget->render();
-        $this->assertTrue($returned);
-
+        $this->assertEquals('value',$returned);
     }
 
     /**
@@ -53,9 +55,9 @@ class BaseInputWidgetTest extends WidgetTest
             'completeTemplate'
         ];
         $baseInputWidget = $this->newBaseInputWidget($mockedMethods);
-        $this->methodWillReturnTrue('completeTemplate', $baseInputWidget);
+        $this->methodWillReturn('value','completeTemplate', $baseInputWidget);
         $returned = $this->invokeMethod($baseInputWidget, 'formatInputField', ['name', [], true]);
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**
@@ -73,13 +75,13 @@ class BaseInputWidgetTest extends WidgetTest
             'completeTemplate'
         ];
         $baseInputWidget = $this->newBaseInputWidget($mockedMethods);
-        $this->methodWillReturnTrue('completeTemplate', $baseInputWidget);
+        $this->methodWillReturn('value','completeTemplate', $baseInputWidget);
         $this->methodWillReturn('input', 'getTemplate', $baseInputWidget);
         $this->methodWillReturnArgument(0, 'formatTemplate', $baseInputWidget);
         $returned = $this->invokeMethod($baseInputWidget, 'formatInputField', ['name', []]);
         $html = $this->getProtectedAttributeOf($baseInputWidget, 'html');
         $this->assertEquals('input', $html);
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**
@@ -110,13 +112,11 @@ class BaseInputWidgetTest extends WidgetTest
             'attrs' => ''
         ];
         $baseInputWidget = $this->newBaseInputWidget($mockedMethods);
-        $this->methodWillReturnTrue('completeTemplate', $baseInputWidget);
+        $this->setProtectedAttributeOf($baseInputWidget, 'name', 'name');
         $this->methodWillReturn('', 'formatAttributes', $baseInputWidget);
-        $this->methodWillReturnArgument(1, 'formatTemplate', $baseInputWidget);
-        $returned = $this->invokeMethod($baseInputWidget, 'formatNestingLabel', $data);
-        $templateAttr = $this->getProtectedAttributeOf($baseInputWidget, 'html');
-        $this->assertEquals($templateAttrPattern, $templateAttr);
-        $this->assertTrue($returned);
+        $this->methodWillThrowExceptionWithArgument('formatTemplate', $baseInputWidget);
+        $this->expectExceptionMessage($this->getExceptionArgumentsMessage(['',$templateAttrPattern]));
+        $this->invokeMethod($baseInputWidget, 'formatNestingLabel', $data);
     }
 
     /**
@@ -125,7 +125,6 @@ class BaseInputWidgetTest extends WidgetTest
      */
     public function testGeneralCheckAttributesWhenCTemplateTrue()
     {
-        ;
         $this->generalCheckAttrTesting(['value' => 'defaultValue']);
     }
 

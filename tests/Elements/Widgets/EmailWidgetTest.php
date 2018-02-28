@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\EmailWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class EmailWidgetTest extends WidgetTest
+class EmailWidgetTest extends LaraFormTestCase
 {
     protected $emailWidget;
 
@@ -29,9 +30,9 @@ class EmailWidgetTest extends WidgetTest
      */
     public function testRender()
     {
-        $this->methodWillReturnTrue('parentRender', $this->emailWidget);
+        $this->methodWillReturn('value','parentRender', $this->emailWidget);
         $returned = $this->emailWidget->render();
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**

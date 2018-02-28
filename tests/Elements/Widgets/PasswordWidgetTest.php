@@ -6,8 +6,10 @@ use LaraForm\Elements\Widgets\PasswordWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class PasswordWidgetTest extends WidgetTest
+class PasswordWidgetTest extends LaraFormTestCase
 {
     protected $passwordWidget;
 
@@ -29,9 +31,9 @@ class PasswordWidgetTest extends WidgetTest
      */
     public function testRender()
     {
-        $this->methodWillReturnTrue('parentRender', $this->passwordWidget);
+        $this->methodWillReturn('value','parentRender', $this->passwordWidget);
         $returned = $this->passwordWidget->render();
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**

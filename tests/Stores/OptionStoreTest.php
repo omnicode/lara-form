@@ -9,8 +9,10 @@ use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use LaraForm\Stores\OptionStore;
 use Tests\Core\BaseStoreTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class OptionStoreTest extends BaseStoreTest
+class OptionStoreTest extends LaraFormTestCase
 {
     /**
      * @var
@@ -35,9 +37,10 @@ class OptionStoreTest extends BaseStoreTest
      */
     public function testSetAttributes()
     {
-        $this->optionStore->setAttributes('attr');
+        $void = $this->optionStore->setAttributes(['attr']);
         $returned = $this->getProtectedAttributeOf($this->optionStore, 'attributes');
-        $this->assertEquals('attr', $returned);
+        $this->assertEquals(['attr'], $returned);
+        $this->assertNull($void);
     }
 
     /**
@@ -63,7 +66,7 @@ class OptionStoreTest extends BaseStoreTest
     }
 
     /**
-     * @throws \ReflectionException
+     *
      */
     public function testAttrWhenNotEmptyAttributes()
     {

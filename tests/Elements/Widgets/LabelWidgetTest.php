@@ -5,9 +5,10 @@ namespace Label\Elements\Widgets;
 use LaraForm\Elements\Widgets\LabelWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class LabelWidgetTest extends WidgetTest
+class LabelWidgetTest extends LaraFormTestCase
 {
     protected $labelWidget;
 
@@ -29,9 +30,10 @@ class LabelWidgetTest extends WidgetTest
      */
     public function testRender()
     {
-        $this->methodWillReturnTrue('renderLabel',$this->labelWidget);
+        $this->setProtectedAttributeOf($this->labelWidget, 'name', 'name');
+        $this->methodWillReturn('value','renderLabel', $this->labelWidget);
         $returned = $this->labelWidget->render();
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**

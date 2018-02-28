@@ -4,8 +4,10 @@ namespace Tests\Stores;
 
 use LaraForm\Stores\OldInputStore;
 use Tests\Core\BaseStoreTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class OldInputStoreTest extends BaseStoreTest
+class OldInputStoreTest extends LaraFormTestCase
 {
     /**
      * @var

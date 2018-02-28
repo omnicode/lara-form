@@ -28,7 +28,7 @@ abstract class LaraFormTestCase extends TestCase
      * @param null $methods
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function newInstance($className,$args = [],$methods = null)
+    protected function newInstance($className, $args = [],$methods = null)
     {
         if (!empty($methods) && !is_array($methods)) {
             $methods = [$methods];
@@ -58,5 +58,22 @@ abstract class LaraFormTestCase extends TestCase
         $mock = $builder->build();
         $mock->enable();
         return $mock;
+    }
+
+    /**
+     * @param $className
+     * @param null $methods
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function newInstanceWithDisableArgs($className, $methods = null)
+    {
+        $instance = $this->getMockBuilder($className)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->disallowMockingUnknownTypes()
+            ->setMethods($methods)
+            ->getMock();
+        return $instance;
     }
 }

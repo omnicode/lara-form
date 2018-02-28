@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\TextareaWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class TextareaWidgetTest extends WidgetTest
+class TextareaWidgetTest extends LaraFormTestCase
 {
     protected $textaretaWidget;
 
@@ -30,9 +31,10 @@ class TextareaWidgetTest extends WidgetTest
      */
     public function testRender()
     {
+        $this->setProtectedAttributeOf($this->textaretaWidget, 'name', 'name');
         $this->methodWillReturn('formatedTemplate','formatTemplate',$this->textaretaWidget);
         $this->methodWillReturn('completedTemplate','completeTemplate',$this->textaretaWidget);
-        $this->methodWillReturn([],'getValue',$this->textaretaWidget);
+        $this->methodWillReturn(['value'=> 'data'],'getValue',$this->textaretaWidget);
         $returned = $this->textaretaWidget->render();
         $html = $this->getProtectedAttributeOf($this->textaretaWidget, 'html');
         $this->assertEquals('formatedTemplate',$html);

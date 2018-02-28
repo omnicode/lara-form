@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\FormWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class FormWidgetTest extends WidgetTest
+class FormWidgetTest extends LaraFormTestCase
 {
     protected $formWidget;
 
@@ -71,12 +72,11 @@ class FormWidgetTest extends WidgetTest
           '_form_token' => 'token',
         ];
         $formWidget = $this->newFormWidget(['checkAttributes', 'getTemplate', 'formatAttributes', 'formatTemplate']);
-        $this->methodWillReturnArgument(0,'formatAttributes',$formWidget);
-        $this->methodWillReturnArgument(1,'formatTemplate',$formWidget);
+        $this->methodWillReturn('attr','formatAttributes',$formWidget);
+        $this->methodWillReturnArgument(0,'getTemplate',$formWidget);
+        $this->methodWillReturnArgument(0,'formatTemplate',$formWidget);
         $returned = $this->invokeMethod($formWidget,'start', [$options]);
-        $options['method'] = 'GET';
-        $options['action'] = 'foo/bar';
-        $this->assertEquals($options,$returned['attrs']);
+        $this->assertEquals('formStart',$returned);
     }
 
     /**

@@ -193,7 +193,7 @@ class FormBuilder extends BaseFormBuilder
      * @param bool $templateValue
      * @param bool $global
      */
-    public function setTemplate(?array $templateName, ?string $templateValue = null, bool $global = false): void
+    public function setTemplate($templateName, ?string $templateValue = null, bool $global = false): void
     {
         if (is_array($templateName)) {
             $options = [];

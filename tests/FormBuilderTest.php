@@ -3,6 +3,8 @@
 namespace Tests;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Routing\Route;
 use LaraForm\Elements\Widgets\InputWidget;
 use LaraForm\FormBuilder;
 use LaraForm\FormProtection;
@@ -13,13 +15,18 @@ use LaraForm\Stores\OptionStore;
 use phpmock\MockBuilder;
 use Tests\Core\BaseFormBuilderTest;
 
-class FormBuilderTest extends BaseFormBuilderTest
+class FormBuilderTest extends LaraFormTestCase
 {
 
     /**
      * @var
      */
-    protected $formBuilder;
+    public $formBuilder;
+
+    /**
+     * @var
+     */
+    public $optionStore;
 
     /**
      *
@@ -31,7 +38,9 @@ class FormBuilderTest extends BaseFormBuilderTest
             $mthods = ['generateToken', 'getAction', 'getMethod', 'isForm', 'getIsForm', 'addTemplatesAndParams', 'make', 'getGeneralUnlockFieldsBy'];
             $this->formBuilder = $this->newFormBuilder($mthods);
         };
-
+        if (empty($this->optionStore)) {
+            $this->optionStore = $this->newOptionStore();
+        };
     }
 
     /**
@@ -54,19 +63,19 @@ class FormBuilderTest extends BaseFormBuilderTest
         $this->methodWillReturn('11111', 'generateToken', $this->formBuilder);
         $this->methodWillReturn('/foo/bar', 'getAction', $this->formBuilder);
         $this->methodWillReturn('get', 'getMethod', $this->formBuilder);
-        $this->methodWillReturn('maked', 'make', $this->formBuilder);
+        $this->methodWillReturn($this->optionStore, 'make', $this->formBuilder);
         $form = $this->formBuilder->create(null);
         $isForm = $this->getProtectedAttributeOf($this->formBuilder, 'isForm');
         $model = $this->getProtectedAttributeOf($this->formBuilder, 'model');
         $this->assertTrue($isForm);
         $this->assertNull($model);
-        $this->assertEquals('maked', $form);
+        $this->assertInstanceOf(OptionStore::class, $form);
     }
 
     /**
      * @throws \ReflectionException
      */
-    public function testCreateWhenIsFormFalse()
+    public function testCrateWhenIsFormFalse()
     {
         $formProtectionMockMethods = [
             'setToken',
@@ -79,7 +88,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $this->methodWillReturn('11111', 'generateToken', $this->formBuilder);
         $this->methodWillReturn('/foo/bar', 'getAction', $this->formBuilder);
         $this->methodWillReturn('post', 'getMethod', $this->formBuilder);
-        $this->methodWillReturn('maked', 'make', $this->formBuilder);
+        $this->methodWillReturn($this->optionStore, 'make', $this->formBuilder);
         $this->methodWillReturn([], 'getGeneralUnlockFieldsBy', $this->formBuilder);
         $formProtection = $this->newInstance(FormProtection::class, [], $formProtectionMockMethods);
         $this->setProtectedAttributeOf($this->formBuilder, 'formProtection', $formProtection);
@@ -88,7 +97,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $model = $this->getProtectedAttributeOf($this->formBuilder, 'model');
         $this->assertTrue($isForm);
         $this->assertNull($model);
-        $this->assertEquals('maked', $form);
+        $this->assertInstanceOf(OptionStore::class, $form);
     }
 
     /**
@@ -96,13 +105,15 @@ class FormBuilderTest extends BaseFormBuilderTest
      */
     public function testEndWhenIsFormTrue()
     {
-        $formBuilder = $this->newFormBuilder(['make', 'resetProperties']);
-        $val = str_random(5);
-        $this->methodWillReturn($val, 'make', $formBuilder);
+        $formBuilder = $this->newFormBuilder(['make', 'resetProperties', 'output']);
+        $optionStore = $this->newOptionStore();
+        $this->setProtectedAttributeOf($optionStore, 'builder', $formBuilder);
+        $this->methodWillReturn($optionStore, 'make', $formBuilder);
+        $this->methodWillReturn('output', 'output', $formBuilder);
         $this->methodWillReturnTrue('resetProperties', $formBuilder);
         $this->invokeMethod($formBuilder, 'setIsForm', [true]);
         $end = $formBuilder->end();
-        $this->assertEquals($val, $end);
+        $this->assertEquals('output', $end);
     }
 
     /**
@@ -278,9 +289,9 @@ class FormBuilderTest extends BaseFormBuilderTest
             'checkbox' => 'checkbox',
         ];
         $formBuilder = $this->newFormBuilder('addTemplatesAndParams');
-        $this->setProtectedAttributeOf($formBuilder, 'localTemplates', 'local');
-        $this->methodWillThrowExceptionWithArgument('addTemplatesAndParams', $formBuilder, 1);
-        $this->expectExceptionMessage('method attribute is :[{"input":"input","checkbox":"checkbox"},"local",[]]');
+        $this->setProtectedAttributeOf($formBuilder, 'localTemplates', []);
+        $this->methodWillThrowExceptionWithArgument('addTemplatesAndParams', $formBuilder);
+        $this->expectExceptionMessage('method attribute is :[{"input":"input","checkbox":"checkbox"},[],[]]');
         $formBuilder->setTemplate($tmp);
     }
 
@@ -294,9 +305,9 @@ class FormBuilderTest extends BaseFormBuilderTest
             '_options' => ['global' => true]
         ];
         $this->methodWillReturnTrue('addTemplatesAndParams', $this->formBuilder);
-        $this->setProtectedAttributeOf($this->formBuilder, 'globalTemplates', 'global');
+        $this->setProtectedAttributeOf($this->formBuilder, 'globalTemplates', []);
         $this->methodWillThrowExceptionWithArgument('addTemplatesAndParams', $this->formBuilder, 1);
-        $this->expectExceptionMessage('method attribute is :[{"input":"input"},"global",{"global":true}]');
+        $this->expectExceptionMessage('method attribute is :[{"input":"input"},[],{"global":true}]');
         $this->formBuilder->setTemplate($tmp);
     }
 
@@ -462,10 +473,12 @@ class FormBuilderTest extends BaseFormBuilderTest
                 'class' => 'has-error'
             ]
         ];
+        $model = $this->newInstanceWithDisableArgs(Model::class);
         $formBuilder = $this->newFormBuilder();
         $modelName = ucfirst($method);
         $classNamspace = config('lara_form_core.method_full_name') . $modelName . config('lara_form_core.method_sufix');
-        $this->setProtectedAttributeOf($formBuilder, 'model',new \stdClass());
+        $this->setProtectedAttributeOf($formBuilder, 'model', $model);
+        $this->setProtectedAttributeOf($formBuilder, 'optionStore', $this->optionStore);
         $make = $this->invokeMethod($formBuilder, 'make', [$method, $attr]);
         $makedField = $this->getProtectedAttributeOf($formBuilder, 'maked')[$modelName];
         $this->assertInstanceOf($classNamspace, $makedField);
@@ -479,9 +492,13 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $attr = ['input', ['attr']];
         $formBuilder = $this->newFormBuilder();
+        $this->setProtectedAttributeOf($formBuilder, 'optionStore', $this->optionStore);
         $this->invokeMethod($formBuilder, 'make', $attr);
+        $this->setProtectedAttributeOf($formBuilder, 'optionStore', $this->optionStore);
         $this->invokeMethod($formBuilder, 'make', $attr);
+        $this->setProtectedAttributeOf($formBuilder, 'optionStore', $this->optionStore);
         $this->invokeMethod($formBuilder, 'make', $attr);
+        $this->setProtectedAttributeOf($formBuilder, 'optionStore', $this->optionStore);
         $this->invokeMethod($formBuilder, 'make', $attr);
         $maked = $this->getProtectedAttributeOf($formBuilder, 'maked');
         $this->assertEquals(1, count($maked));
@@ -493,15 +510,16 @@ class FormBuilderTest extends BaseFormBuilderTest
     public function testMakeWhenExistModel()
     {
         $attr = ['input', ['attr']];
-        $formBuilder = $this->newFormBuilder(['setModel', 'binding', 'setAttributes', 'setBuilder']);
-        $this->setProtectedAttributeOf($formBuilder, 'optionStore', $formBuilder);
+        $formBuilder = $this->newFormBuilder(['setModel', 'binding']);
+        $optionStore = $this->newOptionStore(['setAttributes', 'setBuilder']);
+        $this->setProtectedAttributeOf($formBuilder, 'optionStore', $optionStore);
         $this->setProtectedAttributeOf($formBuilder, 'bindStore', $formBuilder);
         $this->setProtectedAttributeOf($formBuilder, 'maked', ['Input' => $formBuilder]);
         $this->setProtectedAttributeOf($formBuilder, 'model', true);
-        $this->methodWillReturnTrue('setModel',$formBuilder);
-        $this->methodWillReturnTrue('binding',$formBuilder);
-        $this->methodWillReturnTrue('setAttributes',$formBuilder);
-        $this->methodWillReturnTrue('setBuilder',$formBuilder);
+        $this->methodWillReturnTrue('setModel', $formBuilder);
+        $this->methodWillReturnTrue('binding', $formBuilder);
+        $this->methodWillReturnTrue('setAttributes', $optionStore);
+        $this->methodWillReturnTrue('setBuilder', $optionStore);
         $this->invokeMethod($formBuilder, 'make', $attr);
     }
 
@@ -514,10 +532,9 @@ class FormBuilderTest extends BaseFormBuilderTest
         $this->methodWillReturnTrue('getFieldType', $formBuilder);
         $this->methodWillReturnTrue('fixField', $formBuilder);
         $this->methodWillReturnTrue('hasTemplate', $formBuilder);
-        $val = str_random(5);
-        $this->methodWillReturn($val, 'make', $formBuilder);
+        $this->methodWillReturn($this->optionStore, 'make', $formBuilder);
         $returned = $formBuilder->__call('input', []);
-        $this->assertEquals($val, $returned);
+        $this->assertEquals($this->optionStore, $returned);
     }
 
     /**
@@ -531,11 +548,17 @@ class FormBuilderTest extends BaseFormBuilderTest
         ], ['setArguments', 'setParams', 'render']);
         $optionStore = $this->newInstance(OptionStore::class, [], ['getOptions', 'resetOptions']);
         $formBuilder = $this->newFormBuilder(['hasTemplate', 'complateTemplatesAndParams']);
-        $this->methodWillReturnTrue('render', $inputWidget);
+        $this->methodWillReturn('rendered','render', $inputWidget);
+        $this->methodWillReturn([],'getOptions', $optionStore);
+        $this->methodWillReturnTrue('resetOptions', $optionStore);
+        $this->methodWillReturnTrue('setParams', $inputWidget);
+        $this->methodWillReturnTrue('setArguments', $inputWidget);
+        $this->methodWillReturn([],'complateTemplatesAndParams', $formBuilder);
+        $this->methodWillReturnTrue('hasTemplate', $formBuilder);
         $this->setProtectedAttributeOf($formBuilder, 'widget', $inputWidget);
         $this->setProtectedAttributeOf($formBuilder, 'optionStore', $optionStore);
         $returned = $formBuilder->output();
-        $this->assertTrue($returned);
+        $this->assertEquals('rendered',$returned);
     }
 
     /**
@@ -564,9 +587,9 @@ class FormBuilderTest extends BaseFormBuilderTest
     public function testGetIsForm()
     {
         $formBuilder = $this->newFormBuilder();
-        $this->setProtectedAttributeOf($formBuilder, 'isForm', 'form');
+        $this->setProtectedAttributeOf($formBuilder, 'isForm', true);
         $returned = $this->invokeMethod($formBuilder, 'getIsForm');
-        $this->assertEquals('form', $returned);
+        $this->assertTrue($returned);
     }
 
     /**
@@ -579,9 +602,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $builder = new MockBuilder();
         $builder->setNamespace("LaraForm\Traits");
         $builder->setName('route');
-        $builder->setFunction(function () {
-            return 'foo/bar';
-        });
+        $builder->setFunction(function () {return 'foo/bar';});
         $mock = $builder->build();
         $mock->enable();
         $formBuilder = $this->newFormBuilder(['getRoutes', 'setRequestMethod']);
@@ -622,9 +643,9 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $options = ['action' => 'create'];
         $formBuilder = $this->newFormBuilder('getActionWithMethod');
-        $this->methodWillReturnTrue('getActionWithMethod', $formBuilder);
+        $this->methodWillReturn('action','getActionWithMethod', $formBuilder);
         $returned = $this->invokeMethod($formBuilder, 'getAction', [&$options]);
-        $this->assertTrue($returned);
+        $this->assertEquals('action',$returned);
     }
 
     /**
@@ -635,7 +656,7 @@ class FormBuilderTest extends BaseFormBuilderTest
     {
         $options = [];
         $formBuilder = $this->newFormBuilder(['url']);
-        $this->methodWillReturnTrue('url', $formBuilder);
+        $this->methodWillReturn('url','url', $formBuilder);
         $builder = new MockBuilder();
         $builder->setNamespace("LaraForm\Traits");
         $builder->setName('request');
@@ -645,7 +666,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $mock = $builder->build();
         $mock->enable();
         $returned = $this->invokeMethod($formBuilder, 'getAction', [&$options]);
-        $this->assertTrue($returned);
+        $this->assertEquals('url',$returned);
         $mock->disable();
     }
 
@@ -664,7 +685,7 @@ class FormBuilderTest extends BaseFormBuilderTest
         $mock = $builder->build();
         $mock->enable();
         $formBuilder = $this->newFormBuilder(['getRouteName', 'getController', 'getCurrentRoute']);
-        $this->methodWillReturn($formBuilder, 'getCurrentRoute', $formBuilder);
+        $this->methodWillReturn(app(Route::class), 'getCurrentRoute', $formBuilder);
         $this->methodWillReturn(Controller::class, 'getController', $formBuilder);
         $this->methodWillReturnFalse('getRouteName', $formBuilder);
         $this->invokeMethod($formBuilder, 'getActionWithMethod', [['method', 'params']]);
@@ -729,8 +750,9 @@ class FormBuilderTest extends BaseFormBuilderTest
         $formBuilder = $this->newFormBuilder('getRoutes');
         $this->methodWillReturn([], 'getRoutes', $formBuilder);
         $returned = $this->invokeMethod($formBuilder, 'getRouteName', ['bar']);
-        $this->assertFalse($returned);
+        $this->assertNull($returned);
     }
+
     /**
      * @throws \ReflectionException
      */
@@ -889,5 +911,14 @@ class FormBuilderTest extends BaseFormBuilderTest
             app(BindStore::class),
         ];
         return $this->newInstance(FormBuilder::class, $args, $methods);
+    }
+
+    /**
+     * @param null $methods
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function newOptionStore($methods = null)
+    {
+        return $this->newInstance(OptionStore::class, [], $methods);
     }
 }

@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\CheckboxWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class CheckboxWidgetTest extends WidgetTest
+class CheckboxWidgetTest extends LaraFormTestCase
 {
     /**
      * @var
@@ -87,15 +88,20 @@ class CheckboxWidgetTest extends WidgetTest
         $attr = [];
         $checkboxWidget = $this->newCheckboxWidget(['getValue', 'setHidden', 'generateId', 'parentCheckAttributes']);
         $checkboxWidget->expects($this->once())->method('setHidden')->willReturn('hidden');
+        $checkboxWidget->expects($this->any(3))->method('getValue')->willReturn(['value' => 'data']);
+
         $this->setProtectedAttributeOf($checkboxWidget, 'name', 'field[]');
         $checkboxWidget->checkAttributes($attr);
         $hidden1 = $this->getProtectedAttributeOf($checkboxWidget, 'hidden');
+
         $this->setProtectedAttributeOf($checkboxWidget, 'name', 'field[]');
         $checkboxWidget->checkAttributes($attr);
         $hidden2 = $this->getProtectedAttributeOf($checkboxWidget, 'hidden');
+
         $this->setProtectedAttributeOf($checkboxWidget, 'name', 'field[]');
         $checkboxWidget->checkAttributes($attr);
         $hidden3 = $this->getProtectedAttributeOf($checkboxWidget, 'hidden');
+
         $this->assertEquals('hidden', $hidden1);
         $this->assertEquals('', $hidden2);
         $this->assertEquals('', $hidden3);

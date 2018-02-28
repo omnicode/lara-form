@@ -7,8 +7,10 @@ use LaraForm\Elements\Widgets\NumberWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
 use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class NumberWidgetTest extends WidgetTest
+class NumberWidgetTest extends LaraFormTestCase
 {
     protected $numberWidget;
 
@@ -30,9 +32,10 @@ class NumberWidgetTest extends WidgetTest
      */
     public function testRender()
     {
-        $this->methodWillReturnTrue('parentRender', $this->numberWidget);
+
+        $this->methodWillReturn('value','parentRender', $this->numberWidget);
         $returned = $this->numberWidget->render();
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Tests\Core;
 
 use LaraForm\Core\BaseWidget;
 use Tests\LaraFormTestCase;
+use TestsTestCase;
 
 class BaseWidgetTest extends LaraFormTestCase
 {
@@ -331,10 +332,10 @@ class BaseWidgetTest extends LaraFormTestCase
     public function testGetLabelAttributes()
     {
         $baseWidget = $this->newBaseWidget('getModifiedData');
-        $this->setProtectedAttributeOf($baseWidget, 'labelAttr', 'value');
+        $this->setProtectedAttributeOf($baseWidget, 'labelAttr', ['value']);
         $this->methodWillReturnArgument(0, 'getModifiedData', $baseWidget);
         $returned = $this->invokeMethod($baseWidget, 'getLabelAttributes');
-        $this->assertEquals('value', $returned);
+        $this->assertEquals(['value'], $returned);
     }
 
     /**
@@ -342,7 +343,7 @@ class BaseWidgetTest extends LaraFormTestCase
      */
     public function testGetHtmlClassControlByArgumentOne()
     {
-        $this->getModifiedDataArgumentOne('getHtmlClassControl', 'classConcat');
+        $this->getModifiedDataArgumentOne('getHtmlClassControl', 'classConcat',['v']);
     }
 
     /**
@@ -350,7 +351,7 @@ class BaseWidgetTest extends LaraFormTestCase
      */
     public function testGetHtmlClassControlByArgumentTwo()
     {
-        \Config::set('lara_form.css.class_control', 'value');
+        \Config::set('lara_form.css.class_control', true);
         $this->getModifiedDataArgumentTwo('getHtmlClassControl');
     }
 
@@ -359,7 +360,11 @@ class BaseWidgetTest extends LaraFormTestCase
      */
     public function testGetIsEsceptByArgumentOne()
     {
-        $this->getModifiedDataArgumentOne('getIsEscept', 'escept');
+        $baseWidget = $this->newBaseWidget('getModifiedData');
+        $this->setProtectedAttributeOf($baseWidget, 'escept', [true]);
+        $this->methodWillReturnTrue( 'getModifiedData', $baseWidget);
+        $returned = $this->invokeMethod($baseWidget, 'getIsEscept');
+        $this->assertEquals(true, $returned);
     }
 
     /**
@@ -367,7 +372,7 @@ class BaseWidgetTest extends LaraFormTestCase
      */
     public function testGetIsEsceptByArgumentTwo()
     {
-        \Config::set('lara_form.escept', 'value');
+        \Config::set('lara_form.escept', true);
         $this->getModifiedDataArgumentTwo('getIsEscept');
     }
 
@@ -540,9 +545,9 @@ class BaseWidgetTest extends LaraFormTestCase
      */
     public function testAssignOtherhtmlAtrributes()
     {
-        $this->invokeMethod($this->baseWidget, 'assignOtherhtmlAtrributes', ['data']);
+        $this->invokeMethod($this->baseWidget, 'assignOtherhtmlAtrributes', [['data']]);
         $returned = $this->getProtectedAttributeOf($this->baseWidget, 'otherHtmlAttributes');
-        $this->assertEquals('data', $returned);
+        $this->assertEquals(['data'], $returned);
     }
 
     /**
@@ -645,13 +650,13 @@ class BaseWidgetTest extends LaraFormTestCase
      * @param $prop
      * @throws \ReflectionException
      */
-    private function getModifiedDataArgumentOne($method, $prop)
+    private function getModifiedDataArgumentOne($method, $prop, $val = 'value')
     {
         $baseWidget = $this->newBaseWidget('getModifiedData');
-        $this->setProtectedAttributeOf($baseWidget, $prop, 'value');
+        $this->setProtectedAttributeOf($baseWidget, $prop, $val);
         $this->methodWillReturnArgument(0, 'getModifiedData', $baseWidget);
         $returned = $this->invokeMethod($baseWidget, $method);
-        $this->assertEquals('value', $returned);
+        $this->assertEquals($val, $returned);
     }
 
     /**
@@ -664,7 +669,7 @@ class BaseWidgetTest extends LaraFormTestCase
         $this->setProtectedAttributeOf($baseWidget, 'config', config('lara_form'));
         $this->methodWillReturnArgument(1, 'getModifiedData', $baseWidget);
         $returned = $this->invokeMethod($baseWidget, $method);
-        $this->assertEquals('value', $returned);
+        $this->assertEquals(true, $returned);
     }
 
     /**

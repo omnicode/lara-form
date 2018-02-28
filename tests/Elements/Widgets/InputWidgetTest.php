@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\InputWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class InputWidgetTest extends WidgetTest
+class InputWidgetTest extends LaraFormTestCase
 {
     protected $inputWidget;
 
@@ -29,9 +30,9 @@ class InputWidgetTest extends WidgetTest
      */
     public function testRender()
     {
-        $this->methodWillReturnTrue('parentRender', $this->inputWidget);
+        $this->methodWillReturn('value','parentRender', $this->inputWidget);
         $returned = $this->inputWidget->render();
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**

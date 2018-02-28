@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\SubmitWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class SubmitWidgetTest extends WidgetTest
+class SubmitWidgetTest extends LaraFormTestCase
 {
     protected $submitWidget;
 
@@ -26,24 +27,26 @@ class SubmitWidgetTest extends WidgetTest
     }
 
     /**
+     * @throws \PHPUnit_Framework_Constraint
      * @throws \ReflectionException
      */
     public function testRenderWhenNameFalse()
     {
         $this->setProtectedAttributeOf($this->submitWidget, 'name', false);
         $this->methodWillReturnTrue('formatAttributes', $this->submitWidget);
-        $this->methodWillReturnTrue('completeTemplate', $this->submitWidget);
+        $this->methodWillReturn('value','completeTemplate', $this->submitWidget);
         $this->methodWillReturnArgument(0, 'formatTemplate', $this->submitWidget);
         $this->submitWidget->expects($this->any(2))->method('getTemplate')->will($this->returnArgument(0));
         $returned = $this->submitWidget->render();
         $template = $this->getProtectedAttributeOf($this->submitWidget, 'html');
         $currentTemplate = $this->getProtectedAttributeOf($this->submitWidget, 'currentTemplate');
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
         $this->assertEquals('button', $template);
         $this->assertEquals('submitContainer', $currentTemplate);
     }
 
     /**
+     * @throws \PHPUnit_Framework_Constraint
      * @throws \ReflectionException
      */
     public function testRenderWhenExistName()
@@ -53,6 +56,7 @@ class SubmitWidgetTest extends WidgetTest
     }
 
     /**
+     * @throws \PHPUnit_Framework_Constraint
      * @throws \ReflectionException
      */
     public function testRenderWhenNameFromConfig()
@@ -89,19 +93,20 @@ class SubmitWidgetTest extends WidgetTest
 
     /**
      * @param $name
+     * @throws \PHPUnit_Framework_Constraint
      * @throws \ReflectionException
      */
     private function renderByName($name)
     {
         $this->methodWillReturnTrue('formatAttributes', $this->submitWidget);
-        $this->methodWillReturnTrue('completeTemplate', $this->submitWidget);
-        $this->methodWillReturnArgument(1, 'formatTemplate', $this->submitWidget);
+        $this->methodWillReturn('value','completeTemplate', $this->submitWidget);
+        $this->methodWillReturn('value', 'formatTemplate', $this->submitWidget);
         $this->submitWidget->expects($this->any(2))->method('getTemplate')->will($this->returnArgument(0));
         $returned = $this->submitWidget->render();
         $html = $this->getProtectedAttributeOf($this->submitWidget, 'html');
         $currentTemplate = $this->getProtectedAttributeOf($this->submitWidget, 'currentTemplate');
-        $this->assertTrue($returned);
-        $this->assertEquals(['attrs' => true, 'text' => $name], $html);
+        $this->assertEquals('value',$returned);
+        $this->assertEquals('value', $html);
         $this->assertEquals('submitContainer', $currentTemplate);
     }
 

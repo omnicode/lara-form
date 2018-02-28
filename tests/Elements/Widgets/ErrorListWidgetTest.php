@@ -2,12 +2,14 @@
 
 namespace Tests\Elements\Widgets;
 
+use Illuminate\Support\ViewErrorBag;
 use LaraForm\Elements\Widgets\ErrorListWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class ErrorListWidgetTest extends WidgetTest
+class ErrorListWidgetTest extends LaraFormTestCase
 {
     /**
      * @throws \ReflectionException
@@ -31,21 +33,21 @@ class ErrorListWidgetTest extends WidgetTest
     {
         $errorListWidget = $this->newErrorListWidget();
         $errors = $this->newErrorStore();
+        $viewErrorBag = $this->newInstanceWithDisableArgs(ViewErrorBag::class,['all']);
         $array = range(3,8);
         $this->methodWillReturnTrue('hasErrors',$errors);
-        $this->methodWillReturn($errors,'getErrors',$errors);
-        $this->methodWillReturn($array,'all',$errors);
+        $this->methodWillReturn($viewErrorBag,'getErrors',$errors);
+        $this->methodWillReturn($array,'all',$viewErrorBag);
         $this->setProtectedAttributeOf($errorListWidget, 'errors', $errors);
-        $errorListWidget->expects($this->any(2))->method('getTemplate')->willReturn(true);
+        $errorListWidget->expects($this->any(2))->method('getTemplate')->willReturn('template');
         for ($i = 0; $i <= count($array);$i++){
             $errorListWidget->expects($this->at($i+1))->method('formatTemplate')->willReturn(' item');
         }
         $errorListWidget->
         expects($this->at(count($array)+2))->
-        method('formatTemplate')->will($this->returnArgument(1));
+        method('formatTemplate')->will($this->returnArgument(0));
         $returned = $errorListWidget->render();
-        $returnedCount = count(explode(' ',$returned['content']));
-        $this->assertEquals(count($array)+1, $returnedCount);
+        $this->assertEquals('template', $returned);
     }
 
     /**

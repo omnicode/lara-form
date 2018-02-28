@@ -2,11 +2,14 @@
 
 namespace Tests\Stores;
 
+use Illuminate\Database\Eloquent\Model;
 use LaraForm\Stores\BindStore;
 use phpmock\MockBuilder;
 use Tests\Core\BaseStoreTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class BindStoreTest extends BaseStoreTest
+class BindStoreTest extends LaraFormTestCase
 {
     /**
      * @var
@@ -29,9 +32,10 @@ class BindStoreTest extends BaseStoreTest
      */
     public function testSetModel()
     {
-        $this->bindStore->setModel('value');
+        $model = $this->newInstanceWithDisableArgs(Model::class);
+        $this->bindStore->setModel($model);
         $returned = $this->getProtectedAttributeOf($this->bindStore, 'data');
-        $this->assertEquals('value', $returned);
+        $this->assertInstanceOf(Model::class, $returned);
     }
 
     /**
@@ -49,9 +53,10 @@ class BindStoreTest extends BaseStoreTest
      */
     public function testData()
     {
-        $this->bindStore->setModel('value');
+        $model = $this->newInstanceWithDisableArgs(Model::class);
+        $this->bindStore->setModel($model);
         $returned = $this->bindStore->data();
-        $this->assertEquals('value', $returned);
+        $this->assertInstanceOf(Model::class, $returned);
     }
 
     /**
@@ -93,11 +98,12 @@ class BindStoreTest extends BaseStoreTest
      */
     public function testDataGetWhenTargetIsObject()
     {
-        $args = [$this, ['user'], null];
+        $model = $this->newInstanceWithDisableArgs(Model::class);
+        $args = [$model, ['user'], null];
         $bindStore = $this->newBindStore(['objectGet']);
-        $this->methodWillReturnTrue('objectGet', $bindStore);
+        $this->methodWillReturn($model,'objectGet', $bindStore);
         $returned = $this->invokeMethod($bindStore, 'dataGet', $args);
-        $this->assertTrue($returned);
+        $this->assertInstanceOf(Model::class,$returned);
     }
 
     /**
@@ -140,8 +146,10 @@ class BindStoreTest extends BaseStoreTest
      */
     public function testObjectGetWhenNotProperty()
     {
+        $mock = $this->mockGlobalFunction("LaraForm\Stores",'method_exists',false);
         $returned = $this->getObjectTesting('property_exists');
         $this->assertEquals('default', $returned);
+        $mock->disable();
     }
 
     /**
@@ -174,16 +182,10 @@ class BindStoreTest extends BaseStoreTest
     private function getObjectTesting($func,$val = false)
     {
 
-        $builder = new MockBuilder();
-        $builder->setNamespace("LaraForm\Stores");
-        $builder->setName($func);
-        $builder->setFunction(function () use ($val){
-            return $val;
-        });
-        $mock = $builder->build();
-        $mock->enable();
+        $mock = $this->mockGlobalFunction("LaraForm\Stores",$func,$val);
         $bindStore = $this->newBindStore('dataGet');
-        $args = [$bindStore, ['data'], 'default'];
+        $model = $this->newInstanceWithDisableArgs(Model::class,['objectGet']);
+        $args = [$model, ['data'], 'default'];
         if ($val) {
             $this->methodWillReturnTrue('dataGet', $bindStore);;
         }

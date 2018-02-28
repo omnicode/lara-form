@@ -5,9 +5,10 @@ namespace Tests\Elements\Widgets;
 use LaraForm\Elements\Widgets\FileWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class FileWidgetTest extends WidgetTest
+class FileWidgetTest extends LaraFormTestCase
 {
     protected $fileWidget;
 
@@ -115,11 +116,13 @@ class FileWidgetTest extends WidgetTest
      */
     private function renderByName()
     {
+        $this->setProtectedAttributeOf($this->fileWidget, 'fileTemplate','fileTemplate');
+        $this->setProtectedAttributeOf($this->fileWidget, 'attr',[]);
         $this->methodWillReturn('currentTemplate', 'getTemplate', $this->fileWidget);
         $this->methodWillReturn('customClass', 'formatClass', $this->fileWidget);
-        $this->methodWillReturnArgument(2, 'formatNestingLabel', $this->fileWidget);
+        $this->methodWillReturnArgument(0, 'formatNestingLabel', $this->fileWidget);
         $returned = $this->fileWidget->render();
-        $this->assertEquals(['class' => 'customClass'], $returned);
+        $this->assertEquals('fileTemplate', $returned);
     }
 
     /**

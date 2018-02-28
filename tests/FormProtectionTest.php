@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Tests\Core\BaseFormProtectionTest;
 
-class FormProtectionTest extends BaseFormProtectionTest
+class FormProtectionTest extends LaraFormTestCase
 {
 
     /**
@@ -82,10 +82,10 @@ class FormProtectionTest extends BaseFormProtectionTest
     public function testSetUnlockFields()
     {
         $formProtection = $this->newFormProtection(['processUnlockFields']);
-        $this->methodWillReturn(555, 'processUnlockFields', $formProtection);
-        $formProtection->setUnlockFields(555);
+        $this->methodWillReturn([555], 'processUnlockFields', $formProtection);
+        $formProtection->setUnlockFields([555]);
         $result = $this->getProtectedAttributeOf($formProtection, 'unlockFields');
-        $this->assertEquals(555, $result);
+        $this->assertEquals([555], $result);
     }
 
     /**
@@ -381,7 +381,7 @@ class FormProtectionTest extends BaseFormProtectionTest
     {
         $data = ['disabled' => true];
         $result = $this->formProtection->addField('field', $data);
-        $this->assertFalse($result);
+        $this->assertNull($result);
     }
 
     /**

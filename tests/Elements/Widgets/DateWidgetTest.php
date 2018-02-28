@@ -2,13 +2,13 @@
 
 namespace Tests\Elements\Widgets;
 
-use LaraForm\Elements\Widgets\InputWidget;
-use LaraForm\Elements\Widgets\DateWidget;
+use LaraForm\Elements\Widgets\dateWidget;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
-use Tests\Elements\WidgetTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class DateWidgetTest extends WidgetTest
+class DateWidgetTest extends LaraFormTestCase
 {
     protected $dateWidget;
 
@@ -19,7 +19,7 @@ class DateWidgetTest extends WidgetTest
     {
         parent::setUp();
         if (empty($this->dateWidget)) {
-            $this->dateWidget = $this->newNumberWidget(['parentRender', 'parentCheckAttributes']);
+            $this->dateWidget = $this->newdateWidget(['parentRender', 'setOtherHtmlAttributes', 'parentCheckAttributes']);
         };
 
         $this->setProtectedAttributeOf($this->dateWidget, 'config', config('lara_form'));
@@ -30,9 +30,9 @@ class DateWidgetTest extends WidgetTest
      */
     public function testRender()
     {
-        $this->methodWillReturnTrue('parentRender', $this->dateWidget);
+        $this->methodWillReturn('value','parentRender', $this->dateWidget);
         $returned = $this->dateWidget->render();
-        $this->assertTrue($returned);
+        $this->assertEquals('value',$returned);
     }
 
     /**
@@ -49,9 +49,9 @@ class DateWidgetTest extends WidgetTest
      * @param null $methods
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function newNumberWidget($methods = null)
+    private function newdateWidget($methods = null)
     {
-        $dateWidget = $this->newInstance(DateWidget::class,
+        $dateWidget = $this->newInstance(dateWidget::class,
             [app(ErrorStore::class), app(OldInputStore::class)],
             $methods);
         return $dateWidget;

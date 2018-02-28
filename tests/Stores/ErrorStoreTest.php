@@ -2,10 +2,13 @@
 
 namespace Tests\Stores;
 
+use Illuminate\Support\ViewErrorBag;
 use LaraForm\Stores\ErrorStore;
 use Tests\Core\BaseStoreTest;
+use Tests\LaraFormTestCase;
+use TestsTestCase;
 
-class ErrorStoreTest extends BaseStoreTest
+class ErrorStoreTest extends LaraFormTestCase
 {
     /**
      * @var
@@ -19,7 +22,7 @@ class ErrorStoreTest extends BaseStoreTest
     {
         parent::setUp();
         if (empty($this->errorStore)) {
-            $this->errorStore = $this->newErrorStore(['hasErrors','transformKey']);
+            $this->errorStore = $this->newErrorStore(['hasErrors', 'transformKey']);
         };
     }
 
@@ -47,14 +50,15 @@ class ErrorStoreTest extends BaseStoreTest
      */
     public function testHasErrorWhenExistErrors()
     {
-        $this->withSession(['errors'=>['field'=>'message']]);
-        $errorStore = $this->newErrorStore(['hasErrors', 'transformKey', 'getErrors','has']);
+        $viewErrorBag = $this->newInstanceWithDisableArgs(ViewErrorBag::class,['has']);
+        $this->withSession(['errors' => ['field' => 'message']]);
+        $errorStore = $this->newErrorStore(['hasErrors', 'transformKey','getErrors']);
         $this->methodWillReturnTrue('hasErrors', $errorStore);
         $this->methodWillReturn('field', 'transformKey', $errorStore);
-        $this->methodWillReturn($errorStore , 'getErrors', $errorStore);
-        $this->methodWillReturn('message', 'has', $errorStore);
+        $this->methodWillReturn($viewErrorBag, 'getErrors', $errorStore);
+        $this->methodWillReturnTrue('has', $viewErrorBag);
         $returned = $errorStore->hasError('field');
-        $this->assertEquals('message',$returned);
+        $this->assertTrue($returned);
     }
 
     /**
@@ -73,14 +77,15 @@ class ErrorStoreTest extends BaseStoreTest
      */
     public function testGetErrorWhenExistError()
     {
-        $errorStore = $this->newErrorStore(['hasError', 'transformKey', 'getErrors','first']);
+        $viewErrorBag = $this->newInstanceWithDisableArgs(ViewErrorBag::class,['first']);
+        $errorStore = $this->newErrorStore(['hasError', 'transformKey', 'getErrors']);
         $this->methodWillReturnTrue('hasError', $errorStore);
         $this->methodWillReturnTrue('hasError', $errorStore);
         $this->methodWillReturn('field', 'transformKey', $errorStore);
-        $this->methodWillReturn($errorStore , 'getErrors', $errorStore);
-        $this->methodWillReturn('message', 'first', $errorStore);
+        $this->methodWillReturn($viewErrorBag, 'getErrors', $errorStore);
+        $this->methodWillReturn('message', 'first', $viewErrorBag);
         $returned = $errorStore->getError('key');
-        $this->assertEquals('message',$returned);
+        $this->assertEquals('message', $returned);
     }
 
     /**
@@ -89,7 +94,7 @@ class ErrorStoreTest extends BaseStoreTest
     public function testHasErrors()
     {
         $errorStore = $this->newErrorStore('has');
-        $this->setProtectedAttributeOf($errorStore,'session',$errorStore);
+        $this->setProtectedAttributeOf($errorStore, 'session', $errorStore);
         $this->methodWillReturnTrue('has', $errorStore);
         $returned = $errorStore->hasErrors();
         $this->assertTrue($returned);
@@ -112,13 +117,15 @@ class ErrorStoreTest extends BaseStoreTest
      */
     public function testGetErrorsWhenExistErrors()
     {
+        $viewErrorBag = $this->newInstanceWithDisableArgs(ViewErrorBag::class);
         $errorStore = $this->newErrorStore(['hasErrors', 'get']);
         $this->setProtectedAttributeOf($errorStore, 'session', $errorStore);
         $this->methodWillReturnTrue('hasErrors', $errorStore);
-        $this->methodWillReturnTrue('get', $errorStore);
+        $this->methodWillReturn($viewErrorBag, 'get', $errorStore);
         $returned = $errorStore->getErrors();
-        $this->assertTrue($returned);
-}
+        $this->assertInstanceOf(ViewErrorBag::class, $returned);
+    }
+
     /**
      * @param null $methods
      * @return \PHPUnit_Framework_MockObject_MockObject

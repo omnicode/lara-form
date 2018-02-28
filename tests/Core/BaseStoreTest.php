@@ -4,6 +4,7 @@ namespace Tests\Core;
 
 use LaraForm\Core\BaseStore;
 use Tests\LaraFormTestCase;
+use TestsTestCase;
 
 class BaseStoreTest extends LaraFormTestCase
 {
