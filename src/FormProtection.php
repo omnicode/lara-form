@@ -237,7 +237,7 @@ class FormProtection extends BaseFormProtection
             return;
         }
 
-        $formHistory = session(config('lara_form.session.name'));
+        $formHistory = session(config('lara_form.session.name'),[]);
 
         if (count($formHistory) > $maxCount) {
             $newHistory = array_slice($formHistory, -$maxCount);
