@@ -330,6 +330,7 @@ abstract class BaseWidget
     {
         $this->icon = '';
         $this->label = '';
+        $this->hidden = '';
         $this->htmlClass = [];
         $this->attr = [];
     }

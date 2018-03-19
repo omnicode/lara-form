@@ -93,13 +93,13 @@ class SelectWidget extends Widget
         }
 
         if (!empty($attr['empty'])) {
-            $this->optionsArray = [0 => $attr['empty']] + $this->optionsArray;
+            $this->optionsArray = ['' => $attr['empty']] + $this->optionsArray;
             unset($attr['empty']);
         } elseif (!isset($attr['empty']) || (isset($attr['empty']) && $attr['empty'] !== false)) {
             $emptyValue = $this->config['text']['select_empty'];
 
             if ($emptyValue) {
-                $this->optionsArray = [0 => $emptyValue] + $this->optionsArray;
+                $this->optionsArray = ['' => $emptyValue] + $this->optionsArray;
             }
         }
 
