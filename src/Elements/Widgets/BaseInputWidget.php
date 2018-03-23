@@ -77,6 +77,7 @@ class BaseInputWidget extends Widget
             $anonymous = false;
         }
         $icon = $this->icon;
+        $hidden = $this->hidden;
         $this->icon = '';
         $this->formatInputField($this->name, $attr, $template);
 
@@ -89,7 +90,7 @@ class BaseInputWidget extends Widget
         }
 
         $templateAttr = [
-            'hidden' => $this->hidden,
+            'hidden' => $hidden,
             'content' => $this->html,
             'text' => $text,
             'icon' => $icon,

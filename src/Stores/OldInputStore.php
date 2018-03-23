@@ -41,7 +41,7 @@ class OldInputStore extends BaseStore
      * @param $key
      * @return mixed
      */
-    public function getOldInput($key): ?string
+    public function getOldInput($key)
     {
         return $this->session->getOldInput($this->transformKey($key));
     }
