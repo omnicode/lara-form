@@ -66,6 +66,7 @@ class FileWidget extends BaseInputWidget
             unset($attr['label']);
         }
 
+        $this->hidden = $this->setHidden($this->name);
         $this->generateClass($attr, $default, false);
         $this->parentCheckAttributes($attr);
     }
