@@ -211,13 +211,13 @@ abstract class BaseWidget
             return $attr;
         }
 
-        $attributes = array_filter($attributes, function ($value) {
-            if (!empty($value) && $value !== '' && $value !== false) {
-                return $value;
+        $attributes = array_filter($attributes, function ($value, $key) {
+            if (isset($value) && $value !== 0 && $value !== '' && $value !== false) {
+                return [$key => $value];
             }
-        });
-        $attributes = $this->array_iunique($attributes);
+        }, ARRAY_FILTER_USE_BOTH);
 
+        $attributes = $this->array_iunique($attributes);
         $this->setOtherHtmlAttributes($attributes);
 
         foreach ($attributes as $index => $attribute) {
@@ -278,12 +278,17 @@ abstract class BaseWidget
      * case-insensitive array_unique
      * @param array
      * @return array
-     * @link http://stackoverflow.com/a/2276400/932473
      */
     private function array_iunique(array $array): array
     {
         $lowered = array_map('mb_strtolower', $array);
-        return array_intersect_key($array, array_unique($lowered));
+        $onlyStrKeys = array_filter($lowered, function ($key) {
+            if (is_string($key)) {
+                return $key;
+            }
+        }, ARRAY_FILTER_USE_KEY );
+        $unique = array_unique($lowered);
+        return array_intersect_key($array, array_merge($unique, $onlyStrKeys));
     }
 
     /**
@@ -429,8 +434,8 @@ abstract class BaseWidget
     {
         $attributes = [];
 
-        $attributes += $this->containerAttributeRequiredAndDisabled($data,'required');
-        $attributes += $this->containerAttributeRequiredAndDisabled($data,'disabled');
+        $attributes += $this->containerAttributeRequiredAndDisabled($data, 'required');
+        $attributes += $this->containerAttributeRequiredAndDisabled($data, 'disabled');
         $attributes += $this->containerAttributeType($data);
         $attributes += $this->containerAttributeClass($data);
 

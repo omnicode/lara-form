@@ -80,7 +80,7 @@ class SelectWidget extends Widget
         if (isset($attr['multiple'])) {
             $this->selectTemplate = $this->getTemplate('selectMultiple');
             if (empty($attr['disabled'])) {
-                $this->hidden = $this->setHidden($this->name, 0);
+                $this->hidden = $this->setHidden($this->name);
             }
             unset($attr['multiple']);
         } else {

@@ -27,15 +27,5 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "LaraForm\\ServiceProvider\\LaraFormServiceProvider"
-            ],
-            "aliases": {
-                "LaraForm": "LaraForm\\Facades\\LaraForm"
-            }
-        }
     }
 }

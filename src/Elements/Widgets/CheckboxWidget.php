@@ -67,7 +67,7 @@ class CheckboxWidget extends BaseInputWidget
                 } else {
                     $hiddenName = $this->name;
                 }
-                $this->hidden = $this->setHidden($hiddenName, 0);
+                $this->hidden = $this->setHidden($hiddenName);
             }
 
             $this->oldCheckboxNames[] = $this->name;

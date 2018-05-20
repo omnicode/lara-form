@@ -108,7 +108,7 @@ class BaseInputWidget extends Widget
      * @param $attr
      * @param $cTemplate
      */
-    protected function generalcheckAttributes(array &$attr, ?string $cTemplate): void
+    protected function generalCheckAttributes(array &$attr, ?string $cTemplate): void
     {
         if (!empty($attr['type'])) {
             $this->setHtmlAttributes('type', $attr['type']);
