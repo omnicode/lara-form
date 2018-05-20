@@ -322,8 +322,9 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function setHidden($name, $value = 0)
+    protected function setHidden($name, $value = null)
     {
+        $value = empty($value) ? $this->config['hidden_value'] : $value;
         $hiddenTemplate = $this->getTemplate('hiddenInput');
         $attr = ['name' => $name, 'value' => $value,];
         return $this->formatTemplate($hiddenTemplate, $attr);
