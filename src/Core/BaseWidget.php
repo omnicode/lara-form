@@ -212,7 +212,7 @@ abstract class BaseWidget
         }
 
         $attributes = array_filter($attributes, function ($value, $key) {
-            if (isset($value) && $value !== 0 && $value !== '' && $value !== false) {
+            if (isset($value) && $value !== 0 && $value !==[] && $value !== '' && $value !== false) {
                 return [$key => $value];
             }
         }, ARRAY_FILTER_USE_BOTH);
