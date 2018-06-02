@@ -62,6 +62,7 @@ class SelectWidget extends Widget
         $this->setHtmlAttributes('type', 'select');
         $this->currentTemplate = $this->getTemplate('selectContainer');
         $this->html = $this->formatTemplate($this->selectTemplate, $selectAttrs);
+        $this->resetAttributes();
         return $this->completeTemplate();
     }
 
@@ -221,4 +222,14 @@ class SelectWidget extends Widget
         }
     }
 
+    /**
+     * Reset current select attributes
+     */
+    protected function resetAttributes()
+    {
+        $this->selected = [];
+        $this->optionDisabled = [];
+        $this->optionsArray = [];
+        $this->groupDisabled = [];
+    }
 }
