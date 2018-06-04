@@ -9,13 +9,13 @@
         }
     ],
     "require": {
-        "laravel/framework": "5.5.*",
-        "omnicode/lara-support": "~2.0"
+        "laravel/framework": "5.6.*",
+        "omnicode/lara-support": "~3.0"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
-        "phpunit/phpunit": "~4.0|~5.0",
-        "omnicode/lara-test": "~0.0",
+        "phpunit/phpunit": "~7.0",
+        "omnicode/lara-test": "~3.0",
         "php-mock/php-mock": "^2.0"
     },
     "autoload": {
