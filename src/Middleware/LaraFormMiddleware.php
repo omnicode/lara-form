@@ -47,9 +47,9 @@ class LaraFormMiddleware
 
             $validate = $this->formProtection->validate($request, $data);
 
-           /* if ($validate === false) {
+            if ($validate === false) {
                 abort(403, 'Your Action Is Forbidden');
-            }*/
+            }
 
             unset($request[config('lara_form.token_name', 'laraform_token')]);
         }
