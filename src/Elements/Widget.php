@@ -327,10 +327,23 @@ class Widget extends BaseWidget implements WidgetInterface
      */
     protected function setHidden(string $name, $value = null): string
     {
-        $value = $value ?? $this->config['hidden_value'];
+        $value = $value ?? $this->getCustomHiddenValueForField();
         $hiddenTemplate = $this->getTemplate('hiddenInput');
         $attr = ['name' => $name, 'value' => $value,];
         return $this->formatTemplate($hiddenTemplate, $attr);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCustomHiddenValueForField()
+    {
+        $value = $this->config['hidden_value'];
+        if (isset($this->attr['hidden_value'])) {
+            $value = $this->attr['hidden_value'];
+            unset($this->attr['hidden_value']);
+        }
+        return $value;
     }
 
     /**
