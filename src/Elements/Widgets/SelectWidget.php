@@ -91,6 +91,8 @@ class SelectWidget extends Widget
         if (!empty($attr['options'])) {
             $this->optionsArray = is_array($attr['options']) ? $attr['options'] : [$attr['options']];
             unset($attr['options']);
+        } else {
+            $this->optionsArray = [];
         }
 
         if (!empty($attr['empty'])) {
