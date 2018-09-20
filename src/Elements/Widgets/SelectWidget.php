@@ -190,7 +190,7 @@ class SelectWidget extends Widget
             $disabled = $this->optionDisabled;
         }
         $arr = [];
-        if (in_array($str, $disabled, true)) {
+        if (in_array($str, $disabled)) {
             $arr['disabled'] = 'disabled';
         }
         return $arr;
@@ -203,7 +203,7 @@ class SelectWidget extends Widget
     protected function isSelected($str)
     {
         $arr = [];
-        if (in_array($str, $this->selected, true)) {
+        if (in_array($str, $this->selected)) {
             $arr['selected'] = 'selected';
         }
         return $arr;
