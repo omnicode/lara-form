@@ -384,7 +384,8 @@ class Widget extends BaseWidget implements WidgetInterface
         } else {
             $path = '';
         }
-
+        
+        $str = mb_strtolower($str);
         if (function_exists('__')) {
             return __($path . $str);
         }
