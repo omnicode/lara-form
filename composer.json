@@ -1,0 +1,41 @@
+{
+    "name": "omnicode/lara-form",
+    "description": "Form for Laravel",
+    "keywords": ["laravel", "laraform"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "OmniCode"
+        }
+    ],
+    "require": {
+        "laravel/framework": "5.6.*",
+        "omnicode/lara-support": "~3.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "~0.9",
+        "phpunit/phpunit": "~7.0",
+        "omnicode/lara-test": "~3.0",
+        "php-mock/php-mock": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaraForm\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaraForm\\ServiceProvider\\LaraFormServiceProvider"
+            ],
+            "aliases": {
+                "LaraForm": "LaraForm\\Facades\\LaraForm"
+            }
+        }
+    }
+}
