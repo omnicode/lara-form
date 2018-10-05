@@ -4,8 +4,12 @@ return [
     'token_name' => 'laraform_token',
     'escept' => false,
     'hidden_value' => 0, //hidden default value
-    'translate_file' => '',
-    'translate_directive' => 'lang.en',
+    'environment' => 'local',
+    'translator' => [
+        'translate' => true,
+        'file_name' => '',
+        'directive' => 'lang.en'
+    ],
     'separator' => [
         'start' => '{%', // [..., {..., (...
         'end' => '%}',   // ...], ...}, ...)

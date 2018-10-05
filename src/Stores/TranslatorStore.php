@@ -4,6 +4,7 @@ namespace LaraForm\Stores;
 
 use Illuminate\Support\Facades\File;
 use LaraForm\Core\BaseStore;
+use LaraForm\Traits\StrParser;
 
 /**
  * Class TranslatorStore
@@ -12,6 +13,13 @@ use LaraForm\Core\BaseStore;
  */
 class TranslatorStore extends BaseStore
 {
+    use StrParser;
+    
+    /**
+     * TAB
+     */
+    const TAB = '    ';
+
     /**
      * @var string
      */
@@ -26,11 +34,11 @@ class TranslatorStore extends BaseStore
      * @var string
      */
     protected $fullPath = '';
-    
+
     /**
-     * TAB
+     * @var array
      */
-    const TAB = '    ';
+    protected $items = [];
 
     /**
      * TranslatorStore constructor.
@@ -43,14 +51,14 @@ class TranslatorStore extends BaseStore
     }
 
     /**
-     *
+     * 
      */
     protected function setPath()
     {
-        $this->path = str_ireplace('.',DIRECTORY_SEPARATOR, config('lara_form.translate_directive'));
+        $this->path = str_ireplace('.', DIRECTORY_SEPARATOR, config('lara_form.translator.directive'));
         $this->path = resource_path($this->path);
-        $this->fileName = config('lara_form.translate_file');
-        $this->fullPath = $this->path.DIRECTORY_SEPARATOR.$this->fileName.'.php';
+        $this->fileName = config('lara_form.translator.file_name');
+        $this->fullPath = $this->path . DIRECTORY_SEPARATOR . $this->fileName . '.php';
     }
 
     /**
@@ -60,9 +68,9 @@ class TranslatorStore extends BaseStore
      */
     protected function generateContent($items)
     {
-        $content = "<?php".PHP_EOL."return [" . PHP_EOL;
-        foreach ($items as $key => $item) {
-            $content .= self::TAB . "'" . $key . "' => '".$item."'," . PHP_EOL;
+        $content = "<?php" . PHP_EOL . "return [" . PHP_EOL;
+        foreach (array_filter($items) as $key => $item) {
+            $content .= self::TAB . "'" . $key . "' => '" . $item . "'," . PHP_EOL;
         }
         return $content . "];";
     }
@@ -70,60 +78,35 @@ class TranslatorStore extends BaseStore
     /**
      * @param $string
      */
-    public function put($str)
+    public function put()
     {
-        $items = require $this->fullPath;
-        $items[$this->parseKey($str)] = $this->parseName($str);
-        File::put($this->fullPath, $this->generateContent($items)) ;
+        if (empty($this->fullPath)) {
+            return;
+        }
+        $this->firstPut();
+        $oldItems = require $this->fullPath;
+        foreach ($this->items as $item) {
+            $oldItems[$this->parseKey($item)] = $this->parseName($item);
+        }
+        File::put($this->fullPath, $this->generateContent($oldItems));
+        $this->items = [];
     }
 
     /**
      * @param $str
      */
-    public function addTranslate($str)
-    {     
-          if (env('APP_ENV') === config('lara_form.env') && !empty($this->fullPath)) {
-              $this->firstPut();
-              $this->put($str);
-          };
+    public function add($str)
+    {
+        $this->items[] = $str;
     }
 
     /**
-     * @param $name
      *
-     * @return string
-     */
-    protected function parseName($name)
-    {
-        return ucwords($this->parse($name));
-    }
-
-    /**
-     * @param $key
-     *
-     * @return string
-     */
-    protected function parseKey($key)
-    {
-        $str = snake_case($this->parse($key));
-        return str_slug($str,'_');
-    }
-
-    /**
-     * @return string
-     */
-    protected function parse($str)
-    {
-        return trim(preg_replace('/[^a-zA-Z]/', ' ', $str));
-    }
-
-    /**
-     * 
      */
     protected function firstPut()
     {
         if (!File::exists($this->fullPath)) {
-            File::put($this->fullPath, $this->generateContent([])) ;
+            File::put($this->fullPath, $this->generateContent([]));
         }
     }
 }

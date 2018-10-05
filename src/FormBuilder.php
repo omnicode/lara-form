@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LaraForm;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Config;
 use LaraForm\Core\BaseFormBuilder;
 use LaraForm\Stores\BindStore;
 use LaraForm\Stores\ErrorStore;
@@ -16,6 +15,7 @@ use LaraForm\Traits\FormControl;
 /**
  * Creates objects of fields and displays them
  * Class FormBuilder
+ *
  * @package LaraForm
  */
 class FormBuilder extends BaseFormBuilder
@@ -24,58 +24,71 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Keeped here object FormProtection
+     *
      * @var FormProtection
      */
     protected $formProtection;
 
     /**
      * Keeped here object ErrorStore
+     *
      * @var ErrorStore
      */
     protected $errorStore;
 
     /**
      * Keeped here object OldInputStore
+     *
      * @var OldInputStore
      */
     protected $oldInputStore;
 
-
     /**
      * Keeped here object OptionStore
+     *
      * @var OptionStore
      */
     protected $optionStore;
 
     /**
      * Keeped here object BindStore
+     *
      * @var BindStore
      */
     protected $bindStore;
 
     /**
      * Keeped here objects by  already created fields
+     *
      * @var array
      */
     protected $maked = [];
 
     /**
      * Keeped here model that was passed in form
+     *
      * @var $model
      */
     protected $model;
 
     /**
      * Designate the start and end of the form
+     *
      * @var bool
      */
     protected $isForm = false;
 
     /**
      * Keeped here object of the current field
+     *
      * @var widget
      */
     protected $widget;
+
+    /**
+     * @var object
+     */
+    protected $translator;
 
     /**
      * @var array
@@ -90,18 +103,21 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Keeped modifications for the view template of one element
+     *
      * @var array
      */
     protected $inlineTemplates = [];
 
     /**
      * Keeped modifications for the view templates inside in form
+     *
      * @var array
      */
     protected $localTemplates = [];
 
     /**
      * Keeped modifications for the view templates inside in page
+     *
      * @var array
      */
     protected $globalTemplates = [];
@@ -109,6 +125,7 @@ class FormBuilder extends BaseFormBuilder
     /**
      * Accepts an objects and assigns the properties
      * FormBuilder constructor.
+     *
      * @param FormProtection $formProtection
      * @param ErrorStore $errorStore
      * @param OldInputStore $oldInputStore
@@ -136,8 +153,10 @@ class FormBuilder extends BaseFormBuilder
      * Opens the form, and begins to store data about the fields
      * Warning!
      * The attributes of the action and method must be passed in the second parameter or not transmitted at all!!!
+     *
      * @param null $model
      * @param array $options
+     *
      * @return mixed
      * @throws \Exception
      */
@@ -185,11 +204,15 @@ class FormBuilder extends BaseFormBuilder
         $this->formProtection->confirm();
         $end = $this->make('form', ['end']);
         $this->resetProperties();
-        return $end.'';
+        if (!empty($this->translator)) {
+            $this->translator->put();
+        }
+        return $end . '';
     }
 
     /**
      * Accepts changes for presentation templates within a form or on a page
+     *
      * @param $templateName
      * @param bool $templateValue
      * @param bool $global
@@ -236,6 +259,7 @@ class FormBuilder extends BaseFormBuilder
     /**
      * @param $method
      * @param array $arrgs
+     *
      * @return OptionStore
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
@@ -252,6 +276,7 @@ class FormBuilder extends BaseFormBuilder
     /**
      * @param $attr
      * @param $default
+     *
      * @return string
      */
     protected function getFieldType(array $attr, string $default): string
@@ -299,8 +324,10 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Instantiates field objects and returns an object OptionStore to create a chain
+     *
      * @param $method
      * @param $arguments
+     *
      * @return OptionStore
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \LogicException
@@ -320,7 +347,7 @@ class FormBuilder extends BaseFormBuilder
             $this->bindStore->setModel($this->model);
             $this->widget->binding($this->bindStore);
         }
-        $this->makeTranslations(array_first($arguments));
+        $this->makeTranslations($arguments);
         $this->optionStore->setAttributes($arguments);
         $this->optionStore->setBuilder($this);
         return $this->optionStore;
@@ -328,6 +355,7 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Completing modifying templates and their parame
+     *
      * @return array
      */
     protected function complateTemplatesAndParams(): array
@@ -347,6 +375,7 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * Checks whether the template modification has been transferred from a separate field
+     *
      * @param $attr
      */
     protected function hasTemplate(array &$attr): void
@@ -381,6 +410,7 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * locally or globally stores modifications and template parameters in properties
+     *
      * @param $data
      * @param $container
      * @param $options
@@ -409,7 +439,9 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * From the form parameters get a list of fields that should not be validated
+     *
      * @param $options
+     *
      * @return array|string
      * @throws \Exception
      */
@@ -439,6 +471,7 @@ class FormBuilder extends BaseFormBuilder
 
     /**
      * @param $val
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -459,9 +492,31 @@ class FormBuilder extends BaseFormBuilder
         return $this->isForm;
     }
 
-    protected function makeTranslations($str)
+    /**
+     * @param $arguments
+     */
+    protected function makeTranslations($arguments)
     {
-        $transliator = app(TranslatorStore::class);
-        $transliator->addTranslate($str);
+        if (env('APP_ENV') !== config('lara_form.environment')) {
+            return;
+        }
+
+        $name = array_shift($arguments);
+        $attr = [];
+        if (!empty($arguments)) {
+            $attr = array_shift($arguments);
+        }
+        if (isset($attr['translate']) && $attr['translate'] === false) {
+            return;
+        }
+        if (empty($this->translator)) {
+            $this->translator = app(TranslatorStore::class);
+        }
+        $string = $attr['label'] ?? $attr['label_text'] ?? $name;
+        $this->translator->add($string);
+
+        if (!$this->isForm) {
+            $this->translator->put();
+        }
     }
 }

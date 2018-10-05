@@ -7,6 +7,7 @@ use LaraForm\Core\BaseWidget;
 use LaraForm\Stores\BindStore;
 use LaraForm\Stores\ErrorStore;
 use LaraForm\Stores\OldInputStore;
+use LaraForm\Traits\StrParser;
 
 /**
  * Class Widget
@@ -15,6 +16,8 @@ use LaraForm\Stores\OldInputStore;
  */
 class Widget extends BaseWidget implements WidgetInterface
 {
+    use StrParser;
+
     /**
      * Widget constructor.
      *
@@ -288,7 +291,7 @@ class Widget extends BaseWidget implements WidgetInterface
                 $attr['placeholder'] = $this->translate($this->name);
             }
         } elseif ($this->config['text']['placeholder']) {
-            $attr['placeholder'] = $this->getLabelName($this->name);
+            $attr['placeholder'] = $this->translate($this->name);
         }
     }
 
@@ -406,15 +409,23 @@ class Widget extends BaseWidget implements WidgetInterface
      *
      * @return string|\Symfony\Component\Translation\TranslatorInterface
      */
-    protected function translate(string $str, bool $parse = true): string
+    protected function translate(string $str): string
     {
-        $path = $this->config['translate_file'];
-        if (empty($path)) {
-            return $parse ? $this->getLabelName($str) : $parse;
+        $isTrans = $this->config['translator']['translate'];
+        if (isset($this->attr['translate'])) {
+            $isTrans = (bool)$this->attr['translate'];
         }
+        if (!$isTrans) {
+            return $this->parseName($str);
+        }
+        
+        $path = $this->config['translator']['file_name'];
+
         if (!empty($path) && !ends_with('.', $path)) {
             $path = $path . '.';
+            $str = $this->parseKey($str);
         } else {
+            $str = $this->parseName($str);
             $path = '';
         }
         $str = mb_strtolower($str);
