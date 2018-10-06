@@ -416,24 +416,23 @@ class Widget extends BaseWidget implements WidgetInterface
             $isTrans = (bool)$this->attr['translate'];
         }
         if (!$isTrans) {
-            return $this->parseName($str);
+            return $this->getLabelName($str);
         }
-        
+
         $path = $this->config['translator']['file_name'];
 
-        if (!empty($path) && !ends_with('.', $path)) {
-            $path = $path . '.';
-            $str = $this->parseKey($str);
-        } else {
+        if (empty($path)) {
             $str = $this->parseName($str);
-            $path = '';
+        } else {
+            $path = ends_with('.', $path) ? $path : $path . '.';
+            $str = $path . $this->parseKey($str);
         }
-        $str = mb_strtolower($str);
+
         if (function_exists('__')) {
-            return __($path . $str);
+            return __($str);
         }
         if (function_exists('trans')) {
-            return trans($path . $str);
+            return trans($str);
         }
         return $str;
     }

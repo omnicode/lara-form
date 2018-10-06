@@ -6,7 +6,7 @@ return [
     'hidden_value' => 0, //hidden default value
     'environment' => 'local',
     'translator' => [
-        'translate' => true,
+        'translate' => false, 
         'file_name' => '',
         'directive' => 'lang.en'
     ],
