@@ -53,7 +53,7 @@ class BaseInputWidget extends Widget
         } else {
             $template = $cTemplate;
         }
-
+        
         $this->generalCheckAttributes($attr, $cTemplate);
         $this->setHtmlAttributes('name', $name);
         $this->setHtmlAttributes('attrs', $this->formatAttributes($attr));
@@ -86,7 +86,7 @@ class BaseInputWidget extends Widget
             unset($attr['type']);
         }
         if ($anonymous) {
-            $text = !empty($attr['label']) ? $this->translate($attr['label'],false) : $this->translate($this->name);
+            $text = !empty($attr['label']) ? $this->translate($attr['label']) : $this->translate($this->name);
         }
 
         $templateAttr = [
