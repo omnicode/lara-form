@@ -85,19 +85,27 @@ class TranslatorStore extends BaseStore
         }
         $this->firstPut();
         $oldItems = require $this->fullPath;
-        foreach ($this->items as $item) {
-            $oldItems[$this->parseKey($item)] = $this->parseName($item);
+        foreach ($this->items as $key => $item) {
+            if (!is_string($key)) {
+              $key = $item;
+            }
+            $oldItems[$this->parseKey($key)] = $this->parseName($item);
         }
         File::put($this->fullPath, $this->generateContent($oldItems));
         $this->items = [];
     }
 
     /**
-     * @param $str
+     * @param $attr
+     * @param null $key
      */
-    public function add($str)
+    public function add($attr, $key = null)
     {
-        $this->items[] = $str;
+        if ($key) {
+            $this->items[$key] = $attr;
+        }else{
+            $this->items[] = $attr;
+        }
     }
 
     /**

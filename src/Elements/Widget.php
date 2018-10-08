@@ -211,8 +211,12 @@ class Widget extends BaseWidget implements WidgetInterface
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function checkLabel(string $inputName, array $option, bool $treatment = false, array $labelAttr = []): string
-    {
+    protected function checkLabel(
+        string $inputName,
+        array $option,
+        bool $treatment = false,
+        array $labelAttr = []
+    ): string {
         $for = $option['id'] ?? $inputName;
         $labelName = $treatment ? $this->escept($inputName) : $this->translate($inputName);
         $labelAttr = array_merge($labelAttr, ['for' => $for]);
@@ -401,20 +405,21 @@ class Widget extends BaseWidget implements WidgetInterface
     }
 
     /**
-     * @param $str
+     * @param string $str
+     * @param bool $parse
      *
-     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     * @return string
      */
-    protected function translate(string $str): string
+    protected function translate(string $str, $parse = true): string
     {
         $isTrans = $this->config['translator']['translate'];
         if (isset($this->attr['translate'])) {
             $isTrans = (bool)$this->attr['translate'];
             unset($this->attr['translate']);
         }
-        
+
         if (!$isTrans) {
-            return $this->getLabelName($str);
+            return $parse ? $this->getLabelName($str) : $str;
         }
 
         $path = $this->config['translator']['file_name'];

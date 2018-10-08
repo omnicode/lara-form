@@ -501,11 +501,6 @@ class FormBuilder extends BaseFormBuilder
             return;
         }
 
-        $name = array_shift($arguments);
-        $attr = [];
-        if (!empty($arguments)) {
-            $attr = array_shift($arguments);
-        }
         $isTrans = config('lara_form.translator.translate');
         if (isset($attr['translate'])) {
             $isTrans = (bool)$attr['translate'];
@@ -513,11 +508,28 @@ class FormBuilder extends BaseFormBuilder
         if (!$isTrans) {
             return;
         }
+
+        $name = array_shift($arguments);
+        $attr = [];
+
+        if (!empty($arguments)) {
+            $attr = array_shift($arguments);
+        }
         if (empty($this->translator)) {
             $this->translator = app(TranslatorStore::class);
         }
-        $string = $attr['label'] ?? $attr['label_text'] ?? $name;
-        $this->translator->add($string);
+
+        $key = null;
+        $string = $name;
+        if (!empty($attr['label'])) {
+            $key = $name;
+            $string = $attr['label'];
+        } elseif (!empty($attr['label_text']) && is_string($attr['label_text'])) {
+            $key = $name;
+            $string = $attr['label_text'];
+        }
+
+        $this->translator->add($string, $key);
 
         if (!$this->isForm) {
             $this->translator->put();
