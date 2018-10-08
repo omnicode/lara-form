@@ -8,12 +8,14 @@ use LaraForm\Elements\Widget;
 /**
  * Processes and creates input tags
  * Class BaseInputWidget
+ *
  * @package LaraForm\Elements\Widgets
  */
 class BaseInputWidget extends Widget
 {
     /**
      * Returns the finished html view
+     *
      * @return string
      */
     public function render(): string
@@ -24,6 +26,7 @@ class BaseInputWidget extends Widget
 
     /**
      * @param $attr
+     *
      * @return mixed|void
      */
     public function checkAttributes(array &$attr): void
@@ -41,9 +44,11 @@ class BaseInputWidget extends Widget
 
     /**
      * Formats input fields according to a given template or by default
+     *
      * @param $name
      * @param $attr
      * @param bool $cTemplate
+     *
      * @return mixed|string
      */
     protected function formatInputField(string $name, array $attr, ?string $cTemplate = null): string
@@ -63,9 +68,11 @@ class BaseInputWidget extends Widget
 
     /**
      * Formats the fields inside the label field
+     *
      * @param $template
      * @param $attr
      * @param array $labelAttrs
+     *
      * @return mixed|string
      */
     protected function formatNestingLabel(string $template, array $attr, array $labelAttrs = []): string
@@ -76,6 +83,15 @@ class BaseInputWidget extends Widget
         if (isset($attr['label_text']) && $attr['label_text'] === false) {
             $anonymous = false;
         }
+        if ($anonymous) {
+            if (empty($attr['label'])) {
+                $text = $this->getLabelName($this->name);
+            } else {
+                $text = $attr['label'];
+                unset($attr['label']);
+            }
+        }
+
         $icon = $this->icon;
         $hidden = $this->hidden;
         $this->icon = '';
@@ -84,9 +100,6 @@ class BaseInputWidget extends Widget
         if (!empty($attr['type'])) {
             $this->setOtherHtmlAttributes('type', $attr['type']);
             unset($attr['type']);
-        }
-        if ($anonymous) {
-            $text = !empty($attr['label']) ? $attr['label'] : $this->getLabelName($this->name);
         }
 
         $templateAttr = [
@@ -125,13 +138,13 @@ class BaseInputWidget extends Widget
 
         $idNotFor = ['radio', 'checkbox', 'label'];
         $labelNotFor = ['hidden', 'submit', 'reset', 'button'];
-        if (!in_array($this->getHtmlAttributes('type'), array_merge($idNotFor,$labelNotFor)) && !$cTemplate) {
+        if (!in_array($this->getHtmlAttributes('type'), array_merge($idNotFor, $labelNotFor)) && !$cTemplate) {
             $attr += $this->getValue($this->name);
         }
 
         $this->generateId($attr);
 
-        if (!in_array($this->getHtmlAttributes('type'), $labelNotFor)) {
+        if (!in_array($this->getHtmlAttributes('type'), array_merge($idNotFor, $labelNotFor))) {
             $this->generateLabel($attr);
             $this->generatePlaceholder($attr);
         }
