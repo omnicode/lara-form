@@ -35,7 +35,11 @@ class BindStore extends BaseStore
      */
     public function get(string $name, ?string $default = null)
     {
-        return $this->dotGet($this->transformKey($name), $default);
+        $data =  $this->dotGet($this->transformKey($name), $default);
+        if (is_object($data)) {
+            return count($data) > 0 ? $data : '';
+        }
+        return $data;
     }
 
     /**
