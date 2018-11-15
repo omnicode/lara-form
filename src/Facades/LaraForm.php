@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace LaraForm\Facades;
 
 use Illuminate\Support\Facades\Facade;
@@ -10,7 +12,7 @@ class LaraForm extends Facade
      *
      * @return string
      */
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
         return 'laraform';
     }
