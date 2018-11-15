@@ -10,7 +10,7 @@
     ],
     "require": {
         "laravel/framework": "5.5.*",
-        "omnicode/lara-support": "~2.0"
+        "omnicode/lara-support": "~2.1"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
