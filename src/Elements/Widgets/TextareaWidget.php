@@ -24,7 +24,7 @@ class TextareaWidget extends Widget
         $this->checkAttributes($this->attr);
         $value = null;
 
-        if ($this->attr['value']) {
+        if (!empty($this->attr['value'])) {
             $value = $this->attr['value'];
             unset($this->attr['value']);
         }
