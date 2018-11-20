@@ -23,11 +23,23 @@ class TextareaWidget extends Widget
     {
         $template = $this->getTemplate('textarea');
         $this->checkAttributes($this->attr);
+        $value = null;
+
+        if ($this->attr['value']) {
+            $value = $this->attr['value'];
+            unset($this->attr['value']);
+        }
+
         $attributes = [
             'name' => $this->name,
             'attrs' => $this->formatAttributes($this->attr)
         ];
-        $attributes += $this->getValue($this->name);
+
+        if (empty($value)) {
+            $attributes += $this->getValue($this->name);
+        }else{
+            $attributes += ['value' => $value];
+        }
         $this->html = $this->formatTemplate($template, $attributes);
         return $this->completeTemplate();
     }
