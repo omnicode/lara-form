@@ -85,6 +85,7 @@ class TranslatorStore extends BaseStore
         }
         $this->firstPut();
         $oldItems = require $this->fullPath;
+        $oldItems = is_array($oldItems) ? $oldItems : [];
         foreach ($this->items as $key => $item) {
             if (!is_string($key)) {
               $key = $item;
