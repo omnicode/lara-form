@@ -502,19 +502,21 @@ class FormBuilder extends BaseFormBuilder
         }
 
         $isTrans = config('lara_form.translator.translate');
-        if (isset($attr['translate'])) {
-            $isTrans = (bool)$attr['translate'];
-        }
-        if (!$isTrans) {
-            return;
-        }
-
         $name = array_shift($arguments);
         $attr = [];
 
         if (!empty($arguments)) {
             $attr = array_shift($arguments);
         }
+        
+        if (isset($attr['translate'])) {
+            $isTrans = (bool)$attr['translate'];
+        }
+        
+        if (!$isTrans) {
+            return;
+        }
+        
         if (empty($this->translator)) {
             $this->translator = app(TranslatorStore::class);
         }
