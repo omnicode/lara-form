@@ -245,6 +245,9 @@ abstract class BaseWidget
             $classes = $this->htmlClass;
             $this->htmlClass = [];
         }
+        
+        $classes = array_filter($classes);
+        
         if (!empty($classes)) {
             if (is_string($classes)) {
                 $classes = explode(' ', $classes);
@@ -256,13 +259,8 @@ abstract class BaseWidget
                 $classes = $exClasses;
             }
 
-            $classes = array_filter($classes, function ($val) {
-                $val = trim($val);
-                if (!empty($val) && $val !== '' && $val !== false) {
-                    return $val;
-                }
-            });
-
+            $classes = array_filter($classes);
+            
             if (empty($classes)) {
                 return $strClass;
             }
