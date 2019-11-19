@@ -107,22 +107,22 @@ class FormProtection extends BaseFormProtection
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function validate(Request $request, array $data): bool
+    public function validate(Request $request, array $data)
     {
         $this->removeByTime();
         $tokenName = config('lara_form.token_name', 'laraform_token');
         $token = !empty($data[$tokenName]) ? $data[$tokenName] : false;
         if (!$token) {
-            return false;
+            return 'Lara Form token not found in request data';
         }
 
         if (!session()->has($this->sessionPath($token))) {
-            return false;
+            return 'Lara Form token not found in session';
         }
 
 
         if (!$this->isValidAction($request, $token)) {
-            return false;
+            return 'Lara Form request url is invalid';
         }
 
         $checkedFields = $this->getCheckedFieldsBy($token);
@@ -139,7 +139,7 @@ class FormProtection extends BaseFormProtection
             session()->forget($this->sessionPath($token));
         }
         if (array_keys($data) != array_keys($checkedFields)) {
-            return false;
+            return 'Lara Form data is not equal to session data';
         }
 
         foreach ($checkedFields as $field => $value) {
@@ -147,17 +147,17 @@ class FormProtection extends BaseFormProtection
                 if (is_array($value)) {
                     // for array input;
                     if (array_keys(array_dot($value)) != array_keys(array_dot($data[$field]))) {
-                        return false;
+                        return 'Lara Form array data is not equal to session data';
                     }
                 } else {
                     //for hidden input
                     if ($checkedFields[$field] != $data[$field]) {
-                        return false;
+                        return 'Lara Form hidden input value is not equal to session data';
                     }
                 }
             }
         }
-
+        
         return true;
     }
 
